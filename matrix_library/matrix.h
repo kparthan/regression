@@ -1,67 +1,10 @@
-/****************************************************************************************************
-The Matrix class provides routines with the following functionalities:
-   
-Constructors:-
-	1. Create a NULL vector 
-		Matrix<type> A ;
-        2. Create a rectangular matrix of zeroes 
-		Matrix<type> A (ROWS,COLS) ;
-	3. Create a square matrix of zeroes
-		Matrix<type> A (DIMENSION) ;
-        4. Create a rectangular matrix with all elements constant
-                Matrix<type> A (constant,ROWS,COLS) ;
-        5. Copy constructor
-                Matrix<type> B ;
-                Matrix<type> A (B) ;
-  
-Operator overloading:-
-        1. operator =   		// copies the contents of an object
-                Matrix<type> A,B ;
-                B = A ;
-        2. operator =   		// assigns all the elements of a matrix to a constant 'c'
-                Matrix<type> A ;
-                type c ;
-                A = c ;
-        3. operator []  		// subscripting - returns the i^{th} row in the matrix
-		Matrix<type> A ;
-                MyVector<type> row = A[i] ;
-  
-Member Functions:-
-	   Matrix<type> A,B,C ;
-        1. A.print()
-		prints the details of the matrix (dimensions and elements) - for error checking
-        2. A.nrows()
-		gets the # of rows
-	3. A.ncols()
-		gets the # of cols
-	4. A.changeDimensions (rows,cols)
-		resizes the matrix to new dimensions and fills the matrix with zeroes
-	5. A.element(i,j)
-		to access the (i,j)^{th} element in the matrix
-	6. A.transpose()
-		generates the matrix transpose
-	7. C = A.add(B)  
-		creates a matrix C (= A + B)
-	8. C = A.product(B)
-		creates a matrix C (= A * B)
-	9. A.inverse()
-		generates the matrix inverse
-
-Other functions:-
-	1. A = zeros (ROWS,COLS)
-		creates a rectangular matrix of zeros
-	2. A = zeros (DIMENSION)
-		creates a square matrix of zeros
-	3. A = ones (ROWS,COLS)
-		creates a rectangular matrix of ones
-	4. A = ones (DIMENSION)	
-		creates a square matrix of ones
-	5. A = identity (ROWS,COLS)
-		creates a rectangular identity matrix
-	6. A = identity (DIMENSION)
-		creates a square identity matrix
-
-****************************************************************************************************/
+/*!
+ *  \file matrix.h
+ *  \details Implementation of Matrix class
+ *  \author Parthan Kasarapu
+ *  \version 1.0
+ *  \date Modified: Tue 29 May 2012
+*/
 
 #ifndef _MATRIX_H_
 #define _MATRIX_H_
@@ -71,6 +14,12 @@ Other functions:-
 #include <vector>
 #include "error.h"
 
+/*! 
+ *  \class Matrix matrix.h "matrix_library/matrix.h"
+ *  \brief This is a Matrix class.
+ *
+ *  The class acts as an interface to do various operations associated with linear algebra. Matrix operations such as addition, multiplication, inverse, and solving a system of linear equations can be done using this implementation.
+ */
 template <class T>
 class Matrix
 {
@@ -78,34 +27,62 @@ class Matrix
 		int numRows, numCols ;
 		vector <vector<T> > m ;
 	public:
-		/* Constructors */
-		Matrix () ;						// null matrix
-		Matrix (int, int) ;					// rectangular zero matrix
-		Matrix (int) ;						// square zero matrix
-		Matrix (const T &, int , int) ;				// intialize to constant
-		Matrix (const Matrix &) ;				// Copy constructor
+				/* Constructors */
+		//! null matrix	
+		Matrix () ;		
+		//! rectangular zero matrix		
+		Matrix (int, int) ;		
+		//! square zero matrix
+		Matrix (int) ;	
+		//! intialize to constant					
+		Matrix (const T &, int , int) ;	
+		//! Copy constructor			
+		Matrix (const Matrix &) ;				
 
-		/* Overloading = and [] */
-		Matrix & operator = (const Matrix &) ;			// assignment to a source matrix
-		Matrix & operator = (const T &) ;			// assignment to a constant
-		//inline Matrix<T> operator [] (const int) ;		// returns the i^{th} row
+				/* Overloading = and [] */
+		//! assignment to a source matrix		
+		Matrix & operator = (const Matrix &) ;			
+		//! assignment to a constant
+		Matrix & operator = (const T &) ;			
+		// returns the i^{th} row
+		//inline Matrix<T> operator [] (const int) ;		
 
-		/* Other sub-routines */
-		void print() ;						// prints the elements of the matrix
-		inline int nrows() const ;				// gets the number of rows
-		inline int ncols() const ;				// gets the number if columns
+				/* Other sub-routines */
+		//! prints the elements of the matrix		
+		void print() ;						
+		//! gets the number of rows
+		inline int nrows() const ;				
+		//! gets the number of columns
+		inline int ncols() const ;				
+		//! generates a rectangular identity matrix
 		template <class U> 
-		friend Matrix<U> identity (int, int) ;			// generates a rectangular/square identity matrix
-		void changeDimensions (const int &, const int &) ;	// resizes the matrix
-		inline T element (const int &, const int &) const ; 	// gets the (i,j)^{th} matrix element
-		Matrix transpose () ;					// builds the transpose of the matrix
-		Matrix add (const Matrix &) ;				// sums two matrices
-		Matrix product (const Matrix &) ;			// multiplies two matrices
-		Matrix inverse() ;					// computes the inverse of the matrix (if it is square)
-		
-		~Matrix() ;						// destructor
+		friend Matrix<U> identity (int, int) ;			
+		//! generates a square identity matrix
+		template <class U> 
+		friend Matrix<U> identity (int) ;			
+		//! resizes the matrix
+		void changeDimensions (const int &, const int &) ;	
+		//! gets the (i,j)^{th} matrix element
+		inline T element (const int &, const int &) const ; 	
+		//! builds the transpose of the matrix
+		Matrix transpose () ;					
+		//! sums two matrices
+		Matrix add (const Matrix &) ;				
+		//! multiplies two matrices
+		Matrix product (const Matrix &) ;			
+		//! computes the inverse of the matrix (if it is square)
+		Matrix inverse() ;					
+		//! destructor
+		~Matrix() ;						
 } ;
 
+/*! 
+ *  \relates Matrix
+ *  \brief This function is used to generate a matrix (with unequal dimensions) of zeroes.
+ *  \param rows an integer.
+ *  \param cols an integer.	
+ *  \return A zero rectangular matrix.
+ */
 template <class T>
 Matrix<T> zeros (int rows, int cols)
 {
@@ -113,12 +90,25 @@ Matrix<T> zeros (int rows, int cols)
 	return result ;
 }
 
+/*! 
+ *  \relates Matrix
+ *  \brief This function is used to generate a matrix (with equal dimensions) of zeroes.
+ *  \param dimension an integer.
+ *  \return A zero square matrix.
+ */
 template <class T>
 Matrix<T> zeros (int dimension)
 {
 	return zeros<T>(dimension,dimension) ;
 }
 
+/*! 
+ *  \relates Matrix
+ *  \brief This function is used to generate a matrix (with equal dimensions) of ones.
+ *  \param rows an integer.
+ *  \param cols an integer.
+ *  \return A rectangular matrix of ones.
+ */
 template <class T>
 Matrix<T> ones (int rows, int cols)
 {
@@ -126,12 +116,24 @@ Matrix<T> ones (int rows, int cols)
 	return result ;
 }
 
+/*! 
+ *  \relates Matrix
+ *  \brief This function is used to generate a matrix (with equal dimensions) of ones.
+ *  \param dimension an integer.
+ *  \return A square matrix of ones.
+ */
 template <class T>
 Matrix<T> ones (int dimension)
 {
 	return ones<T>(dimension,dimension) ;
 }
 
+/*! 
+ *  This function generates an identity matrix of unequal dimensions.
+ *  \param rows an integer.
+ *  \param cols an integer.
+ *  \return A rectangular identity matrix.
+ */
 template <class U>
 Matrix<U> identity (int rows, int cols)
 {
@@ -144,17 +146,33 @@ Matrix<U> identity (int rows, int cols)
 	return result ;
 }
 
+/*! 
+ *  This function generates a square identity matrix.
+ *  \param dimension an integer.
+ *  \return A square identity matrix.
+ */
 template <class U>
 Matrix<U> identity (int dimension)
 {
 	return identity<U> (dimension,dimension) ;
 }
 
+/*! 
+ *  null martix Constructor.
+ *  \return A new instance of a matrix.
+ */
 template <class T>
 Matrix<T> :: Matrix() : numRows(0), numCols(0), m(0)
 {
 }
 
+/*! 
+ *  \fn Matrix<T> :: Matrix(int rows, int cols)
+ *  \brief This constructor function creates a rectangular zero matrix.
+ *  \param rows an integer.
+ *  \param cols an integer.
+ *  \return A new instance of a zero matrix.
+ */
 template <class T>
 Matrix<T> :: Matrix(int rows, int cols) : numRows(rows), numCols(cols)
 {
@@ -168,6 +186,12 @@ Matrix<T> :: Matrix(int rows, int cols) : numRows(rows), numCols(cols)
 	}
 }
 
+/*! 
+ *  \fn Matrix<T> :: Matrix(int dimension)
+ *  \brief This constructor function creates a square zero matrix.
+ *  \param dimension an integer.
+ *  \return A new instance of a zero matrix.
+ */
 template <class T>
 Matrix<T> :: Matrix (int dimension) : numRows(dimension), numCols(dimension)
 {
@@ -181,6 +205,14 @@ Matrix<T> :: Matrix (int dimension) : numRows(dimension), numCols(dimension)
 	}
 }
 
+/*! 
+ *  \fn Matrix<T> :: Matrix (const T &a, int rows, int cols) 
+ *  \brief This constructor function matrix of equal elements.
+ *  \param a a reference to a constant value.
+ *  \param rows an integer.
+ *  \param cols an integer.
+ *  \return A new instance of a matrix with all elements equal.
+ */
 template <class T>
 Matrix<T> :: Matrix (const T &a, int rows, int cols) : numRows(rows), numCols(cols)
 {
@@ -194,6 +226,12 @@ Matrix<T> :: Matrix (const T &a, int rows, int cols) : numRows(rows), numCols(co
 	}
 }
 
+/*! 
+ *  \fn Matrix<T> :: Matrix (const Matrix<T> &sourceMatrix)
+ *  \brief The copy constructor instantiates a new Matrix object which is a copy of the sourceMatrix.
+ *  \param sourceMatrix a reference to a matrix object.
+ *  \return A new instance of a matrix.
+ */
 template <class T>
 Matrix<T> :: Matrix (const Matrix<T> &sourceMatrix) : numRows(sourceMatrix.numRows), numCols(sourceMatrix.numCols)
 {
@@ -207,6 +245,12 @@ Matrix<T> :: Matrix (const Matrix<T> &sourceMatrix) : numRows(sourceMatrix.numRo
 	}
 }
 
+/*! 
+ *  \fn Matrix<T> & Matrix<T> :: operator = (const Matrix<T> &sourceMatrix)
+ *  \brief The assignment operator is overloaded to assign the sourceMatrix to the current matrix object. The dimensions of the original matrix are altered to that of the assigned matrix.
+ *  \param sourceMatrix a reference to a matrix object.
+ *  \return A matrix.
+ */
 template <class T>
 Matrix<T> & Matrix<T> :: operator = (const Matrix<T> &sourceMatrix)
 {
@@ -226,6 +270,12 @@ Matrix<T> & Matrix<T> :: operator = (const Matrix<T> &sourceMatrix)
 	return *this ;
 }
 
+/*! 
+ *  \fn Matrix<T> & Matrix<T> :: operator = (const T &a)
+ *  \brief The assignment operator is overloaded to assign a constant value to all the elements in a matrix.
+ *  \param a a reference to a constant.
+ *  \return A matrix.
+ */
 template <class T>
 Matrix<T> & Matrix<T> :: operator = (const T &a)
 {
@@ -237,6 +287,12 @@ Matrix<T> & Matrix<T> :: operator = (const T &a)
 }
 
 /* 
+ *  \fn Matrix<T> & Matrix<T> :: operator [] (const int row)
+ *  \brief The [] operator is overloaded to return the ith row in the matrix.
+ *  \param row an integer.
+ *  \return A vector.
+ */
+/*
 template <class T>
 MyVector<T> Matrix<T> :: operator [] (const int row)
 {
@@ -247,11 +303,15 @@ MyVector<T> Matrix<T> :: operator [] (const int row)
 }
 */
 
+/*! 
+ *  \fn void Matrix<T> :: print(void)
+ *  \brief The method prints the elements in the matrix.
+ */
 template <class T>
 void Matrix<T> :: print(void)
 {
 	int i,j ;
-	cout << "#rows = " << numRows << endl ;
+	cout << "#rows = " << numRows << "; " ;
 	cout << "#cols = " << numCols << endl ;
 	for (i=0; i<numRows; i++)
 	{
@@ -261,18 +321,34 @@ void Matrix<T> :: print(void)
 	}
 }
 
+/*! 
+ *  \fn int Matrix<T> :: nrows() const
+ *  \brief The function is used to return the number of rows in the matrix.
+ *  \return the number of rows in the matrix.
+ */
 template <class T>
 int Matrix<T> :: nrows() const
 {
 	return numRows ;
 }
 
+/*! 
+ *  \fn int Matrix<T> :: ncols() const
+ *  \brief The function is used to return the number of columns in the matrix.
+ *  \return the number of columns in the matrix.
+ */
 template <class T>
 int Matrix<T> :: ncols() const
 {
 	return numCols ;
 }
 
+/*! 
+ *  \fn void Matrix<T> :: changeDimensions (const int &rows, const int &cols)
+ *  \brief The function is used to resize the matrix.
+ *  \param rows an integer reference
+ *  \param cols an integer reference
+ */
 template <class T>
 void Matrix<T> :: changeDimensions (const int &rows, const int &cols)
 {
@@ -289,6 +365,12 @@ void Matrix<T> :: changeDimensions (const int &rows, const int &cols)
 	}
 }
 
+/*! 
+ *  \fn inline T Matrix<T> :: element (const int &row, const int &col) const
+ *  \brief The function is used to resize the matrix.
+ *  \param row an integer reference
+ *  \param col an integer reference
+ */
 template <class T>
 inline T Matrix<T> :: element (const int &row, const int &col) const
 {
@@ -297,6 +379,11 @@ inline T Matrix<T> :: element (const int &row, const int &col) const
 	else return m[row][col] ;
 }
 
+/*! 
+ *  \fn Matrix<T> Matrix<T> :: transpose (void)
+ *  \brief Creates a transpose of the given matrix
+ *  \return Transpose of a matrix
+ */
 template <class T>
 Matrix<T> Matrix<T> :: transpose (void)
 {
@@ -308,6 +395,12 @@ Matrix<T> Matrix<T> :: transpose (void)
 	return result ;
 }
 
+/*! 
+ *  \fn Matrix<T>  Matrix<T> :: add (const Matrix<T> &other)
+ *  \brief Adds two matrices 
+ *  \param other a reference to a Matrix object
+ *  \return Sum matrix
+ */
 template <class T>
 Matrix<T>  Matrix<T> :: add (const Matrix<T> &other)
 {
@@ -324,6 +417,12 @@ Matrix<T>  Matrix<T> :: add (const Matrix<T> &other)
 	}
 }
 
+/*! 
+ *  \fn Matrix<T>  Matrix<T> :: product (const Matrix<T> &other)
+ *  \brief Multiplies two matrices 
+ *  \param other a reference to a Matrix object
+ *  \return Product matrix
+ */
 template <class T>
 Matrix<T> Matrix<T> :: product (const Matrix<T> &other)
 {
@@ -341,6 +440,11 @@ Matrix<T> Matrix<T> :: product (const Matrix<T> &other)
 	}
 }
 
+/*! 
+ *  \fn Matrix<T>  Matrix<T> :: inverse (void)
+ *  \brief creates the inverse of the given matrix
+ *  \return Inverse matrix object
+ */
 template <class T>
 Matrix<T> Matrix<T> :: inverse (void)
 {
@@ -351,6 +455,10 @@ Matrix<T> Matrix<T> :: inverse (void)
 	}
 }
 
+/*! 
+ *  \fn Matrix<T> :: ~Matrix<T>
+ *  \brief Destructor function of Matrix class
+ */
 template <class T>
 Matrix<T> :: ~Matrix()
 {

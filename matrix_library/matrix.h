@@ -4,14 +4,14 @@
  *  \author Parthan Kasarapu
  *  \version 1.0
  *  \date Modified: Tue 29 May 2012
-*/
+ */
 
 #ifndef _MATRIX_H_
 #define _MATRIX_H_
 
 #include <iostream>
 #include <cmath>
-#include <vector>
+#include "myVector.h"
 #include "error.h"
 
 /*! 
@@ -35,17 +35,29 @@ class Matrix
 		//! square zero matrix
 		Matrix (int) ;	
 		//! intialize to constant					
-		Matrix (const T &, int , int) ;	
+		Matrix (const T &, int, int) ;	
 		//! Copy constructor			
-		Matrix (const Matrix &) ;				
+		Matrix (const Matrix &) ;
+		//! initialize to C/C++ 1-D array
+		Matrix (const T *, int, int) ;
+		//! initialize to C/C++ 2-D array
+		Matrix (T **a, int, int) ;
 
-				/* Overloading = and [] */
+				/* Overloading = [] = - * operators */
 		//! assignment to a source matrix		
 		Matrix & operator = (const Matrix &) ;			
 		//! assignment to a constant
 		Matrix & operator = (const T &) ;			
-		// returns the i^{th} row
-		//inline Matrix<T> operator [] (const int) ;		
+		//! returns the i^{th} row
+		inline MyVector<T> operator [] (const int) ;	
+		//! sums two matrices
+		Matrix operator + (const Matrix &) ;	
+		//! subtracts two matrices
+		Matrix operator - (const Matrix &) ;	
+		//! multiplies two matrices
+		Matrix operator * (const Matrix &) ;
+		//! multiplies a matrix with a constant
+		Matrix operator * (const T &) ;
 
 				/* Other sub-routines */
 		//! prints the elements of the matrix		
@@ -66,10 +78,6 @@ class Matrix
 		inline T element (const int &, const int &) const ; 	
 		//! builds the transpose of the matrix
 		Matrix transpose () ;					
-		//! sums two matrices
-		Matrix add (const Matrix &) ;				
-		//! multiplies two matrices
-		Matrix product (const Matrix &) ;			
 		//! computes the inverse of the matrix (if it is square)
 		Matrix inverse() ;					
 		//! destructor
@@ -246,6 +254,53 @@ Matrix<T> :: Matrix (const Matrix<T> &sourceMatrix) : numRows(sourceMatrix.numRo
 }
 
 /*! 
+ *  \fn Matrix<T> :: Matrix (const T *a, int rows, int cols) 
+ *  \brief This method assigns the elements in the C/C++ style 1-D array to a matrix with appropriate dimensions.
+ *  \param a C/C++ style 1-D array of type T
+ *  \param rows an integer
+ *  \param cols an integer
+ *  \return A new instance of a matrix.
+ */
+template <class T>
+Matrix<T> :: Matrix (const T *a, int rows, int cols) : numRows(rows), numCols(cols)
+{
+	int i,j ;
+	m.resize(numRows) ;
+	for(i=0; i<numRows; i++)
+	{
+		m[i].resize(numCols) ;
+		for(j=0; j<numCols; j++)
+		{
+			if (a!=NULL)	// need an elegant way to check the end of array?
+				m[i][j] = *a++ ;
+			else
+				error("In initializing to C/C++ array: data insufficient ...") ;
+		}
+	}
+}
+
+/*! 
+ *  \fn Matrix<T> :: Matrix (const T **a, int rows, int cols) 
+ *  \brief This method assigns the elements in the C/C++ style 2-D array to a matrix with appropriate dimensions.
+ *  \param a C/C++ style 2-D array of type T
+ *  \param rows an integer
+ *  \param cols an integer
+ *  \return A new instance of a matrix.
+ */
+template <class T>
+Matrix<T> :: Matrix (T **a, int rows, int cols) : numRows(rows), numCols(cols)
+{
+	int i,j ;
+	m.resize(numRows) ;
+	for (i=0; i<numRows; i++)
+	{
+		m[i].resize(numCols) ;
+		for (j=0; j<numCols; j++)
+			m[i][j] = a[i][j] ;
+	}
+}
+
+/*! 
  *  \fn Matrix<T> & Matrix<T> :: operator = (const Matrix<T> &sourceMatrix)
  *  \brief The assignment operator is overloaded to assign the sourceMatrix to the current matrix object. The dimensions of the original matrix are altered to that of the assigned matrix.
  *  \param sourceMatrix a reference to a matrix object.
@@ -286,13 +341,12 @@ Matrix<T> & Matrix<T> :: operator = (const T &a)
 	return *this ;
 }
 
-/* 
+/*! 
  *  \fn Matrix<T> & Matrix<T> :: operator [] (const int row)
  *  \brief The [] operator is overloaded to return the ith row in the matrix.
  *  \param row an integer.
  *  \return A vector.
  */
-/*
 template <class T>
 MyVector<T> Matrix<T> :: operator [] (const int row)
 {
@@ -301,7 +355,91 @@ MyVector<T> Matrix<T> :: operator [] (const int row)
 		myvec[i] = m[row][i] ;
 	return myvec ;
 }
-*/
+
+/*! 
+ *  \fn Matrix<T>  Matrix<T> :: operator + (const Matrix<T> &other)
+ *  \brief Adds two matrices 
+ *  \param other a reference to a Matrix object
+ *  \return Sum matrix
+ */
+template <class T>
+Matrix<T> Matrix<T> :: operator + (const Matrix<T> &other)
+{
+	if (numRows!=other.numRows || numCols!=other.numCols)
+		error ("In adding matrices: dimensions mismatch!") ;
+	else
+	{
+		int i,j ;
+		Matrix<T> result (numRows,numCols) ;
+		for (i=0; i<numRows; i++)
+			for (j=0; j<numCols; j++)
+				result.m[i][j] = m[i][j] + other.m[i][j] ;
+		return result ;
+	}
+}
+
+/*! 
+ *  \fn Matrix<T> Matrix<T> :: operator - (const Matrix<T> &other)
+ *  \brief Subtracts two matrices 
+ *  \param other a reference to a Matrix object
+ *  \return Difference matrix
+ */
+template <class T>
+Matrix<T> Matrix<T> :: operator - (const Matrix<T> &other)
+{
+	if (numRows!=other.numRows || numCols!=other.numCols)
+		error ("In subtracting matrices: dimensions mismatch!") ;
+	else
+	{
+		int i,j ;
+		Matrix<T> result (numRows,numCols) ;
+		for (i=0; i<numRows; i++)
+			for (j=0; j<numCols; j++)
+				result.m[i][j] = m[i][j] - other.m[i][j] ;
+		return result ;
+	}
+}
+
+/*! 
+ *  \fn Matrix<T> Matrix<T> :: operator * (const Matrix<T> &other)
+ *  \brief Multiplies two matrices 
+ *  \param other a reference to a Matrix object
+ *  \return Product matrix
+ */
+template <class T>
+Matrix<T> Matrix<T> :: operator * (const Matrix<T> &other)
+{
+	if (numCols != other.numRows)
+		error ("In computing matrix product: dimensions mismatch!") ;
+	else
+	{
+		int i,j,k ;
+		Matrix<T> result (numRows,other.numCols) ;
+		for (i=0; i<numRows; i++)
+			for (j=0; j<other.numCols; j++)
+				for (k=0; k<numCols; k++)
+					result.m[i][j] += m[i][k] * other.m[k][j] ;
+		return result ;
+	}
+}
+
+/*! 
+ *  \fn Matrix<T> Matrix<T> :: operator * (const T &a)
+ *  \brief Multiplies all the elements in the matrix with a constant 
+ *  \param a a constant of type T
+ *  \return A scaled matrix
+ */
+// keep in mind: operator ordering is important
+template <class T>
+Matrix<T> Matrix<T> :: operator * (const T &a)
+{
+	int i,j ;
+	Matrix<T> result (numRows,numCols) ; 
+	for (i=0; i<numRows; i++)
+		for (j=0; j<numCols; j++)
+			result.m[i][j] = a * m[i][j] ;
+	return result ;
+}
 
 /*! 
  *  \fn void Matrix<T> :: print(void)
@@ -396,51 +534,6 @@ Matrix<T> Matrix<T> :: transpose (void)
 }
 
 /*! 
- *  \fn Matrix<T>  Matrix<T> :: add (const Matrix<T> &other)
- *  \brief Adds two matrices 
- *  \param other a reference to a Matrix object
- *  \return Sum matrix
- */
-template <class T>
-Matrix<T>  Matrix<T> :: add (const Matrix<T> &other)
-{
-	if (numRows!=other.numRows || numCols!=other.numCols)
-		error ("In adding matrices: dimensions mismatch!") ;
-	else
-	{
-		int i,j ;
-		Matrix<T> result (numRows,numCols) ;
-		for (i=0; i<numRows; i++)
-			for (j=0; j<numCols; j++)
-				result.m[i][j] = m[i][j] + other.m[i][j] ;
-		return result ;
-	}
-}
-
-/*! 
- *  \fn Matrix<T>  Matrix<T> :: product (const Matrix<T> &other)
- *  \brief Multiplies two matrices 
- *  \param other a reference to a Matrix object
- *  \return Product matrix
- */
-template <class T>
-Matrix<T> Matrix<T> :: product (const Matrix<T> &other)
-{
-	if (numCols != other.numRows)
-		error ("In computing matrix product: dimensions mismatch!") ;
-	else
-	{
-		int i,j,k ;
-		Matrix<T> result (numRows,other.numCols) ;
-		for (i=0; i<numRows; i++)
-			for (j=0; j<other.numCols; j++)
-				for (k=0; k<numCols; k++)
-					result.m[i][j] += m[i][k] * other.m[k][j] ;
-		return result ;
-	}
-}
-
-/*! 
  *  \fn Matrix<T>  Matrix<T> :: inverse (void)
  *  \brief creates the inverse of the given matrix
  *  \return Inverse matrix object
@@ -468,3 +561,49 @@ Matrix<T> :: ~Matrix()
 }
 
 #endif
+
+/* OBSOLETE Add and Product Methods - replaced by overloading + and * respectively
+ *  \fn Matrix<T>  Matrix<T> :: add (const Matrix<T> &other)
+ *  \brief Adds two matrices 
+ *  \param other a reference to a Matrix object
+ *  \return Sum matrix
+ *
+template <class T>
+Matrix<T>  Matrix<T> :: add (const Matrix<T> &other)
+{
+	if (numRows!=other.numRows || numCols!=other.numCols)
+		error ("In adding matrices: dimensions mismatch!") ;
+	else
+	{
+		int i,j ;
+		Matrix<T> result (numRows,numCols) ;
+		for (i=0; i<numRows; i++)
+			for (j=0; j<numCols; j++)
+				result.m[i][j] = m[i][j] + other.m[i][j] ;
+		return result ;
+	}
+}
+*/
+/* 
+ *  \fn Matrix<T>  Matrix<T> :: product (const Matrix<T> &other)
+ *  \brief Multiplies two matrices 
+ *  \param other a reference to a Matrix object
+ *  \return Product matrix
+ */
+/*template <class T>
+Matrix<T> Matrix<T> :: product (const Matrix<T> &other)
+{
+	if (numCols != other.numRows)
+		error ("In computing matrix product: dimensions mismatch!") ;
+	else
+	{
+		int i,j,k ;
+		Matrix<T> result (numRows,other.numCols) ;
+		for (i=0; i<numRows; i++)
+			for (j=0; j<other.numCols; j++)
+				for (k=0; k<numCols; k++)
+					result.m[i][j] += m[i][k] * other.m[k][j] ;
+		return result ;
+	}
+}
+*/

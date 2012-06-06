@@ -25,7 +25,7 @@ class Matrix
 {
 	private:
 		int numRows, numCols ;
-		vector <MyVector<T> > m ;
+		vector <vector<T> > m ;
 	public:
 				/* Constructors */
 		//! null matrix	
@@ -37,7 +37,7 @@ class Matrix
 		//! intialize to constant					
 		Matrix (const T &, int, int) ;	
 		//! Copy constructor			
-		Matrix (Matrix &) ;
+		Matrix (const Matrix &) ;
 		//! initialize to C/C++ 1-D array
 		Matrix (const T *, int, int) ;
 		//! initialize to C/C++ 2-D array
@@ -49,14 +49,13 @@ class Matrix
 		//! assignment to a constant
 		Matrix & operator = (const T &) ;			
 		//! returns the i^{th} row
-		inline MyVector<T> & operator [] (int) ;	
+		inline MyVector<T> & operator [] (const int) ;	
 		//! sums two matrices
-		Matrix & operator + (Matrix &) ;	
-		Matrix & operator += (Matrix &) ;
+		Matrix operator + (const Matrix &) ;	
 		//! subtracts two matrices
-		Matrix operator - (Matrix &) ;	
+		Matrix operator - (const Matrix &) ;	
 		//! multiplies two matrices
-		Matrix operator * (Matrix &) ;
+		Matrix operator * (const Matrix &) ;
 		//! multiplies a matrix with a constant
 		Matrix operator * (const T &) ;
 
@@ -80,9 +79,9 @@ class Matrix
 		//! builds the transpose of the matrix
 		Matrix transpose () ;					
 		//! computes the inverse of the matrix (if it is square)
-		void inverse() ;					
+		Matrix inverse() ;					
 		//! destructor
-		//~Matrix() ;						
+		~Matrix() ;						
 } ;
 
 /*! 
@@ -92,12 +91,12 @@ class Matrix
  *  \param cols an integer.	
  *  \return A zero rectangular matrix.
  */
-/*template <class T>
+template <class T>
 Matrix<T> zeros (int rows, int cols)
 {
 	Matrix<T> result (rows,cols) ;
 	return result ;
-}*/
+}
 
 /*! 
  *  \relates Matrix
@@ -105,11 +104,11 @@ Matrix<T> zeros (int rows, int cols)
  *  \param dimension an integer.
  *  \return A zero square matrix.
  */
-/*template <class T>
+template <class T>
 Matrix<T> zeros (int dimension)
 {
 	return zeros<T>(dimension,dimension) ;
-}*/
+}
 
 /*! 
  *  \relates Matrix
@@ -117,25 +116,25 @@ Matrix<T> zeros (int dimension)
  *  \param rows an integer.
  *  \param cols an integer.
  *  \return A rectangular matrix of ones.
- *//*
+ */
 template <class T>
 Matrix<T> ones (int rows, int cols)
 {
 	Matrix<T> result (1,rows,cols) ;
 	return result ;
-}*/
+}
 
 /*! 
  *  \relates Matrix
  *  \brief This function is used to generate a matrix (with equal dimensions) of ones.
  *  \param dimension an integer.
  *  \return A square matrix of ones.
- *//*
+ */
 template <class T>
 Matrix<T> ones (int dimension)
 {
 	return ones<T>(dimension,dimension) ;
-}*/
+}
 
 /*! 
  *  This function generates an identity matrix of unequal dimensions.
@@ -147,8 +146,6 @@ template <class T>
 Matrix<T> identity (int rows, int cols)
 {
 	int i,j ;
-	//Matrix<T> *result ;
-	//result = new Matrix<T> (rows,cols) ;
 	Matrix<T> result (rows,cols) ;
 	for (i=0; i<rows; i++)
 		for (j=0; j<cols; j++)
@@ -191,8 +188,7 @@ Matrix<T> :: Matrix(int rows, int cols) : numRows(rows), numCols(cols)
 	m.resize(numRows) ;
 	for (i=0; i<numRows; i++)
 	{
-		MyVector<T> vec (numCols) ;
-		m[i] = vec ;
+		m[i].resize(numCols) ;
 		for (j=0; j<numCols; j++)
 			m[i][j] = (T)0 ;
 	}
@@ -211,8 +207,7 @@ Matrix<T> :: Matrix (int dimension) : numRows(dimension), numCols(dimension)
 	m.resize(numRows) ;
 	for (i=0; i<numRows; i++)
 	{
-		MyVector<T> vec (numCols) ;
-		m[i] = vec ;
+		m[i].resize(numCols) ;
 		for (j=0; j<numCols; j++)
 			m[i][j] = (T)0 ;
 	}
@@ -233,10 +228,9 @@ Matrix<T> :: Matrix (const T &a, int rows, int cols) : numRows(rows), numCols(co
 	m.resize(numRows) ;
 	for (i=0; i<numRows; i++)
 	{
-		MyVector<T> vec (numCols) ;
-		m[i] = vec ;
+		m[i].resize(numCols) ;
 		for (j=0; j<numCols; j++)
-			m[i][j] = (T)a ;
+			m[i][j] = a ;
 	}
 }
 
@@ -247,14 +241,13 @@ Matrix<T> :: Matrix (const T &a, int rows, int cols) : numRows(rows), numCols(co
  *  \return A new instance of a matrix.
  */
 template <class T>
-Matrix<T> :: Matrix (Matrix<T> &sourceMatrix) : numRows(sourceMatrix.numRows), numCols(sourceMatrix.numCols)
+Matrix<T> :: Matrix (const Matrix<T> &sourceMatrix) : numRows(sourceMatrix.numRows), numCols(sourceMatrix.numCols)
 {
 	int i,j ;
 	m.resize(numRows) ;
 	for (i=0; i<numRows; i++)
 	{
-		MyVector<T> vec (numCols) ;
-		m[i] = vec ;
+		m[i].resize(numCols) ;
 		for (j=0; j<numCols; j++)
 			m[i][j] = sourceMatrix.m[i][j] ;
 	}
@@ -275,8 +268,7 @@ Matrix<T> :: Matrix (const T *a, int rows, int cols) : numRows(rows), numCols(co
 	m.resize(numRows) ;
 	for(i=0; i<numRows; i++)
 	{
-		MyVector<T> vec (numCols) ;
-		m[i] = vec ;
+		m[i].resize(numCols) ;
 		for(j=0; j<numCols; j++)
 		{
 			if (a!=NULL)	// need an elegant way to check the end of array?
@@ -302,8 +294,7 @@ Matrix<T> :: Matrix (T **a, int rows, int cols) : numRows(rows), numCols(cols)
 	m.resize(numRows) ;
 	for (i=0; i<numRows; i++)
 	{
-		MyVector<T> vec (numCols) ;
-		m[i] = vec ;
+		m[i].resize(numCols) ;
 		for (j=0; j<numCols; j++)
 			m[i][j] = a[i][j] ;
 	}
@@ -326,8 +317,7 @@ Matrix<T> & Matrix<T> :: operator = (const Matrix<T> &sourceMatrix)
 		m.resize(numRows) ;
 		for (i=0; i<numRows; i++)
 		{
-			MyVector<T> vec (numCols) ;
-			m[i] = vec ;
+			m[i].resize(numCols) ;
 			for (j=0; j<numCols; j++)
 				m[i][j] = sourceMatrix.m[i][j] ;
 		}
@@ -342,7 +332,7 @@ Matrix<T> & Matrix<T> :: operator = (const Matrix<T> &sourceMatrix)
  *  \return A matrix.
  */
 template <class T>
-Matrix<T> &Matrix<T> :: operator = (const T &a)
+Matrix<T> & Matrix<T> :: operator = (const T &a)
 {
 	int i,j ;
 	for (i=0; i<numRows; i++)
@@ -358,9 +348,12 @@ Matrix<T> &Matrix<T> :: operator = (const T &a)
  *  \return A vector.
  */
 template <class T>
-MyVector<T> & Matrix<T> :: operator [] (int row) 
+MyVector<T> & Matrix<T> :: operator [] (const int row)
 {
-	return m.at(row) ;
+	MyVector<T> *myvec = new MyVector<T> (numCols) ;
+	for (int i=0; i<numCols; i++)
+		myvec[i] = m[row][i] ;
+	return *myvec ; //return m[row] ;
 }
 
 /*! 
@@ -370,30 +363,19 @@ MyVector<T> & Matrix<T> :: operator [] (int row)
  *  \return Sum matrix
  */
 template <class T>
-Matrix<T> & Matrix<T> :: operator += (Matrix<T> &other)
+Matrix<T> Matrix<T> :: operator + (const Matrix<T> &other)
 {
 	if (numRows!=other.numRows || numCols!=other.numCols)
 		error ("In adding matrices: dimensions mismatch!") ;
 	else
 	{
 		int i,j ;
-		//Matrix<T> *result ;		// memory leak
-		//result = new Matrix<T> (numRows,numCols) ;
-		//Matrix<T> result (numRows,numCols) ;
+		Matrix<T> result (numRows,numCols) ;
 		for (i=0; i<numRows; i++)
 			for (j=0; j<numCols; j++)
-				m[i][j] = m[i][j] + other.m[i][j] ;
-		//return result ;
-		return *this ;
+				result.m[i][j] = m[i][j] + other.m[i][j] ;
+		return result ;
 	}
-}
-
-template <class T>
-Matrix<T> & Matrix<T> :: operator + (Matrix &other) 
-{
-	//return Matrix(*this)+=other ;
-	Matrix<T> result (*this) ;
-	return result+=other ;
 }
 
 /*! 
@@ -403,15 +385,13 @@ Matrix<T> & Matrix<T> :: operator + (Matrix &other)
  *  \return Difference matrix
  */
 template <class T>
-Matrix<T> Matrix<T> :: operator - (Matrix<T> &other)
+Matrix<T> Matrix<T> :: operator - (const Matrix<T> &other)
 {
 	if (numRows!=other.numRows || numCols!=other.numCols)
 		error ("In subtracting matrices: dimensions mismatch!") ;
 	else
 	{
 		int i,j ;
-		//Matrix<T> *result ;		// memory leak
-		//result = new Matrix<T> (numRows,numCols) ;
 		Matrix<T> result (numRows,numCols) ;
 		for (i=0; i<numRows; i++)
 			for (j=0; j<numCols; j++)
@@ -427,15 +407,13 @@ Matrix<T> Matrix<T> :: operator - (Matrix<T> &other)
  *  \return Product matrix
  */
 template <class T>
-Matrix<T> Matrix<T> :: operator * (Matrix<T> &other)
+Matrix<T> Matrix<T> :: operator * (const Matrix<T> &other)
 {
 	if (numCols != other.numRows)
 		error ("In computing matrix product: dimensions mismatch!") ;
 	else
 	{
 		int i,j,k ;
-		//Matrix<T> *result ;		// memory leak
-		//result = new Matrix<T> (numRows,other.numCols) ;
 		Matrix<T> result (numRows,other.numCols) ;
 		for (i=0; i<numRows; i++)
 			for (j=0; j<other.numCols; j++)
@@ -456,9 +434,7 @@ template <class T>
 Matrix<T> Matrix<T> :: operator * (const T &a)
 {
 	int i,j ;
-	//Matrix<T> *result ;		// memory leak
-	//result = new Matrix<T> (numRows,numCols) ;
-	Matrix<T> result (numRows,numCols) ;
+	Matrix<T> result (numRows,numCols) ; 
 	for (i=0; i<numRows; i++)
 		for (j=0; j<numCols; j++)
 			result.m[i][j] = a * m[i][j] ;
@@ -510,7 +486,7 @@ int Matrix<T> :: ncols() const
  *  \brief The function is used to resize the matrix.
  *  \param rows an integer reference
  *  \param cols an integer reference
- *//*
+ */
 template <class T>
 void Matrix<T> :: changeDimensions (const int &rows, const int &cols)
 {
@@ -525,27 +501,27 @@ void Matrix<T> :: changeDimensions (const int &rows, const int &cols)
 		for (int i=0; i<numRows; i++)
 			m[i].resize(numCols) ;
 	}
-}*/
+}
 
 /*! 
  *  \fn inline T Matrix<T> :: element (const int &row, const int &col) const
  *  \brief The function is used to resize the matrix.
  *  \param row an integer reference
  *  \param col an integer reference
- *//*
+ */
 template <class T>
 inline T Matrix<T> :: element (const int &row, const int &col) const
 {
 	if (row >= numRows || col >= numCols)
 		error ("In accessing element of the matrix: index out of range ...") ;
 	else return m[row][col] ;
-}*/
+}
 
 /*! 
  *  \fn Matrix<T> Matrix<T> :: transpose (void)
  *  \brief Creates a transpose of the given matrix
  *  \return Transpose of a matrix
- *//*
+ */
 template <class T>
 Matrix<T> Matrix<T> :: transpose (void)
 {
@@ -555,7 +531,7 @@ Matrix<T> Matrix<T> :: transpose (void)
 		for (j=0; j<numRows; j++)
 			result.m[i][j] = m[j][i] ;
 	return result ;
-}*/
+}
 
 /*! 
  *  \fn Matrix<T>  Matrix<T> :: inverse (void)
@@ -563,51 +539,90 @@ Matrix<T> Matrix<T> :: transpose (void)
  *  \return Inverse matrix object
  */
 template <class T>
-void Matrix<T> :: inverse (void)
+Matrix<T> Matrix<T> :: inverse (void)
 {
 	if (numRows != numCols)
 		error ("In computing inverse: Not a square matrix!") ;
 	else
 	{
-		int i,j,dimension = numRows ;
+		int dimension = numRows ;
 		Matrix<double> result = identity<double>(dimension) ;
 		Matrix<double> source (*this) ;
 		MyVector<double> row ;
 		double current ;
 		source.print() ;
-		for (i=0; i<dimension; i++)
+		for (int i=0; i<dimension; i++)
 		{
-			current = source[i][i] ;
-			source[i] = source[i] * (1/current) ; 
-			result[i] = result[i] * (1/current) ; 
-			for (j=0; j<dimension; j++)
-			{
-				if (j != i)
-				{
-					current = source[j][i] ;
-					row = source[i] * current ;
-					source[j] = source[j] - row ;
-					row = result[i] * current ;
-					result[j] = result[j] - row ; 
-				}
-			}
-			source.print() ;
-			result.print() ;
+			current = source[i][(const int)i] ;
+			//cout << current << endl ;
+			//source[i].print() ;
+			row = source[i] * 5 ;row.print() ;
+			//source[i].copy(row) ;
+			source[i] = row ;
+			cout << source[i][0] << endl;
+			source[i].print() ;
+			//source.print() ;
 		}
+		return result ;
 	}
 }
 
 /*! 
  *  \fn Matrix<T> :: ~Matrix<T>
  *  \brief Destructor function of Matrix class
- *//*
+ */
 template <class T>
 Matrix<T> :: ~Matrix()
 {
 	for (int i=0; i<numRows; i++)
-		m[i].~MyVector() ;
+		m[i].clear() ;
 	m.clear() ;
-}*/
+}
 
 #endif
 
+/* OBSOLETE Add and Product Methods - replaced by overloading + and * respectively
+ *  \fn Matrix<T>  Matrix<T> :: add (const Matrix<T> &other)
+ *  \brief Adds two matrices 
+ *  \param other a reference to a Matrix object
+ *  \return Sum matrix
+ *
+template <class T>
+Matrix<T>  Matrix<T> :: add (const Matrix<T> &other)
+{
+	if (numRows!=other.numRows || numCols!=other.numCols)
+		error ("In adding matrices: dimensions mismatch!") ;
+	else
+	{
+		int i,j ;
+		Matrix<T> result (numRows,numCols) ;
+		for (i=0; i<numRows; i++)
+			for (j=0; j<numCols; j++)
+				result.m[i][j] = m[i][j] + other.m[i][j] ;
+		return result ;
+	}
+}
+*/
+/* 
+ *  \fn Matrix<T>  Matrix<T> :: product (const Matrix<T> &other)
+ *  \brief Multiplies two matrices 
+ *  \param other a reference to a Matrix object
+ *  \return Product matrix
+ */
+/*template <class T>
+Matrix<T> Matrix<T> :: product (const Matrix<T> &other)
+{
+	if (numCols != other.numRows)
+		error ("In computing matrix product: dimensions mismatch!") ;
+	else
+	{
+		int i,j,k ;
+		Matrix<T> result (numRows,other.numCols) ;
+		for (i=0; i<numRows; i++)
+			for (j=0; j<other.numCols; j++)
+				for (k=0; k<numCols; k++)
+					result.m[i][j] += m[i][k] * other.m[k][j] ;
+		return result ;
+	}
+}
+*/

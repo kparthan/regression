@@ -14,6 +14,9 @@ class TEST_CLASS_FOR_MyVector
 		void TESTING_overloadAssignmentOperatorConstant() ;
 		void TESTING_overloadSquareBracket() ;
 		void TESTING_overloadAsterisk() ;
+		void TESTING_overloadPlus() ;
+		void TESTING_overloadMinus() ;
+		void TESTING_overloadAsteriskConstant() ;
 		void TESTING_modifyElement() ;
 		void TESTING_l2Norm() ;
 		//void TESTING_dotProduct() ;
@@ -45,11 +48,12 @@ void TEST_CLASS_FOR_MyVector :: TESTING_initializeToConstant (void)
 void TEST_CLASS_FOR_MyVector :: TESTING_initializeToCppArray(void)
 {
 	int i ;
-	int *intArray = new int (SIZE) ;
-	for (int i=0; i<SIZE; i++)
+	int *intArray = new int [SIZE] ;
+	for (i=0; i<SIZE; i++)
 		intArray[i] = 2 * i ;
 	MyVector <int> vec1 (intArray,SIZE) ;
 	vec1.print() ;
+	delete[] intArray ;
 	
 	int intArray2[] = {2,3,4,1,2} ;
 	MyVector<int> vec2 (intArray2,SIZE) ;
@@ -58,7 +62,8 @@ void TEST_CLASS_FOR_MyVector :: TESTING_initializeToCppArray(void)
 
 void TEST_CLASS_FOR_MyVector :: TESTING_copyConstructor(void)
 {
-	MyVector <int> source (12,SIZE) ;
+	int n = 12 ;
+	MyVector <int> source (n,SIZE) ;
 	source.print() ;
 
 	MyVector <int> vec1 (source) ;
@@ -67,29 +72,32 @@ void TEST_CLASS_FOR_MyVector :: TESTING_copyConstructor(void)
 
 void TEST_CLASS_FOR_MyVector :: TESTING_overloadAssignmentOperator(void)
 {
-	MyVector<int> source (39,SIZE) ;
+	int n1=39,n2=45 ;
+	MyVector<int> source (n1,SIZE) ;
 	source.print() ;
 
 	MyVector<int> vec1 = source ;
 	vec1.print() ;
 
-	MyVector<int> vec2(45,2*SIZE) ;
+	MyVector<int> vec2(n2,2*SIZE) ;
 	vec2.print() ;
 	vec2 = source ;
 	vec2.print() ;
 }
- 
+
 void TEST_CLASS_FOR_MyVector :: TESTING_overloadAssignmentOperatorConstant(void)
 {
-	MyVector<int> vec1(3,SIZE) ;
+	int n1=3,n2=15 ;
+	MyVector<int> vec1(n1,SIZE) ;
 	vec1.print() ;
-	vec1 = 15 ;
+	vec1 = n2 ;
 	vec1.print() ;
 }
  
 void TEST_CLASS_FOR_MyVector ::  TESTING_overloadSquareBracket(void)
 {
-	MyVector<int> vec1 (3,2*SIZE) ;
+	int n=3;
+	MyVector<int> vec1 (n,2*SIZE) ;
 	vec1.print() ;
 	cout << vec1[4] << endl ;
 	//cout << vec1[100] << endl ;
@@ -97,18 +105,53 @@ void TEST_CLASS_FOR_MyVector ::  TESTING_overloadSquareBracket(void)
 
 void TEST_CLASS_FOR_MyVector :: TESTING_overloadAsterisk(void)
 {
+	int n1=2,n2=3;
 	MyVector<int> vec1 (SIZE) ;
 	vec1.print() ;
-	MyVector<int> vec2 (2*SIZE) ;
+	MyVector<int> vec2 (n1*SIZE) ;
 	vec2.print() ;
-	MyVector<int> vec3 (3,SIZE) ;
+	MyVector<int> vec3 (n2,SIZE) ;
 	vec3.print() ;
 		
-	vec1 = 10 ;
-	vec2 = 23 ;
+	int n3=10,n4=23;
+	vec1 = n3 ;
+	vec2 = n4 ;
 	cout << "dot product[1,3] = " << vec1 * vec3 << endl ;
 	cout << "dot product[3,1] = " << vec3 * vec1 << endl ;
 	//cout << "dot product[1,2] = " << vec1 * vec2 << endl ;
+}
+
+void TEST_CLASS_FOR_MyVector ::  TESTING_overloadPlus(void)
+{
+	int n1=3,n2=9 ;
+	MyVector<int> vec1(n1,SIZE) ;
+	vec1.print() ;
+	MyVector<int> vec2(n2,SIZE) ;
+	vec2.print() ;
+	MyVector<int> vec3 = vec1 + vec2 ;
+	vec3.print() ;
+}
+
+void TEST_CLASS_FOR_MyVector ::  TESTING_overloadMinus(void)
+{
+	MyVector<int> vec1(3,SIZE) ;
+	vec1.print() ;
+	MyVector<int> vec2(9,SIZE) ;
+	vec2.print() ;
+	MyVector<int> vec3 = vec1 - vec2 ;
+	vec3.print() ;
+}
+
+void TEST_CLASS_FOR_MyVector :: TESTING_overloadAsteriskConstant(void)
+{
+	MyVector<int> vec1(3,SIZE) ;
+	vec1.print() ;
+	MyVector<int> vec2 = vec1 * 5 ;
+	vec2.print() ;
+	MyVector<int> vec3(8,3) ;
+	vec3.print() ;
+	vec3 = vec1 * 10.6 ;
+	vec3.print() ;
 }
 
 void TEST_CLASS_FOR_MyVector :: TESTING_modifyElement(void)
@@ -129,24 +172,6 @@ void TEST_CLASS_FOR_MyVector :: TESTING_l2Norm(void)
 	vec1.print() ;
 	cout << "Magnitude = " << vec1.l2Norm() << endl ;
 }
-
-/*
-void TEST_CLASS_FOR_MyVector :: TESTING_dotProduct(void)
-{
-	MyVector<int> vec1 (SIZE) ;
-	vec1.print() ;
-	MyVector<int> vec2 (2*SIZE) ;
-	vec2.print() ;
-	MyVector<int> vec3 (3,SIZE) ;
-	vec3.print() ;
-		
-	vec1 = 10 ;
-	vec2 = 23 ;
-	cout << "dot product[1,3] = " << vec1.dotProduct(vec3) << endl ;
-	cout << "dot product[3,1] = " << vec3.dotProduct(vec1) << endl ;
-	//cout << "dot product[1,2] = " << vec1.dotProduct(vec2) << endl ;
-}
-*/
 
 int main (int argc, char **argv)
 {
@@ -179,14 +204,20 @@ int main (int argc, char **argv)
 	cout << "Testing overloading * ..." << endl ;
 	test.TESTING_overloadAsterisk() ;
 
+	cout << "Testing overloading + ..." << endl ;
+	test.TESTING_overloadPlus() ;
+
+	cout << "Testing overloading - ..." << endl ;
+	test.TESTING_overloadMinus() ;
+
+	cout << "Testing overloading * constant ..." << endl ;
+	test.TESTING_overloadAsteriskConstant() ;
+	
 	cout << "Testing modifyElement() method ..." << endl ;
 	test.TESTING_modifyElement() ;
 
 	cout << "Testing l2Norm() method ..." << endl ;
-	test.TESTING_l2Norm() ;
-
-	/*cout << "Testing dotProduct() method ..." << endl ;
-	test.TESTING_dotProduct() ;*/		//OBSOLETE
+	test.TESTING_l2Norm() ;	
 
 	return 0 ;
 }

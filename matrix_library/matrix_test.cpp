@@ -17,6 +17,9 @@ class TEST_CLASS_FOR_Matrix
 		void TESTING_overloadMinus() ;
 		void TESTING_overloadAsterisk() ;
 		void TESTING_overloadAsteriskConstant() ;
+		void TESTING_identityRectangular() ;
+		void TESTING_identitySquare() ;
+		void TESTING_inverse() ;
 } ;
 
 void TEST_CLASS_FOR_Matrix :: TESTING_null (void)
@@ -54,22 +57,24 @@ void TEST_CLASS_FOR_Matrix :: TESTING_copyConstructor (void)
 void TEST_CLASS_FOR_Matrix :: TESTING_initializeToCppArray (void)
 {
 	int a[9] = {1,2,4,6,0,-2,-4,9,0} ;
-	Matrix<int> mat(a,4,3) ;
+	Matrix<int> mat(a,3,3) ;
 	mat.print() ;
 }
 
 void TEST_CLASS_FOR_Matrix :: TESTING_initializeToCppArray2D (void)
 {
 	int NUM_ROWS = 3, NUM_COLS = 2 ;
-	int **a ;
-	a = (int **)malloc(NUM_ROWS * sizeof(int *)) ;
-	for (int i=0; i<NUM_ROWS; i++)
-		a[i] = (int *)malloc(NUM_COLS * sizeof(int)) ;
+	int** a = new int * [NUM_ROWS];
+	for(int i=0; i<NUM_ROWS; i++)
+    		a[i] = new int[NUM_COLS];
 	a[0][0] = 1 ; a[0][1] = -9 ;
 	a[1][0] = -7 ; a[1][1] = 8 ;
 	a[2][0] = 7 ; a[2][1] = 400 ;
 	Matrix<int> mat1(a,3,2) ;
 	mat1.print() ;
+	for (int i=0; i<NUM_ROWS;i++)
+		delete[] a[i] ;
+	delete[] a ;	
 }
 
 void TEST_CLASS_FOR_Matrix :: TESTING_overloadAssignment (void)
@@ -108,10 +113,10 @@ void TEST_CLASS_FOR_Matrix :: TESTING_overloadPlus(void)
 	mat1.print() ;
 	Matrix<int> mat2 (44,3,2) ;
 	mat2.print() ;
-	Matrix<int> mat3 = mat1 + mat2 ;
+	Matrix<int> mat3 ; mat3 = mat1 + mat2 ;
 	mat3.print() ;
 }
-
+/*
 void TEST_CLASS_FOR_Matrix :: TESTING_overloadMinus(void)
 {
 	Matrix<int> mat1(2,3,2) ;
@@ -152,6 +157,48 @@ void TEST_CLASS_FOR_Matrix :: TESTING_overloadAsteriskConstant(void)
 	mat6.print() ;
 }
 
+void TEST_CLASS_FOR_Matrix :: TESTING_identityRectangular(void)
+{
+	Matrix<int> mat1 = identity<int>(4,6) ;
+	mat1.print() ;
+}
+
+void TEST_CLASS_FOR_Matrix :: TESTING_identitySquare(void)
+{
+	Matrix<int> mat1 = identity<int>(4) ;
+	mat1.print() ;
+}
+
+void TEST_CLASS_FOR_Matrix :: TESTING_inverse(void)
+{
+	int NUM_ROWS = 3, NUM_COLS = 3 ;
+	double **a ;
+	a = new double*[NUM_ROWS] ;
+	for (int i=0; i<NUM_ROWS; i++)
+		a[i] = new double[NUM_COLS] ;
+	a[0][0] = 1.5 ; a[0][1] = -9.9 ; a[0][2] = 12 ;
+	a[1][0] = -7 ; a[1][1] = 8.1 ; a[1][2] = 1.6 ;
+	a[2][0] = 70 ; a[2][1] = 400 ; a[2][2] = 2 ;
+	Matrix<double> mat1(a,NUM_ROWS,NUM_COLS) ;
+	mat1.print() ;
+	for (int i=0; i<NUM_ROWS; i++)
+		delete[] a[i] ;
+	delete[] a ;
+	mat1.inverse() ;
+
+	a = new double*[2] ;
+	for (int i=0; i<2; i++)
+		a[i] = new double[2] ;
+	a[0][0] = 1 ; a[0][1] = 2 ;
+	a[1][0] = 3 ; a[1][1] = 4 ;
+	Matrix<double> mat2(a,2,2) ;
+	mat2.print() ;
+	for (int i=0; i<2; i++)
+		delete[] a[i] ;
+	delete[] a ;
+	mat2.inverse() ;
+}
+*/
 int main(int argc, char **argv)
 {
 	TEST_CLASS_FOR_Matrix test ;
@@ -179,7 +226,7 @@ int main(int argc, char **argv)
 
 	cout << "Testing overloading = ..." << endl ;
 	test.TESTING_overloadAssignment() ;
-
+/*
 	cout << "Testing overloading = constant ..." << endl ;
 	test.TESTING_overloadAssignmentConstant() ;
 
@@ -197,6 +244,15 @@ int main(int argc, char **argv)
 
 	cout << "Testing overloading * with constant ..." << endl ;
 	test.TESTING_overloadAsteriskConstant() ;
+	
+	cout << "Testing rectangular identity matrix ..." << endl ;
+	test.TESTING_identityRectangular() ;
 
+	cout << "Testing square identity matrix ..." << endl ;
+	test.TESTING_identitySquare() ;
+
+	cout << "Testing matrix inverse ..." << endl ;
+	test.TESTING_inverse() ;
+*/
 	return 0 ;
 }

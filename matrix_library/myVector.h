@@ -40,27 +40,35 @@ class MyVector
 		//! Copy constructor
 		MyVector (const MyVector &) ;			
 
-				/* Overloading = and [] */
+				/* Overloading = [] * operators */
 		//! assignment to a sourceVector
 		MyVector & operator = (const MyVector &) ;	
 		//! assignment to a constant
 		MyVector & operator = (const T &) ;		
 		//! return i^{th} element
-		inline T & operator [] (const int ) ;		
+		inline T & operator [] (int ) ;		
 		//! computes the dot product between vectors
 		float operator * (MyVector &) ;
+		//! computes the sum of two vectors
+		MyVector operator + (MyVector &) ;
+		//! computes the difference between two vectors
+		MyVector operator - (MyVector &) ;
+		//! scaling a vector by a constant value
+		MyVector operator * (const T &) ;
 
 				/* Other sub-routines */
 		//! print the elements of the vector
-		void print (void) ;				
+		void print (void) const ;				
 		//! return size of vector
 		inline int length(void) const ;	
 		//! changes the element at position i
 		inline void modifyElement(const int, T &) ;
 		//! computes the L2-Norm (magnitude) of the vector
-		float l2Norm () ;				
+		float l2Norm () ;			
+		//! copy the elements of the source vector
+		void copy(MyVector &) ;	
 		//! destructor
-		~MyVector() ;					
+		//~MyVector() ;					
 		
 		/*	OBSOLETE
 		// return i^{th} element
@@ -168,7 +176,7 @@ MyVector<T> & MyVector<T> :: operator = (const T &a)
  *  \return The ith vector element.
  */
 template <class T>
-inline T & MyVector<T> :: operator [] (const int i)
+inline T & MyVector<T> :: operator [] (int i) 
 {
 	
 	if (i >= size)
@@ -197,11 +205,66 @@ float MyVector<T> :: operator * (MyVector<T> &vec)
 }
 
 /*! 
+ *  \fn MyVector<T> MyVector<T> :: operator + (MyVector<T> &other)
+ *  \brief The + operator is overloaded to compute the sum of two vectors.
+ *  \param other reference to a MyVector object
+ *  \return The vector sum.
+ */
+template <class T>
+MyVector<T> MyVector<T> :: operator + (MyVector<T> &other)
+{
+	if (size != other.size)
+		error("In computing vector sum: dimensions mismatch!") ;
+	else
+	{
+		MyVector<T> result (size) ;
+		for (int i=0; i<size; i++)
+			result[i] = v[i] + other[i] ;
+		return result ;
+	}
+}
+ 
+/*! 
+ *  \fn MyVector<T> MyVector<T> :: operator - (MyVector &other)
+ *  \brief The - operator is overloaded to compute the difference of two vectors.
+ *  \param other reference to a MyVector object
+ *  \return The vector difference.
+ */
+template <class T>
+MyVector<T> MyVector<T> :: operator - (MyVector<T> &other)
+{
+	if (size != other.size)
+		error("In computing vector sum: dimensions mismatch!") ;
+	else
+	{
+		MyVector<T> result (size) ;
+		for (int i=0; i<size; i++)
+			result[i] = v[i] - other[i] ;
+		return result ;
+	}
+}
+ 
+/*! 
+ *  \fn MyVector<T> MyVector<T> :: operator * (const T &a)
+ *  \brief The * operator is overloaded to scale the vector by a constant value.
+ *  \param a reference oy type T.
+ *  \return The scaled vector.
+ */
+template <class T>
+MyVector<T> MyVector<T> :: operator * (const T &a)
+{
+	MyVector<T> result (size) ;
+	for (int i=0; i<size; i++)
+		result[i] = v[i] * a ;
+	return result ;
+}
+
+/*! 
  *  \fn void MyVector<T> :: print(void)
  *  \brief The method prints the elements in the vector.
  */
 template <class T>
-void MyVector<T> :: print(void)
+void MyVector<T> :: print(void) const
 {
 	cout << size << endl ;
 	for (int i=0; i<size; i++)
@@ -252,46 +315,12 @@ float MyVector<T> :: l2Norm(void)
 /*! 
  *  \fn MyVector<T> :: ~MyVector()
  *  \brief Destructor function of MyVector class
- */
+ *//*
 template <class T>
 MyVector<T> :: ~MyVector()
 {
 	v.clear() ;
-}
+}*/
 
 #endif
 
-/* 		OBSOLETE
- *  \fn inline T MyVector<T> :: element (const int &index)
- *  \brief The method returns the element at position 'index'.
- *  \param index an integer reference
- *  \return vector element
- */
-/*template <class T>
-inline T MyVector<T> :: element (const int &index)
-{
-	if (index >= size)
-		error ("In accessing vector elements: index out of range ...") ;
-	else return v[index] ;
-}*/
-
-/*	OBSOLETE - REPLACED BY * OVERLOADING
- *  \fn float MyVector<T> :: dotProduct (const MyVector<T> &other)
- *  \brief The method computes the dot product with another vector. 
- *  \param other a reference to another vector
- *  \return dot product
- */
-/*template <class T>
-float MyVector<T> :: dotProduct (const MyVector<T> &other)
-{
-	float dotProduct = 0 ;
-	if (size != other.size)
-		error("In computing dot product: Vector sizes don't match!") ;
-	else
-	{
-		for (int i=0; i<size; i++)
-			//dotProduct += v.at(i) * other.v.at(i) ;
-			dotProduct += v[i] * other.v[i] ;
-	}
-	return dotProduct ;
-}*/

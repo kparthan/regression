@@ -13,17 +13,23 @@
 #include <cstdlib>
 
 using namespace std ;
-
+/*#define ASSERT(x) \
+                if (! (x)) \
+                { \
+                   cout << "ERROR!! Assert " << #x << " failed\n"; \
+                   cout << " on line " << __LINE__  << "\n"; \
+                   cout << " in file " << __FILE__ << "\n";  \
+                }*/
 /*! 
-*  \fn inline void error (const char* errorText)
+*  \fn inline void error (const char* errorMessage)
 *  \brief This is an error handling function - informs the user of a potential breach in input parameters/variables.
 *  \param errorText pointer to a character string
 */
 
-inline void error (const char* errorText)
+inline void error (const char* errorMessage)
 {
 	cerr << "Run-time error ..." << endl ;
-	cerr << errorText << endl ;
+	cerr << errorMessage << endl ;
 	cerr << "exiting ..." << endl ;
 	exit(1) ;
 }

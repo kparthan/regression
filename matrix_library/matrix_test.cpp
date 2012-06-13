@@ -373,7 +373,19 @@ void TEST_CLASS_FOR_Matrix :: TESTING_determinant(void)
 	for (int i=0; i<NUM_ROWS; i++)
 		delete[] a[i] ;
 	delete[] a ;
-	mat1.determinant() ;
+	cout <<	mat1.determinant() << endl ;
+	
+	a = new double*[2] ;
+	for (int i=0; i<2; i++)
+		a[i] = new double[2] ;
+	a[0][0] = 1 ; a[0][1] = 1 ;
+	a[1][0] = 1 ; a[1][1] = 1 ;
+	Matrix<double> mat2(a,2,2) ;
+	mat2.print() ;
+	for (int i=0; i<2; i++)
+		delete[] a[i] ;
+	delete[] a ;
+	cout << mat2.determinant() << endl ;
 }
 
 int main(int argc, char **argv)

@@ -81,10 +81,21 @@ class Matrix
 		//! computes the inverse of the matrix (if it is square) using partial pivoting
 		Matrix inverse() ;
 		//! computes the determinant of a square matrix
-		void determinant() ;		
+		double determinant() ;		
 		///void inverse_noPivoting() ;
 		// destructor
-		//~Matrix() ;						
+		//~Matrix() ;
+				/* TODO */
+		 
+		// LU Decomposition Routine [dolittle & crout matrix decomposition]
+		// Trivial:- AX = B, where A = LU
+		// Partial Pivoting:- AX = B, where PAX = PB and A = LU
+
+		// Eigen decomposition
+
+		// SVD
+	
+		// Anything else??
 } ;
 
 /*! 
@@ -626,7 +637,7 @@ Matrix<T> Matrix<T> :: inverse (void)
 		double pivot,current ;
 		for (i=0; i<dimension; i++)	// iterate over columns
 		{
-			splitColumn = getColumnElements(i,i,dimension-1) ;
+			splitColumn = source.getColumnElements(i,i,dimension-1) ;
 			pivotPresentAtRow = getPivotRow (splitColumn,i) ;
 			pivot = source[pivotPresentAtRow][i] ;
 			if (fabs(pivot) <= MINIMUM)
@@ -663,8 +674,44 @@ Matrix<T> Matrix<T> :: inverse (void)
 }
 
 template <class T>
-void Matrix<T> :: determinant (void)
+double Matrix<T> :: determinant (void)
 {
+	// checking for an empty matrix
+	if (numRows == 0 && numCols == 0)
+		return 0 ;
+	if (numRows != numCols)
+		error ("In computing determinant: Not a square matrix!") ;
+	MyVector<double> row,splitColumn ;
+	double pivot,current,det = 1 ;
+	int pivotPresentAtRow,dimension = numRows ;
+	Matrix<T> source (*this) ;
+	source.print() ;
+	for (int i=0; i<dimension; i++)	// iterate over columns
+	{
+		
+		splitColumn = source.getColumnElements(i,i,dimension-1) ;
+		pivotPresentAtRow = getPivotRow (splitColumn,i) ;
+		pivot = source[pivotPresentAtRow][i] ;
+		if (fabs(pivot) <= MINIMUM)
+			return 0 ;	// singular matrix
+			// pivot is on a different row
+			// need to swap rows
+		if (i != pivotPresentAtRow)
+		{
+			row = source[i] ;
+			source[i] = source[pivotPresentAtRow] ;
+			source[pivotPresentAtRow] = row ;
+			det *= -1 ;	// change the sign of the determinant
+		}
+		det *= pivot ;
+		for (int j=i+1; j<dimension; j++)	// iterate over rows
+		{
+			current = source[j][i] ;
+			row = source[i] * (current / pivot) ;
+			source[j] = source[j] - row ;
+		}
+	}
+	return det ;
 }
 
 /* 

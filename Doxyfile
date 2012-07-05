@@ -640,7 +640,9 @@ RECURSIVE              = YES
 # excluded from the INPUT source files. This way you can easily exclude a
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
 
-EXCLUDE                = ./test/ ./test.cpp ./test_Vector.cpp ./test_Matrix.cpp ./test_Point.cpp ./test_Data.cpp ./test_RandomDataGenerator.cpp ./test_Gaussian.cpp ./test_Plot.cpp ./generate_data.cpp
+EXCLUDE                = ./test/ ./test.cpp ./test_Vector.cpp ./test_Matrix.cpp \
+												 ./test_Point.cpp ./test_Data.cpp ./test_RandomDataGenerator.cpp \
+												 ./test_Gaussian.cpp ./test_Plot.cpp 
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded

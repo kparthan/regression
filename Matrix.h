@@ -15,7 +15,7 @@
 
 #include "GenericMatrix.h"
 #include "Vector.h"
-#include "error.h"
+#include "Error.h"
 
 //namespace lcb {
 

@@ -87,7 +87,9 @@
       }
 
   protected:
+		//!	number of rows
     std::size_t _number_of_rows;
+		//!	number of columns 
     std::size_t _number_of_columns;
   };
 //}

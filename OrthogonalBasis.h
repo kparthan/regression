@@ -11,7 +11,7 @@
 #include <iostream>
 #include <cstdlib>
 #include "Data.h"
-#include "error.h"
+#include "Error.h"
 #include "Matrix.h"
 #include <boost/math/constants/constants.hpp>
 
@@ -50,10 +50,10 @@ OrthogonalBasis :: OrthogonalBasis (int n, double length, int index) :
 }
 
 /*!
- *	\fn Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &)
+ *	\fn Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
  *	\brief This module computes the design matrix based on the 
  *	number of orthogonal functions - odd sines 
- *	\param Data<T> a reference to a data object of class T
+ *	\param data a reference to a data object of class T
  *	\return the design matrix to be used in the computation 
  *	of weights of the corresponding orthogonal functions
  */

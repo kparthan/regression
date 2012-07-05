@@ -12,7 +12,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
-#include <cstring>
+#include <string>
 #include "Data.h"
 #include "Gaussian.h"
 #include "Plot.h"
@@ -55,7 +55,7 @@ struct Parameters
   double peak ;
   int numSamples ;
   int numFunctions ;
-	char file[100] ;
+	string file ;
 } ;
 
 /*!
@@ -72,7 +72,7 @@ class RandomDataGenerator
 		Data<T> xVal ;
 		Data<T> fxVal ;
 		Data<T> yVal ;
-		char fname[100] ;
+		string fname ;
 	public:
 		//! constructor
 		RandomDataGenerator(struct Parameters) ;
@@ -123,11 +123,10 @@ RandomDataGenerator<T> :: RandomDataGenerator (struct Parameters parameters) :
 template <class T>
 void RandomDataGenerator<T> :: generate ()
 {
-
 	srand ((unsigned)time(0)) ;
-	if (strcmp(parameters.file,"\0") != 0)
+	if (!parameters.file.empty())
 	{
-		ifstream dataFile (parameters.file) ;
+		ifstream dataFile (parameters.file.c_str()) ;
 		// updating number of samples
 		dataFile >> parameters.numSamples ;
 		if (parameters.numSamples <= 0)
@@ -190,6 +189,7 @@ void RandomDataGenerator<T> :: generate ()
  *
  *  \param x a double
  *	\param timePeriod a double
+ *  \param peak a double
  *	\param slope a double
  *	\return the sawtooth function value
  */
@@ -320,7 +320,7 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 				double randomX = xVal[i].x() ;
 				y[i] = sawtooth(randomX,parameters.timePeriod,parameters.peak,slope) ;
 			}	
-			strcpy(fname,"SAWTOOTH") ;
+			fname = "SAWTOOTH" ;
 			break ;
 		case 1:		// square wave
 			y = new T [parameters.numSamples] ;
@@ -329,7 +329,7 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 				double randomX = xVal[i].x() ;
 				y[i] = square (randomX,parameters.timePeriod,parameters.peak) ;
 			}
-			strcpy(fname,"SQUARE") ;
+			fname = "SQUARE" ;
 			break ;
 		default:
 			error ("Function index not appropriate!") ;
@@ -551,7 +551,7 @@ void RandomDataGenerator<T> :: print (void)
 	cout << "Peak value = " << parameters.peak << endl ;
 	cout << "Number of samples = " << parameters.numSamples << endl ; 
 	cout << "# of orthogonal fucntions = " << parameters.numFunctions << endl ;
-	if (strcmp(parameters.file,"\0") != 0)
+	if (!parameters.file.empty())
 		cout << "Input file: " << parameters.file << endl ;
 
 	if (xVal.nPoints() > 0)

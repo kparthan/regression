@@ -9,7 +9,7 @@
 #define DATA_H
 
 #include "Point.h"
-#include "error.h"
+#include "Error.h"
 #include "Matrix.h"
 #include "Data.h"
 #include <vector>

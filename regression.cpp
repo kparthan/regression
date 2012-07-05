@@ -2,14 +2,14 @@
 #include <cstdlib>
 #include <vector>
 #include <string>
-#include <cstring>
 #include <cmath>
-#include "error.h"
+#include "Error.h"
 #include "Vector.h"
 #include "Matrix.h"
 #include "Data.h"
 #include "RandomDataGenerator.h"
 #include "OrthogonalBasis.h"
+#include "Message.h"
 
 using namespace std ;
 
@@ -19,76 +19,76 @@ struct Parameters parseCommandLine (int argc, char **argv)
 	double sigma = 1 ;							// -gsigma
 	double low = -1 ;								// -low
 	double high = 1 ;								// -high
-	char fname[] = "sawtooth" ;			// -fn
+	string fname = "sawtooth" ;			// -fn
 	int function = 0 ;						  
 	double timePeriod = 0.1 ;				// -t
 	double peak = 1 ;								// -peak
 	int numSamples = 20 ;						// -nsamples
 	int numFunctions = 3 ;					// -nof
-	char file[100] = "\0" ;					// -file
+	string file ;										// -file
 	bool paramFlags[10] = {0} ;
 	int i = 1 ;
 
 	while (i < argc)
 	{
-		if (strcmp(argv[i],"-gmean") == 0)
+		if (string(argv[i]).compare("-gmean") == 0)
 		{
 			mean = atof(argv[i+1]) ;
 			paramFlags[0] = 1 ;
 		}
-		else if (strcmp(argv[i],"-gsigma") == 0)
+		else if (string(argv[i]).compare("-gsigma") == 0)
 		{
 			sigma = atof(argv[i+1]) ;
 			paramFlags[1] = 1 ;
 		}
-		else if (strcmp(argv[i],"-low") == 0)
+		else if (string(argv[i]).compare("-low") == 0)
 		{
 			low = atof(argv[i+1]) ;
 			paramFlags[2] = 1 ;
 		}
-		else if (strcmp(argv[i],"-high") == 0)
+		else if (string(argv[i]).compare("-high") == 0)
 		{
 			high = atof(argv[i+1]) ;
 			paramFlags[3] = 1 ;
 		}
-		else if (strcmp(argv[i],"-fn") == 0)
+		else if (string(argv[i]).compare("-fn") == 0)
 		{
-			strcpy(fname,argv[i+1]) ;
-			if (strcmp(fname,"sawtooth") == 0)
+			fname = argv[i+1] ;
+			if (fname.compare("sawtooth") == 0)
 				function = 0 ;
-			else if (strcmp(fname,"square") == 0)
+			else if (fname.compare("square") == 0)
 				function = 1 ;
 			else
 				error ("Function not supported ...") ;
 			paramFlags[4] = 1 ;
 		}
-		else if (strcmp(argv[i],"-t") == 0)
+		else if (string(argv[i]).compare("-t") == 0)
 		{
 			timePeriod = atof(argv[i+1]) ;
 			paramFlags[5] = 1 ;
 		}
-		else if (strcmp(argv[i],"-peak") == 0)
+		else if (string(argv[i]).compare("-peak") == 0)
 		{
 			peak = atof(argv[i+1]) ;
 			paramFlags[6] = 1 ;
 		}
-		else if (strcmp(argv[i],"-nsamples") == 0)
+		else if (string(argv[i]).compare("-nsamples") == 0)
 		{
 			numSamples = atoi(argv[i+1]) ;
 			if (numSamples <= 0)
 				error ("# of data samples should be non-negative ...") ;
 			paramFlags[7] = 1 ;
 		}
-		else if (strcmp(argv[i],"-nof") == 0)
+		else if (string(argv[i]).compare("-nof") == 0)
 		{
 			numFunctions = atoi(argv[i+1]) ;
 			if (numFunctions <= 0)
 				error ("# of orthogonal functions should be non-negative ...") ;
 			paramFlags[8] = 1 ;
 		}
-		else if (strcmp(argv[i],"-file") == 0)
+		else if (string(argv[i]).compare("-file") == 0)
 		{
-			strcpy(file,argv[i+1]) ;
+			file = argv[i+1] ;
 			paramFlags[9] = 1 ;
 		}
 		else
@@ -193,7 +193,7 @@ struct Parameters parseCommandLine (int argc, char **argv)
 	params.peak = peak ;
 	params.numSamples = numSamples ;
 	params.numFunctions = numFunctions ;
-	strcpy(params.file,file) ;
+	params.file = file ;
 
 	return params ;
 }
@@ -238,7 +238,8 @@ int main(int argc, char **argv)
 	//dataGenerator.plotDataWithNoise() ;
 
 	Matrix<double> phi ;
-	OrthogonalBasis orthogonal (parameters.numFunctions,parameters.timePeriod,parameters.function) ;
+	OrthogonalBasis orthogonal (parameters.numFunctions,parameters.timePeriod,
+																							parameters.function) ;
 	phi = orthogonal.designMatrix(randomX) ;
 
 	Matrix<double> weights ;
@@ -248,6 +249,9 @@ int main(int argc, char **argv)
 	Data<double> predictions ;
 	predictions = dataGenerator.predict(weights,randomX) ;
 	dataGenerator.plotPredictions(randomX,yValues,predictions) ;
+
+	Message msg (parameters.numFunctions,weights,randomX,yValues) ;
+	msg.messageLength() ;
 
 	double rmse = computeRMSE<double>(weights,phi,yValues) ;
 	cout << "Error in fitting: " << rmse << endl ;

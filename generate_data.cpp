@@ -5,6 +5,8 @@ This program generates random data values and the corresponding function values 
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
+
+#include <liblcb/Vector.h>
 using namespace std ;
 
 class randomNumberGenerator

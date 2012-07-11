@@ -63,28 +63,46 @@ Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
 	int numPoints = data.nPoints() ;
 	Matrix<T> phi(numPoints,numFunctions) ;
 	T pi = boost::math::constants::pi<T>() ;
-	switch (functionIndex)
+	/*switch (functionIndex)
 	{
 		case 0:	// sawtooth
 			for (int i=0; i<numPoints; i++)
-			{
+			{ 
+				int k = 0 ;
 				for (int j=0; j<numFunctions; j++)
 				{
 					double arg = 2 * pi * (j+1) * data[i].x() / timePeriod ;
-					phi[i][j] = sin (arg) ;
+					phi[i][k++] = sin (arg) ;
+					phi[i][k++] = cos (arg) ;
 				}
 			}
 			break ;
 		case 1:	//square
 			for (int i=0; i<numPoints; i++)
 			{
+				int k = 0 ;
 				for (int j=0; j<numFunctions; j++)
 					{
-						double arg = 2.0 * (2*j+1) * pi * data[i].x() / timePeriod ;
-						phi[i][j] = sin (arg) ;
+						double arg = 2 * pi * (j+1) * data[i].x() / timePeriod ;
+						//double arg = 2.0 * (2*j+1) * pi * data[i].x() / timePeriod ;
+						//phi[i][j] = sin (arg) ;
+						phi[i][k++] = sin (arg) ;
+						phi[i][k++] = cos (arg) ;
 					}
 			}
 			break ;
+	}*/
+	for (int i=0; i<numPoints; i++)
+	{
+		for (int j=0; j<numFunctions; j++)
+		{
+			int k = j / 2 + 1 ;
+			double arg = 2 * pi * k * data[i].x() / timePeriod ;
+			if (j % 2 == 0)
+				phi[i][j] = sin (arg) ;
+			else
+				phi[i][j] = cos (arg) ;
+		}
 	}
 	return phi ;
 }

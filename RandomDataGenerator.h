@@ -146,15 +146,15 @@ void RandomDataGenerator<T> :: generate ()
 		T range = parameters.high - parameters.low ;
 		T random ;
 		T *randomValues = new T [parameters.numSamples] ;
-		/*for (int i=0; i<parameters.numSamples; i++)
+		for (int i=0; i<parameters.numSamples; i++)
 		{
 			random = rand() / (T) RAND_MAX ;
 			randomValues[i] = parameters.low + random * range ;
-		}*/
-		double partition = range / parameters.numSamples ;
+		}
+		/*double partition = range / parameters.numSamples ;
 		randomValues[0] = parameters.low ;
 		for (int i=1; i<parameters.numSamples; i++)
-			randomValues[i] = partition + randomValues[i-1] ;
+			randomValues[i] = partition + randomValues[i-1] ;*/
 		xVal = Data<T> (randomValues,parameters.numSamples) ;
 		delete[] randomValues ;
 	}
@@ -186,6 +186,10 @@ void RandomDataGenerator<T> :: generate ()
  *									if (x < 0) => f(x) = -f(-x)
  *									if (x = 0) => function discontinuous (randomly assign 
  *																												+/- peak value)
+ *
+ *	Currently, generating data as per version 2! If changed to version 1, 
+ *	make sure that the harmonic is changed from sine to cosine in the file
+ *	"OrthogonalBasis.h" in constructing the design matrix.
  *
  *  \param x a double
  *	\param timePeriod a double
@@ -255,6 +259,10 @@ double sawtooth (double x, double timePeriod, double peak, double slope)
  *					if (T/2 < x < T) => f(x) = -peak
  *					if (x = 0 or x = T/2) => function discontinuous (randomly assign 
  *																													 +/- peak value)
+ *
+ *	Currently, generating data as per version 2! If changed to version 1, 
+ *	make sure that the harmonic is changed from sine to cosine in the file
+ *	"OrthogonalBasis.h" in constructing the design matrix.
  *
  *  \param x a double
  *	\param timePeriod a double

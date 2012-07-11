@@ -7,8 +7,8 @@ set ytic auto	# set ytics automatically
 set title "SQUARE"
 set xlabel "x"
 set ylabel "predictions"
-set xr [-1.5:1.5]
-set yr [-1.77282:1.77282]
+set xr [-0.5:1.5]
+set yr [-1.68276:1.68139]
 set output "file_XY.png"
 set multiplot
 plot "data_XY.txt" using 1:2 title 'f(x)' \

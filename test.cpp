@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <cstring>
+#include <cmath>
 
 using namespace std ;
 
@@ -13,7 +14,7 @@ int main(int argc, char **argv)
 		file >> a[i] ;
 	for (int i=0; i<10; i++)
 		cout << a[i] << endl ;*/
-  string x ;
+ /* string x ;
 	if (x.compare("something") == 0)
 		cout << "something" << endl ;
 	x = "bjhbbnjknklnmlk" ;
@@ -32,6 +33,10 @@ int main(int argc, char **argv)
 		cout << "not equal" << endl ;
 		strcpy(x,"copied-2") ;
 		cout << x << endl ;
-	}
+	}*/
+	int x = 2 + 3 +
+					5 + 9 ;
+	cout << "x = " << x << endl ;
+	cout << "log(2) = " << log2(1024.0) << endl ;
 }
 

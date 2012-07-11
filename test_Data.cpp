@@ -1,5 +1,6 @@
 #include "Data.h"
 #include "Matrix.h"
+#include <vector>
 
 #define SIZE 10
 
@@ -11,6 +12,7 @@ class TESTING_Data
 		void TESTING_nullConstructor() ;
 		void TESTING_initializeToCppArray() ;
 		void TESTING_copyConstructor() ;
+		void TESTING_instantiateVecPoints() ;
 		void TESTING_convertMatrixToData() ;
 		void TESTING_overloadEqual() ;
 		void TESTING_overloadPlus() ;
@@ -48,6 +50,23 @@ void TESTING_Data :: TESTING_copyConstructor(void)
 
 	Data<int> d2(d) ;
 	d2.print() ;
+}
+
+void TESTING_Data :: TESTING_instantiateVecPoints (void)
+{
+	Point<int> p1(10) ;
+	Point<int> p2(20) ;
+	Point<int> p3(60) ;
+	Point<int> p4(80) ;
+	Point<int> p5(-20) ;
+	vector<Point<int> > vec ;
+	vec.push_back(p1) ;
+	vec.push_back(p2) ;
+	vec.push_back(p3) ;
+	vec.push_back(p4) ;
+	vec.push_back(p5) ;
+	Data<int> d(vec) ;
+	d.print() ;
 }
 
 void TESTING_Data :: TESTING_convertMatrixToData(void)
@@ -174,6 +193,9 @@ main()
 
 	cout << "Testing copy constructor ..." << endl ;
 	test.TESTING_copyConstructor() ;		
+
+	cout << "Testing constructor with vector of Points ..." << endl ;
+	test.TESTING_instantiateVecPoints() ;		
 
 	cout << "Testing convert Matrix to Data ..." << endl ;
 	test.TESTING_convertMatrixToData() ;		

@@ -26,7 +26,7 @@ using namespace std ;
  */
 class Gaussian 
 {
-        private:
+	private:
 		double mu ;
 		double sigma ;
 	public:

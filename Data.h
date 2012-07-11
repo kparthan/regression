@@ -30,6 +30,7 @@ class Data
 		int numPoints ;
 		vector <Point<T> > elements ;
 		vector <Point<T> > sortedElements ;
+		vector <int> index ;
 	public:
 				/* Constructors */
 		//! null constructor
@@ -38,6 +39,8 @@ class Data
 		Data (T *, int) ;
 		//! copy constructor
 		Data (const Data &) ;
+		//! constructor to instantiate a data object
+		Data (vector<Point<T> >)  ;
 		//! convert a Matrix object into a Data object
 		Data (Matrix<T> &) ;
 
@@ -56,14 +59,16 @@ class Data
 		void sortElements() ;
 		//! quicksort() algorithm
 		template <class U>
-		friend void quicksort (vector<Point<T> > &, int, int) ;
+		friend void quicksort (vector<Point<T> > &, vector<int> &, int, int) ;
 		//! partition function to find new pivot in quicksort()
 		template <class U>
-		friend int partition (vector<Point<T> > &, int, int) ;
+		friend int partition (vector<Point<T> > &, vector<int> &, int, int) ;
 		//! retrieves the minimum element
 		T minimum() ;
 		//! retrieves the maximum element
 		T maximum() ;
+		//! returns the sorted list of data elements
+		vector<Point<T> > sortedList () ;
 		//! returns the number of data elements
 		int nPoints() ;
 		//! prints the data elements
@@ -76,7 +81,7 @@ class Data
  *  \return a new instance of Data object
  */
 template <class T>
-Data<T> :: Data() : numPoints(0), elements(0), sortedElements(0)
+Data<T> :: Data() : numPoints(0), elements(0), sortedElements(0), index(0)
 {
 }
 
@@ -89,7 +94,7 @@ Data<T> :: Data() : numPoints(0), elements(0), sortedElements(0)
  *  \return a new instance of Data object
  */
 template <class T>
-Data<T> :: Data (T *array, int size) : numPoints(size), sortedElements(0)
+Data<T> :: Data (T *array, int size) : numPoints(size), sortedElements(0), index(0)
 {
 	for (int i=0; i<numPoints; i++)
 	{
@@ -108,8 +113,22 @@ Data<T> :: Data (T *array, int size) : numPoints(size), sortedElements(0)
 template <class T>
 Data<T> :: Data (const Data<T> &sourceData) : numPoints(sourceData.numPoints),
 						elements(sourceData.elements),
-				     sortedElements(sourceData.sortedElements)
+				     sortedElements(sourceData.sortedElements), index(sourceData.index)
 {
+}
+
+/*!
+ *	\fn Data<T> :: Data (vector<Point<T> > list)
+ *	\brief This constructor function is used to instantiate a data object
+ *	with the elements of a vector of Point objects
+ *	\param list a std::vector of Point objects of type T
+ */
+template <class T>
+Data<T> :: Data (vector<Point<T> > list) : sortedElements(0), index(0)
+{
+	numPoints = list.size() ;
+	for (int i=0; i<numPoints; i++)
+		elements.push_back(list[i]) ;
 }
 
 /*!
@@ -143,6 +162,7 @@ Data<T> Data<T> :: operator = (Data sourceData)
 		numPoints = sourceData.numPoints ;
 		elements = sourceData.elements ;
 		sortedElements = sourceData.sortedElements ;
+		index = sourceData.index ;
 	}
 	return *this ;
 }
@@ -157,9 +177,9 @@ Data<T> Data<T> :: operator = (Data sourceData)
 template <class T>
 Point<T> & Data<T> :: operator [] (int i)  
 {
-        if (i >= numPoints)
+	if (i >= numPoints)
 		error ("index out of range ...") ;
-        else 
+  else 
 		return elements[i] ;      // alternate vector access
 }
 
@@ -213,7 +233,20 @@ template <class T>
 void Data<T> :: sortElements (void)
 {
 	sortedElements = elements ;
-	quicksort (sortedElements,0,numPoints-1) ;
+	if (index.size() == 0)
+	{
+		for (int i=0; i<numPoints; i++)
+			index.push_back(i) ;
+	}
+	else
+	{
+		for (int i=0; i<numPoints; i++)
+			index[i] = i ;
+	}
+	quicksort (sortedElements,index,0,numPoints-1) ;
+	/*for (int i=0; i<numPoints; i++)
+		cout << index[i] << " " ;
+	cout << endl ;*/
 }
 
 /*!
@@ -223,17 +256,18 @@ void Data<T> :: sortElements (void)
  *  Pivot is chosen as the right most element in the list (default)
  *  This function is called recursively.
  *  \param list a reference to a std::vector of Point objects of type T
+ *	\param index a reference to a std::vector
  *  \param left an integer
  *  \param right an integer
  */
 template <class T>
-void quicksort (vector<Point<T> > &list, int left, int right)
+void quicksort (vector<Point<T> > &list, vector<int> &index, int left, int right)
 {
 	if (left < right)
 	{
-		int pivotNewIndex = partition (list,left,right) ;
-		quicksort (list,left,pivotNewIndex-1) ;
-		quicksort (list,pivotNewIndex+1,right) ;
+		int pivotNewIndex = partition (list,index,left,right) ;
+		quicksort (list,index,left,pivotNewIndex-1) ;
+		quicksort (list,index,pivotNewIndex+1,right) ;
 	}
 }
 
@@ -241,15 +275,16 @@ void quicksort (vector<Point<T> > &list, int left, int right)
  *  This function is called from the quicksort() routine to compute the new
  *  pivot index.
  *  \param list a reference to a std::vector of Point objects of type T
+ *	\param index a reference to a std::vector
  *  \param left an integer
  *  \param right an integer
  *  \return the new pivot index
  */
 template <class T>
-int partition (vector<Point<T> > &list, int left, int right)
+int partition (vector<Point<T> > &list, vector<int> &index, int left, int right)
 {
 	Point<T> temp,pivotPoint = list[right] ;
-	int storeIndex = left ;
+	int storeIndex = left,temp_i ;
 	for (int i=left; i<right; i++)
 	{
 		if (list[i] < pivotPoint)
@@ -257,12 +292,18 @@ int partition (vector<Point<T> > &list, int left, int right)
 			temp = list[i] ;
 			list[i] = list[storeIndex] ;
 			list[storeIndex] = temp ;
+			temp_i = index[i] ;
+			index[i] = index[storeIndex] ;
+			index[storeIndex] = temp_i ;
 			storeIndex += 1 ;	
 		}
 	}
 	temp = list[storeIndex] ;
 	list[storeIndex] = list[right] ;
 	list[right] = temp ;
+	temp_i = index[storeIndex] ;
+	index[storeIndex] = index[right] ;
+	index[right] = temp_i ;
 	return storeIndex ;
 }
 
@@ -293,6 +334,19 @@ T Data<T> :: maximum (void)
 }
 
 /*!
+ *	\fn Vector<Point<T> > Data<T> :: sortedList (void)
+ *	\brief This function returns the sorted list of elements
+ *	\return the sorted list in increasing order
+ */
+template <class T>
+vector<Point<T> > Data<T> :: sortedList (void)
+{
+	if (sortedElements.size() == 0)
+		sortElements() ;
+	return sortedElements ;
+}
+
+/*!
  *  \fn const int Data<T> :: nPoints (void)
  *  \brief The function returns the number of data elements
  *  \return number of data points
@@ -316,9 +370,13 @@ void Data<T> :: print (void)
 	cout << endl ;
 	if (sortedElements.size() > 0)
 	{
+		int i ;
 		cout << "sorted list: " ;
-		for (int i=0; i<numPoints; i++)
+		for (i=0; i<numPoints; i++)
 			cout << sortedElements[i].x() << " " ;
+		cout << endl ;
+		for (i=0; i<numPoints; i++)
+			cout << index[i] << " " ;
 		cout << endl ;
 	}
 }

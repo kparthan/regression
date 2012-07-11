@@ -250,11 +250,11 @@ int main(int argc, char **argv)
 	predictions = dataGenerator.predict(weights,randomX) ;
 	dataGenerator.plotPredictions(randomX,yValues,predictions) ;
 
-	Message msg (parameters.numFunctions,weights,randomX,yValues) ;
-	msg.messageLength() ;
-
 	double rmse = computeRMSE<double>(weights,phi,yValues) ;
 	cout << "Error in fitting: " << rmse << endl ;
+
+	Message msg (parameters,weights,randomX,yValues) ;
+	msg.messageLength() ;
 
 	return 0 ;
 }

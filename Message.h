@@ -38,12 +38,12 @@ class Message
 {
 	private:
 		struct Parameters parameters ;
-		Vector<double> weights ;
+		lcb::Vector<double> weights ;
 		Data<double> xVals, yVals ;
 	public:
 		//! constructor
 		template <class T>
-		Message (struct Parameters, Matrix<T> &, Data<T> &, Data<T> &) ;
+		  Message (struct Parameters, lcb::Matrix<T> &, Data<T> &, Data<T> &) ;
 		//! instantiates a normal distribution
 		template <class T>
 		Gaussian normalDistribution (vector<T> &) ;
@@ -66,11 +66,11 @@ class Message
  *	\param yVals a reference to a Data object of type T
  */
 template <class T>
-Message :: Message (struct Parameters params, Matrix<T> &w, Data<T> &xVals, 
+Message :: Message (struct Parameters params, lcb::Matrix<T> &w, Data<T> &xVals, 
            						Data<T> &yVals) : xVals (xVals), yVals (yVals),
 																				parameters(params)
 {
-	weights = w.convertToVector() ;
+  weights = lcb::Vector<T>();//w.convertToVector() ;
 }
 
 /*!

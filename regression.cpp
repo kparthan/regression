@@ -179,9 +179,9 @@ struct Parameters parseCommandLine (int argc, char **argv)
 		cout << "Number of orthogonal functions set to: " << numFunctions << endl ;
 
 	if (paramFlags[9] == 0)
-		cout << "Using data generated randomly" << endl ;
+		cout << "Using data generated randomly ..." << endl ;
 	else
-		cout << "Using data from file: " << file << endl ; 
+		cout << "Using data from file: " << file << "..."  << endl ; 
 
 	struct Parameters params ;
 	params.mean = mean ;
@@ -232,8 +232,8 @@ int main(int argc, char **argv)
 
 	dataGenerator.generate() ;
 	Data<double> randomX = dataGenerator.randomX() ;
-	//Data<double> yValues = dataGenerator.yValues() ;
-	Data<double> yValues = dataGenerator.fxValues() ;
+	Data<double> yValues = dataGenerator.yValues() ;
+	//Data<double> yValues = dataGenerator.fxValues() ;
 	//dataGenerator.plotData() ;
 	//dataGenerator.plotDataWithNoise() ;
 

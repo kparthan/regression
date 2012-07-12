@@ -74,7 +74,7 @@ Message :: Message (struct Parameters params, Matrix<T> &w, Data<T> &xVals,
 }
 
 /*!
- *	\relates Message
+ *	\fn double Message :: encodeIntegers(void)
  *	\brief The function is used to encode the number of data samples
  *	transmitted and the number of orthogonal basis functions used.
  *	\return The message length to transmit the number of data points and
@@ -88,7 +88,7 @@ double Message :: encodeIntegers(void)
 }
 
 /*!
- *	\relates Message
+ *	\fn Gaussian Message :: normalDistribution (vector<T> &samples)
  *	\brief The function constructs a normal distribution whose parameters are
  *	given by the mean and standard deviation of the elements in the list.
  *	\param samples a reference to a std::vector of type T
@@ -111,7 +111,7 @@ Gaussian Message :: normalDistribution (vector<T> &samples)
 }
 
 /*!
- *	\relates Message
+ *	\fn double Message :: encodeX (Data<T> data, struct Parameters parameters)
  *	\brief This function is used to encode the random X values generated.
  *	These values are first sorted to arrange in increasing order. The minimum
  *	(the first) value after this arrangement is then subtracted from all the
@@ -156,6 +156,11 @@ double Message :: encodeX (Data<T> data, struct Parameters parameters)
 	return msgLen ;
 }
 
+double Message :: encodeWeights (void)
+{
+	
+}
+
 /*!
  *	\fn void Message :: messageLength (void)
  *	\brief This function computes the message length (in bits)
@@ -170,6 +175,11 @@ void Message :: messageLength (void)
 	double part2 = encodeX(xVals,parameters) ;
 	cout << "part 1 = " << part1 << endl ;
 	cout << "part 2 = " << part2 << endl ;
+
+	// encode weights
+	double part3 = encodeWeights() ;
+	// encode delta_y values
+
 }
 
 #endif

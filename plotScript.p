@@ -4,11 +4,11 @@ set terminal png small
 set autoscale	# scale axes automatically
 set xtic auto	# set xtics automatically
 set ytic auto	# set ytics automatically
-set title "SQUARE"
+set title "SAWTOOTH"
 set xlabel "x"
 set ylabel "predictions"
-set xr [-0.5:1.5]
-set yr [-1.68276:1.68139]
+set xr [-1.5:1.5]
+set yr [-2.92432:1.82383]
 set output "file_XY.png"
 set multiplot
 plot "data_XY.txt" using 1:2 title 'f(x)' \

@@ -372,7 +372,8 @@ void RandomDataGenerator<T> :: addNoise (void)
 }
 
 /*!
- *	\fn Data<T> RandomDataGenerator<T> :: predict (Matrix<T> &weights, Data<T> &xVals)
+ *	\fn Data<T> RandomDataGenerator<T> :: predict (Matrix<T> &weights, Data<T>
+ *  &xVals)
  *	\brief This function predicts the value of a given x using the weights it 
  *	computed from the regression analysis
  *	\param weights a reference to a Matrix object of type T
@@ -508,9 +509,18 @@ void RandomDataGenerator<T> :: plotDataWithNoise (void)
 }
 
 /*!
+ *	\fn void RandomDataGenerator<T> :: plotPredictions (Data<T> &xVals, 
+ *	Data<T> &yVals, Data<T> &predictions) 
+ *	\brief The function is used to plot the Y values and predicted output 
+ *	values over one other (multiplot) against the X values. This is to give
+ *	a visual idea of how the regression model fits the experimental data.
+ *	\param xVals a reference to a Data object of type T
+ *	\param yVals a reference to a Data object of type T
+ *	\param predictions a reference to a Data object of type T
  */
 template <class T>
-void RandomDataGenerator<T> :: plotPredictions (Data<T> &xVals, Data<T> &yVals, Data<T> &predictions) 
+void RandomDataGenerator<T> :: plotPredictions (Data<T> &xVals, Data<T> &yVals,
+															 Data<T> &predictions) 
 {
 	vector<string> labels ;
 	double min,max ;

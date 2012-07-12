@@ -83,7 +83,7 @@ class RandomDataGenerator
 		//! add noise to the generated data
 		void addNoise() ;
 		//! predicts the value based on the regression fit
-		Data<T> predict (Matrix<T> &, Data<T> &) ;
+		Data<T> predict (lcb::Matrix<T> &, Data<T> &) ;
 		//! returns the random X values generated
 		Data<T> randomX () ;
 		//! returns the corresponding function values
@@ -372,8 +372,7 @@ void RandomDataGenerator<T> :: addNoise (void)
 }
 
 /*!
- *	\fn Data<T> RandomDataGenerator<T> :: predict (Matrix<T> &weights, Data<T>
- *  &xVals)
+ *	\fn Data<T> RandomDataGenerator<T> :: predict (lcb::Matrix<T> &weights, Data<T> &xVals)
  *	\brief This function predicts the value of a given x using the weights it 
  *	computed from the regression analysis
  *	\param weights a reference to a Matrix object of type T
@@ -381,12 +380,12 @@ void RandomDataGenerator<T> :: addNoise (void)
  *	\return a Data object containing the predicted values
  */
 template <class T>
-Data<T> RandomDataGenerator<T> :: predict (Matrix<T> &weights, Data<T> &xVals)
+Data<T> RandomDataGenerator<T> :: predict (lcb::Matrix<T> &weights, Data<T> &xVals)
 {
 	OrthogonalBasis orthogonal (parameters.numFunctions,parameters.timePeriod,parameters.function) ;
-	Matrix<double> designMatrix ;
+	lcb::Matrix<double> designMatrix ;
 	designMatrix = orthogonal.designMatrix(xVals) ;
-	Matrix<T> yEst = designMatrix * weights ; // column matrix
+	lcb::Matrix<T> yEst = designMatrix * weights ; // column matrix
 	return Data<T>(yEst) ;
 }
 

@@ -10,7 +10,7 @@
 
 #include "Point.h"
 #include "Error.h"
-#include "Matrix.h"
+#include <liblcb/Matrix.h>
 #include "Data.h"
 #include <vector>
 
@@ -42,7 +42,7 @@ class Data
 		//! constructor to instantiate a data object
 		Data (vector<Point<T> >)  ;
 		//! convert a Matrix object into a Data object
-		Data (Matrix<T> &) ;
+		Data (lcb::Matrix<T> &) ;
 
 				/* Overloading = + operators */
 		//! assigns a Data object
@@ -54,7 +54,7 @@ class Data
 
 				/* Other sub-routines */
 		//! converts the Data object to a Matrix object
-		Matrix<T> convertToMatrix () ;
+		lcb::Matrix<T> convertToMatrix () ;
 		//! sorts the data elements
 		void sortElements() ;
 		//! quicksort() algorithm
@@ -132,13 +132,13 @@ Data<T> :: Data (vector<Point<T> > list) : sortedElements(0), index(0)
 }
 
 /*!
- *	\fn Data<T> :: Data (Matrix<T> &source)
+ *	\fn Data<T> :: Data (lcb::Matrix<T> &source)
  *	\brief This constructor creates a Data object from a Matrix
  *	object.
  *	\param source a reference to a Matrix object of type T
  */
 template <class T>
-Data<T> :: Data (Matrix<T> &source)
+Data<T> :: Data (lcb::Matrix<T> &source)
 {
 	numPoints = source.rows() ;
 	for (int i=0; i<numPoints; i++)
@@ -205,20 +205,20 @@ Data<T> Data<T> :: operator + (Data<T> sourceData)
 }
 
 /*!
- *	\fn Matrix<T> Data<T> :: convertToMatrix (void)
+ *	\fn lcb::Matrix<T> Data<T> :: convertToMatrix (void)
  *	\brief This function is used to convert a Data object to a Matrix
  *	object to enable matrix operations on data
  *	\return a Matrix object with a single column containing the 
  *	data elements
  */
 template <class T>
-Matrix<T> Data<T> :: convertToMatrix (void)
+lcb::Matrix<T> Data<T> :: convertToMatrix (void)
 {
 	if (numPoints == 0)
-		return Matrix<T>() ;
+		return lcb::Matrix<T>() ;
 	else
 	{
-		Matrix<T> result (numPoints,1) ;
+		lcb::Matrix<T> result (numPoints,1) ;
 		for (int i=0; i<numPoints; i++)
 			result[i][0] = elements[i].x() ;
 		return result ;

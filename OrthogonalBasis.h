@@ -12,7 +12,7 @@
 #include <cstdlib>
 #include "Data.h"
 #include "Error.h"
-#include "Matrix.h"
+#include <liblcb/Matrix.h>
 #include <boost/math/constants/constants.hpp>
 
 using namespace std ;
@@ -36,7 +36,7 @@ class OrthogonalBasis
 		OrthogonalBasis (int, double, int) ;
 		//! computes the design matrix
 		template <class T>
-		Matrix<T> designMatrix (Data<T> &) ;
+		lcb::Matrix<T> designMatrix (Data<T> &) ;
 } ;
 
 /*!
@@ -50,7 +50,7 @@ OrthogonalBasis :: OrthogonalBasis (int n, double length, int index) :
 }
 
 /*!
- *	\fn Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
+ *	\fn lcb::Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
  *	\brief This module computes the design matrix based on the 
  *	number of orthogonal functions - odd sines 
  *	\param data a reference to a data object of class T
@@ -58,10 +58,10 @@ OrthogonalBasis :: OrthogonalBasis (int n, double length, int index) :
  *	of weights of the corresponding orthogonal functions
  */
 template <class T>
-Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
+lcb::Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
 {
 	int numPoints = data.nPoints() ;
-	Matrix<T> phi(numPoints,numFunctions) ;
+	lcb::Matrix<T> phi(numPoints,numFunctions) ;
 	T pi = boost::math::constants::pi<T>() ;
 	/*switch (functionIndex)
 	{

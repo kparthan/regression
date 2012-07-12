@@ -4,8 +4,8 @@
 #include <string>
 #include <cmath>
 #include "Error.h"
-#include "Vector.h"
-#include "Matrix.h"
+#include <liblcb/Matrix.h>
+#include <liblcb/Vector.h>
 #include "Data.h"
 #include "RandomDataGenerator.h"
 #include "OrthogonalBasis.h"
@@ -199,22 +199,22 @@ struct Parameters parseCommandLine (int argc, char **argv)
 }
 
 template <class T>
-Matrix<T> computeWeights (Matrix<T> &phi, Data<T> &yValues)
+lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues)
 {
-	Matrix<T> phiT = phi.transpose() ;
-	Matrix<T> phiTphi = phiT * phi ;
-	Matrix<T> pseudoInv = phiTphi.inverse() ;
-	Matrix<T> temp = pseudoInv * phiT ;
+	lcb::Matrix<T> phiT = phi.transpose() ;
+	lcb::Matrix<T> phiTphi = phiT * phi ;
+	lcb::Matrix<T> pseudoInv = phiTphi.inverse() ;
+	lcb::Matrix<T> temp = pseudoInv * phiT ;
 
-	Matrix<T> y = yValues.convertToMatrix() ;
-	Matrix<T> weights = temp * y ;
+	lcb::Matrix<T> y = yValues.convertToMatrix() ;
+	lcb::Matrix<T> weights = temp * y ;
 	return weights ;
 }
 
 template <class T>
-double computeRMSE (Matrix<T> &weights, Matrix<T> &phi, Data<T> &yVals)
+double computeRMSE (lcb::Matrix<T> &weights, lcb::Matrix<T> &phi, Data<T> &yVals)
 {
-	Matrix<T> yEst = phi * weights ; // column matrix
+        lcb::Matrix<T> yEst = phi * weights ; // column matrix
 	double diff, error = 0 ;
 	int numSamples = phi.rows() ;
 	for (int i=0; i<numSamples; i++)
@@ -237,12 +237,12 @@ int main(int argc, char **argv)
 	//dataGenerator.plotData() ;
 	//dataGenerator.plotDataWithNoise() ;
 
-	Matrix<double> phi ;
+	lcb::Matrix<double> phi ;
 	OrthogonalBasis orthogonal (parameters.numFunctions,parameters.timePeriod,
 																							parameters.function) ;
 	phi = orthogonal.designMatrix(randomX) ;
 
-	Matrix<double> weights ;
+	lcb::Matrix<double> weights ;
 	weights = computeWeights<double>(phi,yValues) ;
 	weights.print() ;
 

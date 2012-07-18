@@ -8,7 +8,7 @@ set title "SAWTOOTH"
 set xlabel "x"
 set ylabel "predictions"
 set xr [-1.5:1.5]
-set yr [-2.92432:1.82383]
+set yr [-2.79142:2.79441]
 set output "file_XY.png"
 set multiplot
 plot "data_XY.txt" using 1:2 title 'f(x)' \

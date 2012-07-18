@@ -1,12 +1,12 @@
-CFLAGS=-std=c++0x $(shell pkg-config --cflags liblcb-0.1.0)
-LDFLAGS=$(shell pkg-config --libs liblcb-0.1.0)
+CFLAGS=-std=c++0x -g $(shell pkg-config --cflags liblcb-experimental)
+LDFLAGS=$(shell pkg-config --libs liblcb-experimental)
 
 all: regression test_Vector test_Matrix
 
 regression: regression.o
 	g++ $< -o $@ $(LDFLAGS)
 
-regression.o: regression.cpp
+regression.o: regression.cpp Message.h
 	g++ -c $(CFLAGS) $< -o $@
 
 test_Vector: test_Vector.o
@@ -20,4 +20,7 @@ test_Matrix: test_Matrix.o
 
 test_Matrix.o: test_Matrix.cpp
 	g++ -c $(CFLAGS) $< -o $@
+
+clean:
+	rm -f *.o regression
 

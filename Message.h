@@ -43,7 +43,7 @@ class Message
 	public:
 		//! constructor
 		template <class T>
-		  Message (struct Parameters, lcb::Matrix<T> &, Data<T> &, Data<T> &) ;
+		Message (struct Parameters, lcb::Matrix<T> &, Data<T> &, Data<T> &) ;
 		//! instantiates a normal distribution
 		template <class T>
 		Gaussian normalDistribution (vector<T> &) ;
@@ -52,6 +52,8 @@ class Message
 		//! measures the information content of data
 		template <class T>
 		double encodeX (Data<T> , struct Parameters) ;
+		//!
+		double encodeWeights() ;
 		//! computes the message length
  		void messageLength() ;
 } ;
@@ -70,7 +72,7 @@ Message :: Message (struct Parameters params, lcb::Matrix<T> &w, Data<T> &xVals,
            						Data<T> &yVals) : xVals (xVals), yVals (yVals),
 																				parameters(params)
 {
-  weights = lcb::Vector<T>();//w.convertToVector() ;
+	weights = w.getColumn(0) ;
 }
 
 /*!
@@ -158,6 +160,8 @@ double Message :: encodeX (Data<T> data, struct Parameters parameters)
 
 double Message :: encodeWeights (void)
 {
+	weights.print() ;
+	// Gaussian normal = normalDistribution<double>(weights) ;
 	
 }
 
@@ -169,15 +173,19 @@ double Message :: encodeWeights (void)
 void Message :: messageLength (void)
 {
 	// encode numFunctions and numSamples
+	cout << "encoding number of functions and number of samples ..." << endl ;
 	double part1 = encodeIntegers() ;
 
 	// encode x's
+	cout << "encoding X values ..." << endl ; 
 	double part2 = encodeX(xVals,parameters) ;
 	cout << "part 1 = " << part1 << endl ;
 	cout << "part 2 = " << part2 << endl ;
 
 	// encode weights
+	cout << "encoding weights ..." << endl ;
 	double part3 = encodeWeights() ;
+
 	// encode delta_y values
 
 }

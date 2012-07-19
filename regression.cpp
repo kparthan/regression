@@ -198,35 +198,17 @@ struct Parameters parseCommandLine (int argc, char **argv)
 	return params ;
 }
 
-template <class T>
-lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues)
+void setPrecision(void)
 {
-	lcb::Matrix<T> phiT = phi.transpose() ;
-	lcb::Matrix<T> phiTphi = phiT * phi ;
-	lcb::Matrix<T> pseudoInv = phiTphi.inverse() ;
-	lcb::Matrix<T> temp = pseudoInv * phiT ;
-
-	lcb::Matrix<T> y = yValues.convertToMatrix() ;
-	lcb::Matrix<T> weights = temp * y ;
-	return weights ;
-}
-
-template <class T>
-double computeRMSE (lcb::Matrix<T> &weights, lcb::Matrix<T> &phi, Data<T> &yVals)
-{
-        lcb::Matrix<T> yEst = phi * weights ; // column matrix
-	double diff, error = 0 ;
-	int numSamples = phi.rows() ;
-	for (int i=0; i<numSamples; i++)
-	{
-		diff = yEst[i][0] - yVals[i].x() ;
-		error += diff * diff ;
-	}
-	return sqrt(error/numSamples) ;
+	cout.unsetf(ios::floatfield) ;
+	int PRECISION = -log10(AOM) ;
+	cout.precision(PRECISION) ;
+	cout.setf(ios::fixed,ios::floatfield) ;
 }
 
 int main(int argc, char **argv)
 {
+	setPrecision() ;
 	struct Parameters parameters = parseCommandLine(argc,argv) ;
 	RandomDataGenerator<double> dataGenerator (parameters) ;
 

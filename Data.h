@@ -11,7 +11,6 @@
 #include "Point.h"
 #include "Error.h"
 #include <liblcb/Matrix.h>
-#include "Data.h"
 #include <vector>
 
 using namespace std ;

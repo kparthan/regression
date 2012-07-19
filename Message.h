@@ -10,10 +10,10 @@
 
 #include "Data.h"
 #include "RandomDataGenerator.h"
-#include "Matrix.h"
 #include "Error.h"
 #include "Gaussian.h"
-#include <vector>
+#include <liblcb/Vector.h>
+#include <liblcb/Matrix.h>
 #include <cmath>
 #include <boost/math/constants/constants.hpp>
 
@@ -25,6 +25,9 @@
 
 //!	setting the accuracy of measurement value for data samples
 #define AOM 0.000001
+
+//! number of iterations
+#define NUM_ITERATIONS 100
 
 using namespace std ;
 
@@ -46,7 +49,7 @@ class Message
 		Message (struct Parameters, lcb::Matrix<T> &, Data<T> &, Data<T> &) ;
 		//! instantiates a normal distribution
 		template <class T>
-		Gaussian normalDistribution (vector<T> &) ;
+		Gaussian normalDistribution (lcb::Vector<T> &) ;
 		//! encodes the number of data samples and number of basis functions
 		double encodeIntegers () ;
 		//! measures the information content of data
@@ -57,6 +60,33 @@ class Message
 		//! computes the message length
  		void messageLength() ;
 } ;
+
+template <class T>
+lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues)
+{
+	lcb::Matrix<T> phiT = phi.transpose() ;
+	lcb::Matrix<T> phiTphi = phiT * phi ;
+	lcb::Matrix<T> pseudoInv = phiTphi.inverse() ;
+	lcb::Matrix<T> temp = pseudoInv * phiT ;
+
+	lcb::Matrix<T> y = yValues.convertToMatrix() ;
+	lcb::Matrix<T> weights = temp * y ;
+	return weights ;
+}
+
+template <class T>
+double computeRMSE (lcb::Matrix<T> &weights, lcb::Matrix<T> &phi, Data<T> &yVals)
+{
+        lcb::Matrix<T> yEst = phi * weights ; // column matrix
+	double diff, error = 0 ;
+	int numSamples = phi.rows() ;
+	for (int i=0; i<numSamples; i++)
+	{
+		diff = yEst[i][0] - yVals[i].x() ;
+		error += diff * diff ;
+	}
+	return sqrt(error/numSamples) ;
+}
 
 /*!
  *	\fn Message :: Message (struct Parameters params, Matrix<T> &w, 
@@ -97,10 +127,10 @@ double Message :: encodeIntegers(void)
  *	\return An instantiated Gaussian class object
  */
 template <class T>
-Gaussian Message :: normalDistribution (vector<T> &samples)
+Gaussian Message :: normalDistribution (lcb::Vector<T> &samples)
 {
 	double mean = 0, sigmaSq = 0 ;
-	int i,numSamples = samples.size() ;
+	int i,numSamples = samples.length() ;
 	for (i=0; i<numSamples; i++)
 		mean += samples[i] ;
 	mean = mean / numSamples ;
@@ -134,7 +164,7 @@ double Message :: encodeX (Data<T> data, struct Parameters parameters)
 	for (int i=1; i<numSamples; i++)
 		sortedX[i] = sortedX[i] - sortedX[0] ;
 	sortedX[0] = 0 ;
-	vector<T> diff (numSamples-1) ;
+	lcb::Vector<T> diff (numSamples-1) ;
 	for (int i=0; i<numSamples-1; i++)
 		diff[i] = sortedX[i+1].x() - sortedX[i].x() ;
 	
@@ -142,7 +172,7 @@ double Message :: encodeX (Data<T> data, struct Parameters parameters)
 	cout << "mu(dx) = " << normal.mean() << endl ;
 	cout << "sigma(dx) = " << normal.standardDeviation() << endl ;
 	double pi = boost::math::constants::pi<double>() ;
-	int N = numSamples - 1 ; 
+	long N = numSamples - 1 ; 
 	double sigma = normal.standardDeviation() ;
 	double vSq = N * sigma * sigma ; 
 	double rangeMu = 2 * (parameters.high - parameters.low) ;
@@ -150,6 +180,17 @@ double Message :: encodeX (Data<T> data, struct Parameters parameters)
 	double logSigmaUpperBound = log2(rangeMu) ;
 	double rangeLogSigma = logSigmaUpperBound - logSigmaLowerBound ;
 	double K2 = 5 / (36 * sqrt(3)) ;
+
+	/*double p1 =0.5 * (N-1) * log2l(vSq/(N-1)) + 0.5 * (N-1) ;
+	double p2 =0.5 * N * log2l (2 * pi/(AOM * AOM));
+	double p3 = 	0.5 * log2l (2 * N * N) ; 
+	double p4 = log2 (rangeMu * rangeLogSigma) ;
+	double p5 =  	1 + log2 (K2) ;
+	cout << "p1 = " << p1 << endl;
+	cout << "p2 = " << p2 << endl;
+	cout << "p3 = " << p3 << endl;
+	cout << "p4 = " << p4 << endl;
+	cout << "p5 = " << p5 << endl;*/
 
 	double msgLen = 0.5 * (N-1) * log2l(vSq/(N-1)) + 0.5 * (N-1) +
 									0.5 * N * log2 (2 * pi/(AOM * AOM)) +
@@ -161,8 +202,22 @@ double Message :: encodeX (Data<T> data, struct Parameters parameters)
 double Message :: encodeWeights (void)
 {
 	weights.print() ;
-	// Gaussian normal = normalDistribution<double>(weights) ;
+	Gaussian normal = normalDistribution<double>(weights) ;
+	cout << normal.mean() << " " << normal.standardDeviation() << endl ;
+
+	double rangeMu = 2 ; // mu \in [-1,1]
+	double codeLengthMu = log2l (rangeMu/AOM) ; 
 	
+	double rangeSigma = 1 ; 	// sigma \in [0,1]
+	double codeLengthSigma = log2l (rangeSigma/AOM) ;
+
+	int N = parameters.numFunctions ;
+	double sigma = normal.standardDeviation() ;
+	double pi = boost::math::constants::pi<double>() ;
+	double codeLengthWeights = N * log2l (sigma * sqrt(2*pi) / AOM) +
+														 N * 0.5 / log(2) ;
+													
+	return codeLengthMu + codeLengthSigma + codeLengthWeights ;	
 }
 
 /*!
@@ -185,6 +240,7 @@ void Message :: messageLength (void)
 	// encode weights
 	cout << "encoding weights ..." << endl ;
 	double part3 = encodeWeights() ;
+	cout << "part 3 = " << part3 << endl ;
 
 	// encode delta_y values
 

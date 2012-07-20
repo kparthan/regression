@@ -42,11 +42,11 @@ class Message
 	private:
 		struct Parameters parameters ;
 		lcb::Vector<double> weights ;
-		Data<double> xVals, yVals ;
+		Data<double> xVals, yVals, predictions ;
 	public:
 		//! constructor
 		template <class T>
-		Message (struct Parameters, lcb::Matrix<T> &, Data<T> &, Data<T> &) ;
+		Message (struct Parameters, lcb::Matrix<T> &, Data<T> &, Data<T> &, Data<T> &) ;
 		//! instantiates a normal distribution
 		template <class T>
 		Gaussian normalDistribution (lcb::Vector<T> &) ;
@@ -57,8 +57,10 @@ class Message
 		double encodeX (Data<T> , struct Parameters) ;
 		//!
 		double encodeWeights() ;
+		//!
+		double encodeOutput() ;
 		//! computes the message length
- 		void messageLength() ;
+ 		double messageLength() ;
 } ;
 
 template <class T>
@@ -99,8 +101,8 @@ double computeRMSE (lcb::Matrix<T> &weights, lcb::Matrix<T> &phi, Data<T> &yVals
  */
 template <class T>
 Message :: Message (struct Parameters params, lcb::Matrix<T> &w, Data<T> &xVals, 
-           						Data<T> &yVals) : xVals (xVals), yVals (yVals),
-																				parameters(params)
+           						Data<T> &yVals, Data<T> &yEst) : xVals (xVals), yVals (yVals),
+																				parameters(params), predictions(yEst)
 {
 	weights = w.getColumn(0) ;
 }
@@ -169,8 +171,8 @@ double Message :: encodeX (Data<T> data, struct Parameters parameters)
 		diff[i] = sortedX[i+1].x() - sortedX[i].x() ;
 	
 	Gaussian normal = normalDistribution<T>(diff) ;
-	cout << "mu(dx) = " << normal.mean() << endl ;
-	cout << "sigma(dx) = " << normal.standardDeviation() << endl ;
+	//cout << "mu(dx) = " << normal.mean() << endl ;
+	//cout << "sigma(dx) = " << normal.standardDeviation() << endl ;
 	double pi = boost::math::constants::pi<double>() ;
 	long N = numSamples - 1 ; 
 	double sigma = normal.standardDeviation() ;
@@ -201,9 +203,9 @@ double Message :: encodeX (Data<T> data, struct Parameters parameters)
 
 double Message :: encodeWeights (void)
 {
-	weights.print() ;
+	//weights.print() ;
 	Gaussian normal = normalDistribution<double>(weights) ;
-	cout << normal.mean() << " " << normal.standardDeviation() << endl ;
+	//cout << normal.mean() << " " << normal.standardDeviation() << endl ;
 
 	double rangeMu = 2 ; // mu \in [-1,1]
 	double codeLengthMu = log2l (rangeMu/AOM) ; 
@@ -220,30 +222,58 @@ double Message :: encodeWeights (void)
 	return codeLengthMu + codeLengthSigma + codeLengthWeights ;	
 }
 
+double Message :: encodeOutput (void)
+{
+	int N = parameters.numSamples ;
+	lcb::Vector<double> diff(N) ;
+	for (int i=0; i<N; i++)
+		diff[i] = yVals[i].x() - predictions[i].x() ;
+	Gaussian normal = normalDistribution<double>(diff) ;
+	//cout << "mu(dy) = " << normal.mean() << endl ;
+	//cout << "sigma(dy) = " << normal.standardDeviation() << endl ;
+	
+	double rangeMu = 2 ; // mu \in [-1,1]
+	double codeLengthMu = log2l (rangeMu/AOM) ; 
+	
+	double rangeSigma = 2 ; 	// sigma \in [0,2]
+	double codeLengthSigma = log2l (rangeSigma/AOM) ;
+
+	double sigma = normal.standardDeviation() ;
+	double pi = boost::math::constants::pi<double>() ;
+	double codeLengthDiff = N * log2l (sigma * sqrt(2*pi) / AOM) +
+													N * 0.5 / log(2) ;
+													
+	return codeLengthMu + codeLengthSigma + codeLengthDiff ;	
+}
+
 /*!
  *	\fn void Message :: messageLength (void)
  *	\brief This function computes the message length (in bits)
  *	MessageLength = length(parameters) + length(data|parameters)
  */
-void Message :: messageLength (void)
+double Message :: messageLength (void)
 {
 	// encode numFunctions and numSamples
-	cout << "encoding number of functions and number of samples ..." << endl ;
+	//cout << "encoding number of functions and number of samples ..." << endl ;
 	double part1 = encodeIntegers() ;
+	//cout << "part 1 = " << part1 << endl ;
 
 	// encode x's
-	cout << "encoding X values ..." << endl ; 
+	//cout << "encoding X values ..." << endl ; 
 	double part2 = encodeX(xVals,parameters) ;
-	cout << "part 1 = " << part1 << endl ;
-	cout << "part 2 = " << part2 << endl ;
+	//cout << "part 2 = " << part2 << endl ;
 
 	// encode weights
-	cout << "encoding weights ..." << endl ;
+	//cout << "encoding weights ..." << endl ;
 	double part3 = encodeWeights() ;
-	cout << "part 3 = " << part3 << endl ;
+	//cout << "part 3 = " << part3 << endl ;
 
 	// encode delta_y values
+	//cout << "encoding difference in output ..." << endl ;
+	double part4 = encodeOutput() ;
+	//cout << "part 4 = " << part4 << endl ;
 
+	return part1 + part2 + part3 + part4 ;
 }
 
 #endif

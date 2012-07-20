@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 #include <vector>
 #include <string>
@@ -219,6 +220,9 @@ int main(int argc, char **argv)
 	//dataGenerator.plotData() ;
 	//dataGenerator.plotDataWithNoise() ;
 
+	for (unsigned M=1; M<100; M++) {
+	cout << "M = " << M << endl ;
+	parameters.numFunctions = M ;
 	lcb::Matrix<double> phi ;
 	OrthogonalBasis orthogonal (parameters.numFunctions,parameters.timePeriod,
 																							parameters.function) ;
@@ -226,17 +230,28 @@ int main(int argc, char **argv)
 
 	lcb::Matrix<double> weights ;
 	weights = computeWeights<double>(phi,yValues) ;
-	weights.print() ;
+	//weights.print() ;
 
 	Data<double> predictions ;
-	predictions = dataGenerator.predict(weights,randomX) ;
-	dataGenerator.plotPredictions(randomX,yValues,predictions) ;
+	predictions = dataGenerator.predict(M,weights,randomX) ;
+	//dataGenerator.plotPredictions(randomX,yValues,predictions) ;
 
 	double rmse = computeRMSE<double>(weights,phi,yValues) ;
-	cout << "Error in fitting: " << rmse << endl ;
+	//cout << "Error in fitting: " << rmse << endl ;
 
-	Message msg (parameters,weights,randomX,yValues) ;
-	msg.messageLength() ;
+	Message msg (parameters,weights,randomX,yValues,predictions) ;
+	double msgLen = msg.messageLength() ;
+	//cout << "Msg Len = " << msgLen << endl ;
+
+	ofstream results ;
+	results.open("results.txt",ios::app) ;	
+	results << parameters.function << "\t" ;
+	results << parameters.numFunctions << "\t" ;
+	results << parameters.numSamples << "\t" ;
+	results << rmse << "\t" ;
+	results << msgLen << endl ;
+	results.close() ;
+	}
 
 	return 0 ;
 }

@@ -83,7 +83,7 @@ class RandomDataGenerator
 		//! add noise to the generated data
 		void addNoise() ;
 		//! predicts the value based on the regression fit
-		Data<T> predict (lcb::Matrix<T> &, Data<T> &) ;
+		Data<T> predict (unsigned, lcb::Matrix<T> &, Data<T> &) ;
 		//! returns the random X values generated
 		Data<T> randomX () ;
 		//! returns the corresponding function values
@@ -380,8 +380,9 @@ void RandomDataGenerator<T> :: addNoise (void)
  *	\return a Data object containing the predicted values
  */
 template <class T>
-Data<T> RandomDataGenerator<T> :: predict (lcb::Matrix<T> &weights, Data<T> &xVals)
+Data<T> RandomDataGenerator<T> :: predict (unsigned M, lcb::Matrix<T> &weights, Data<T> &xVals)
 {
+	parameters.numFunctions = M ;
 	OrthogonalBasis orthogonal (parameters.numFunctions,parameters.timePeriod,parameters.function) ;
 	lcb::Matrix<double> designMatrix ;
 	designMatrix = orthogonal.designMatrix(xVals) ;

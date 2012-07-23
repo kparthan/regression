@@ -53,7 +53,8 @@ class Point
 /*!
  *  \fn Point<T> :: Point ()
  *  \brief This constructor creates a null Point object. 
- *  \return a new instance of Point object with coordinate initialized to zero
+ *  \return a new instance of Point object with coordinate initialized to 
+ *	zero
  */
 template <class T>
 Point<T> :: Point () : xCoordinate (0)
@@ -125,7 +126,8 @@ Point<T> Point<T> :: operator + (Point<T> sourcePoint)
 
 /*!
  *  \fn Point<T> & Point<T> :: operator -= (Point<T> &sourcePoint)
- *  \brief The function subtracts the sourcePoint from the current Point object
+ *  \brief The function subtracts the sourcePoint from the current Point i
+ *	object
  *  \param sourcePoint a reference to a Point object 
  *  \return a reference to a Point object of type T 
  */

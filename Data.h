@@ -93,7 +93,8 @@ Data<T> :: Data() : numPoints(0), elements(0), sortedElements(0), index(0)
  *  \return a new instance of Data object
  */
 template <class T>
-Data<T> :: Data (T *array, int size) : numPoints(size), sortedElements(0), index(0)
+Data<T> :: Data (T *array, int size) : numPoints(size), sortedElements(0), 
+																				index(0)
 {
 	for (int i=0; i<numPoints; i++)
 	{
@@ -111,8 +112,8 @@ Data<T> :: Data (T *array, int size) : numPoints(size), sortedElements(0), index
  */
 template <class T>
 Data<T> :: Data (const Data<T> &sourceData) : numPoints(sourceData.numPoints),
-						elements(sourceData.elements),
-				     sortedElements(sourceData.sortedElements), index(sourceData.index)
+						elements(sourceData.elements),	index(sourceData.index),
+						sortedElements(sourceData.sortedElements)
 {
 }
 
@@ -260,7 +261,8 @@ void Data<T> :: sortElements (void)
  *  \param right an integer
  */
 template <class T>
-void quicksort (vector<Point<T> > &list, vector<int> &index, int left, int right)
+void quicksort (vector<Point<T> > &list, vector<int> &index, int left, 
+								int right)
 {
 	if (left < right)
 	{
@@ -280,7 +282,8 @@ void quicksort (vector<Point<T> > &list, vector<int> &index, int left, int right
  *  \return the new pivot index
  */
 template <class T>
-int partition (vector<Point<T> > &list, vector<int> &index, int left, int right)
+int partition (vector<Point<T> > &list, vector<int> &index, int left, 
+								int right)
 {
 	Point<T> temp,pivotPoint = list[right] ;
 	int storeIndex = left,temp_i ;

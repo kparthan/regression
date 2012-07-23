@@ -144,12 +144,14 @@ struct Parameters parseCommandLine (int argc, char **argv)
 	if (paramFlags[9] != 1)
 	{
 		if (paramFlags[2] == 0)
-			cout << "Using default value for interval's lower bound: " << low << endl ;
+			cout << "Using default value for interval's lower bound: " << low 
+			<< endl ;
 		else
 			cout << "Interval lower bound set to: " << low << endl ;
 
 		if (paramFlags[3] == 0)
-			cout << "Using default value for interval's higher bound: " << high << endl ;
+			cout << "Using default value for interval's higher bound: " << high 
+			<< endl ;
 		else
 			cout << "Interval higher bound set to: " << high << endl ;
 	
@@ -170,12 +172,14 @@ struct Parameters parseCommandLine (int argc, char **argv)
 		cout << "Time period set to: " << timePeriod << endl ;
 
 	if (paramFlags[6] == 0)
-		cout << "Using default value for maximum amplitude of wave: " << peak << endl ;
+		cout << "Using default value for maximum amplitude of wave: " << peak 
+		<< endl ;
 	else
 		cout << "Peak value set to: " << peak << endl ;
 
 	if (paramFlags[8] == 0)
-		cout << "Using default number of orthogonal functions: " << numFunctions << endl ;
+		cout << "Using default number of orthogonal functions: " << numFunctions 
+		<< endl ;
 	else
 		cout << "Number of orthogonal functions set to: " << numFunctions << endl ;
 
@@ -217,41 +221,41 @@ int main(int argc, char **argv)
 	Data<double> randomX = dataGenerator.randomX() ;
 	Data<double> yValues = dataGenerator.yValues() ;
 	//Data<double> yValues = dataGenerator.fxValues() ;
-	//dataGenerator.plotData() ;
+	dataGenerator.plotData() ;
 	//dataGenerator.plotDataWithNoise() ;
 
-	for (unsigned M=1; M<100; M++) {
-	cout << "M = " << M << endl ;
-	parameters.numFunctions = M ;
+	//for (unsigned M=1; M<100; M++) {
+	//cout << "M = " << M << endl ;
+	unsigned M = parameters.numFunctions ;
 	lcb::Matrix<double> phi ;
 	OrthogonalBasis orthogonal (parameters.numFunctions,parameters.timePeriod,
-																							parameters.function) ;
+															parameters.function) ;
 	phi = orthogonal.designMatrix(randomX) ;
 
 	lcb::Matrix<double> weights ;
 	weights = computeWeights<double>(phi,yValues) ;
-	//weights.print() ;
+	weights.print() ;
 
 	Data<double> predictions ;
 	predictions = dataGenerator.predict(M,weights,randomX) ;
-	//dataGenerator.plotPredictions(randomX,yValues,predictions) ;
+	dataGenerator.plotPredictions(randomX,yValues,predictions) ;
 
 	double rmse = computeRMSE<double>(weights,phi,yValues) ;
 	//cout << "Error in fitting: " << rmse << endl ;
 
 	Message msg (parameters,weights,randomX,yValues,predictions) ;
 	double msgLen = msg.messageLength() ;
-	//cout << "Msg Len = " << msgLen << endl ;
+	cout << "Msg Len = " << msgLen << endl ;
 
-	ofstream results ;
+	/*ofstream results ;
 	results.open("results.txt",ios::app) ;	
 	results << parameters.function << "\t" ;
 	results << parameters.numFunctions << "\t" ;
 	results << parameters.numSamples << "\t" ;
 	results << rmse << "\t" ;
 	results << msgLen << endl ;
-	results.close() ;
-	}
+	results.close() ;*/
+	//}
 
 	return 0 ;
 }

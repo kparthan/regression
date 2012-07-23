@@ -24,7 +24,7 @@
 #define MAX_FUNCTIONS 100
 
 //!	setting the accuracy of measurement value for data samples
-#define AOM 0.000001
+#define AOM 0.01
 
 //! number of iterations
 #define NUM_ITERATIONS 100
@@ -46,7 +46,8 @@ class Message
 	public:
 		//! constructor
 		template <class T>
-		Message (struct Parameters, lcb::Matrix<T> &, Data<T> &, Data<T> &, Data<T> &) ;
+		Message (struct Parameters, lcb::Matrix<T> &, Data<T> &, Data<T> &, 
+							Data<T> &) ;
 		//! instantiates a normal distribution
 		template <class T>
 		Gaussian normalDistribution (lcb::Vector<T> &) ;
@@ -77,9 +78,10 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues)
 }
 
 template <class T>
-double computeRMSE (lcb::Matrix<T> &weights, lcb::Matrix<T> &phi, Data<T> &yVals)
+double computeRMSE (lcb::Matrix<T> &weights, lcb::Matrix<T> &phi, 
+										Data<T> &yVals)
 {
-        lcb::Matrix<T> yEst = phi * weights ; // column matrix
+  lcb::Matrix<T> yEst = phi * weights ; // column matrix
 	double diff, error = 0 ;
 	int numSamples = phi.rows() ;
 	for (int i=0; i<numSamples; i++)
@@ -100,9 +102,10 @@ double computeRMSE (lcb::Matrix<T> &weights, lcb::Matrix<T> &phi, Data<T> &yVals
  *	\param yVals a reference to a Data object of type T
  */
 template <class T>
-Message :: Message (struct Parameters params, lcb::Matrix<T> &w, Data<T> &xVals, 
-           						Data<T> &yVals, Data<T> &yEst) : xVals (xVals), yVals (yVals),
-																				parameters(params), predictions(yEst)
+Message :: Message (struct Parameters params, lcb::Matrix<T> &w, 
+										Data<T> &xVals, Data<T> &yVals, Data<T> &yEst) : 
+										xVals (xVals), yVals (yVals), parameters(params), 
+										predictions(yEst)
 {
 	weights = w.getColumn(0) ;
 }
@@ -123,8 +126,8 @@ double Message :: encodeIntegers(void)
 
 /*!
  *	\fn Gaussian Message :: normalDistribution (vector<T> &samples)
- *	\brief The function constructs a normal distribution whose parameters are
- *	given by the mean and standard deviation of the elements in the list.
+ *	\brief The function constructs a normal distribution whose parameters 
+ *	are given by the mean and standard deviation of the elements in the list.
  *	\param samples a reference to a std::vector of type T
  *	\return An instantiated Gaussian class object
  */
@@ -171,8 +174,8 @@ double Message :: encodeX (Data<T> data, struct Parameters parameters)
 		diff[i] = sortedX[i+1].x() - sortedX[i].x() ;
 	
 	Gaussian normal = normalDistribution<T>(diff) ;
-	//cout << "mu(dx) = " << normal.mean() << endl ;
-	//cout << "sigma(dx) = " << normal.standardDeviation() << endl ;
+	cout << "mu(dx) = " << normal.mean() << endl ;
+	cout << "sigma(dx) = " << normal.standardDeviation() << endl ;
 	double pi = boost::math::constants::pi<double>() ;
 	long N = numSamples - 1 ; 
 	double sigma = normal.standardDeviation() ;
@@ -186,7 +189,7 @@ double Message :: encodeX (Data<T> data, struct Parameters parameters)
 	/*double p1 =0.5 * (N-1) * log2l(vSq/(N-1)) + 0.5 * (N-1) ;
 	double p2 =0.5 * N * log2l (2 * pi/(AOM * AOM));
 	double p3 = 	0.5 * log2l (2 * N * N) ; 
-	double p4 = log2 (rangeMu * rangeLogSigma) ;
+	double p4 = log2l (rangeMu * rangeLogSigma) ;
 	double p5 =  	1 + log2 (K2) ;
 	cout << "p1 = " << p1 << endl;
 	cout << "p2 = " << p2 << endl;
@@ -194,10 +197,11 @@ double Message :: encodeX (Data<T> data, struct Parameters parameters)
 	cout << "p4 = " << p4 << endl;
 	cout << "p5 = " << p5 << endl;*/
 
-	double msgLen = 0.5 * (N-1) * log2l(vSq/(N-1)) + 0.5 * (N-1) +
-									0.5 * N * log2 (2 * pi/(AOM * AOM)) +
-									0.5 * log2 (2 * N * N) + log2 (rangeMu * rangeLogSigma) +
-									1 + log2 (K2) ;
+	double msgLen = 0.5 * (N-1) * log2l (vSq/(N-1)) + 0.5 * (N-1) +
+									0.5 * N * log2l (2 * pi/(AOM * AOM)) +
+									0.5 * log2l (2 * N * N) + log2l (rangeMu * rangeLogSigma) +
+									1 + log2l (K2) ;
+	cout << "bits/sample: " << msgLen/N << endl ;
 	return msgLen ;
 }
 
@@ -205,7 +209,8 @@ double Message :: encodeWeights (void)
 {
 	//weights.print() ;
 	Gaussian normal = normalDistribution<double>(weights) ;
-	//cout << normal.mean() << " " << normal.standardDeviation() << endl ;
+	cout << "mu(w): " << normal.mean() << endl ;
+	cout << "sigma(w): " << normal.standardDeviation() << endl ;
 
 	double rangeMu = 2 ; // mu \in [-1,1]
 	double codeLengthMu = log2l (rangeMu/AOM) ; 
@@ -218,8 +223,11 @@ double Message :: encodeWeights (void)
 	double pi = boost::math::constants::pi<double>() ;
 	double codeLengthWeights = N * log2l (sigma * sqrt(2*pi) / AOM) +
 														 N * 0.5 / log(2) ;
-													
-	return codeLengthMu + codeLengthSigma + codeLengthWeights ;	
+
+										
+	double wt = codeLengthMu + codeLengthSigma + codeLengthWeights ;	
+	cout << "bits/wt: " << wt/N << endl ;
+	return wt ;
 }
 
 double Message :: encodeOutput (void)
@@ -242,8 +250,10 @@ double Message :: encodeOutput (void)
 	double pi = boost::math::constants::pi<double>() ;
 	double codeLengthDiff = N * log2l (sigma * sqrt(2*pi) / AOM) +
 													N * 0.5 / log(2) ;
-													
-	return codeLengthMu + codeLengthSigma + codeLengthDiff ;	
+
+	double msgDy = codeLengthMu + codeLengthSigma + codeLengthDiff ;	
+	cout << "bits/dy: " << msgDy/N << endl ;
+	return msgDy ;
 }
 
 /*!
@@ -256,22 +266,22 @@ double Message :: messageLength (void)
 	// encode numFunctions and numSamples
 	//cout << "encoding number of functions and number of samples ..." << endl ;
 	double part1 = encodeIntegers() ;
-	//cout << "part 1 = " << part1 << endl ;
+	cout << "encoding #functions + #samples: " << part1 << endl ;
 
 	// encode x's
 	//cout << "encoding X values ..." << endl ; 
 	double part2 = encodeX(xVals,parameters) ;
-	//cout << "part 2 = " << part2 << endl ;
+	cout << "encoding X: " << part2 << endl ;
 
 	// encode weights
 	//cout << "encoding weights ..." << endl ;
 	double part3 = encodeWeights() ;
-	//cout << "part 3 = " << part3 << endl ;
+	cout << "encoding weights: " << part3 << endl ;
 
 	// encode delta_y values
 	//cout << "encoding difference in output ..." << endl ;
 	double part4 = encodeOutput() ;
-	//cout << "part 4 = " << part4 << endl ;
+	cout << "encoding Y: " << part4 << endl ;
 
 	return part1 + part2 + part3 + part4 ;
 }

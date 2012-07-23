@@ -123,7 +123,8 @@ RandomDataGenerator<T> :: RandomDataGenerator (struct Parameters parameters) :
 template <class T>
 void RandomDataGenerator<T> :: generate ()
 {
-	srand ((unsigned)time(0)) ;
+	//srand ((unsigned)time(0)) ;
+	srand (0) ;
 	if (!parameters.file.empty())
 	{
 		ifstream dataFile (parameters.file.c_str()) ;
@@ -372,7 +373,8 @@ void RandomDataGenerator<T> :: addNoise (void)
 }
 
 /*!
- *	\fn Data<T> RandomDataGenerator<T> :: predict (lcb::Matrix<T> &weights, Data<T> &xVals)
+ *	\fn Data<T> RandomDataGenerator<T> :: predict (lcb::Matrix<T> &weights, 
+ *	Data<T> &xVals)
  *	\brief This function predicts the value of a given x using the weights it 
  *	computed from the regression analysis
  *	\param weights a reference to a Matrix object of type T
@@ -380,10 +382,12 @@ void RandomDataGenerator<T> :: addNoise (void)
  *	\return a Data object containing the predicted values
  */
 template <class T>
-Data<T> RandomDataGenerator<T> :: predict (unsigned M, lcb::Matrix<T> &weights, Data<T> &xVals)
+Data<T> RandomDataGenerator<T> :: predict (unsigned M, lcb::Matrix<T> &weights,
+																					 Data<T> &xVals)
 {
 	parameters.numFunctions = M ;
-	OrthogonalBasis orthogonal (parameters.numFunctions,parameters.timePeriod,parameters.function) ;
+	OrthogonalBasis orthogonal (parameters.numFunctions,parameters.timePeriod,
+															parameters.function) ;
 	lcb::Matrix<double> designMatrix ;
 	designMatrix = orthogonal.designMatrix(xVals) ;
 	lcb::Matrix<T> yEst = designMatrix * weights ; // column matrix
@@ -449,8 +453,8 @@ void RandomDataGenerator<T> :: plotRandomX (void)
 
 /*!
  *  \fn void RandomDataGenerator<T> :: plotData (void)
- *  \brief The function plots the data elements and the corresponding function
- * 	values 
+ *  \brief The function plots the data elements and the corresponding 
+ *	function values 
  */
 template <class T>
 void RandomDataGenerator<T> :: plotData (void)

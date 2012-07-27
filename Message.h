@@ -21,10 +21,10 @@
 #define MAX_SAMPLES 100000
 
 //! bound on the maximum number of orthogonal basis functions
-#define MAX_FUNCTIONS 100
+#define MAX_FUNCTIONS 200
 
 //!	setting the accuracy of measurement value for data samples
-#define AOM 0.01
+//#define AOM 0.01
 
 //! number of iterations
 #define NUM_ITERATIONS 100
@@ -59,9 +59,10 @@ class Message
 		//!
 		double encodeWeights() ;
 		//!
+		double encodeWeights_WallaceFreeman () ;
 		double encodeOutput() ;
 		//! computes the message length
- 		double messageLength() ;
+		double messageLength() ;
 } ;
 
 template <class T>
@@ -174,34 +175,36 @@ double Message :: encodeX (Data<T> data, struct Parameters parameters)
 		diff[i] = sortedX[i+1].x() - sortedX[i].x() ;
 	
 	Gaussian normal = normalDistribution<T>(diff) ;
-	cout << "mu(dx) = " << normal.mean() << endl ;
-	cout << "sigma(dx) = " << normal.standardDeviation() << endl ;
+	//cout << "mu(dx) = " << normal.mean() << endl ;
+	//cout << "sigma(dx) = " << normal.standardDeviation() << endl ;
 	double pi = boost::math::constants::pi<double>() ;
 	long N = numSamples - 1 ; 
 	double sigma = normal.standardDeviation() ;
-	double vSq = N * sigma * sigma ; 
+	if (sigma <= AOM)
+		sigma = 3 * AOM ;
+	//double vSq = N * sigma * sigma ; 
 	double rangeMu = 2 * (parameters.high - parameters.low) ;
-	double logSigmaLowerBound = log2(AOM) ;
-	double logSigmaUpperBound = log2(rangeMu) ;
+	double logSigmaLowerBound = log2l(3*AOM) ;
+	double logSigmaUpperBound = log2l(rangeMu) ;
 	double rangeLogSigma = logSigmaUpperBound - logSigmaLowerBound ;
 	double K2 = 5 / (36 * sqrt(3)) ;
 
 	/*double p1 =0.5 * (N-1) * log2l(vSq/(N-1)) + 0.5 * (N-1) ;
 	double p2 =0.5 * N * log2l (2 * pi/(AOM * AOM));
-	double p3 = 	0.5 * log2l (2 * N * N) ; 
+	double p3 =		0.5 * log2l (2 * N * N) ; 
 	double p4 = log2l (rangeMu * rangeLogSigma) ;
-	double p5 =  	1 + log2 (K2) ;
+	double p5 =		1 + log2 (K2) ;
 	cout << "p1 = " << p1 << endl;
 	cout << "p2 = " << p2 << endl;
 	cout << "p3 = " << p3 << endl;
 	cout << "p4 = " << p4 << endl;
 	cout << "p5 = " << p5 << endl;*/
 
-	double msgLen = 0.5 * (N-1) * log2l (vSq/(N-1)) + 0.5 * (N-1) +
+	double msgLen = 0.5 * (N-1) * log2l (N*sigma*sigma/(N-1)) + 0.5 * (N-1) +
 									0.5 * N * log2l (2 * pi/(AOM * AOM)) +
 									0.5 * log2l (2 * N * N) + log2l (rangeMu * rangeLogSigma) +
 									1 + log2l (K2) ;
-	cout << "bits/sample: " << msgLen/N << endl ;
+	//cout << "bits/sample: " << msgLen/N << endl ;
 	return msgLen ;
 }
 
@@ -209,13 +212,13 @@ double Message :: encodeWeights (void)
 {
 	//weights.print() ;
 	Gaussian normal = normalDistribution<double>(weights) ;
-	cout << "mu(w): " << normal.mean() << endl ;
-	cout << "sigma(w): " << normal.standardDeviation() << endl ;
+	//cout << "mu(w): " << normal.mean() << endl ;
+	//cout << "sigma(w): " << normal.standardDeviation() << endl ;
 
 	double rangeMu = 2 ; // mu \in [-1,1]
 	double codeLengthMu = log2l (rangeMu/AOM) ; 
 	
-	double rangeSigma = 1 ; 	// sigma \in [0,1]
+	double rangeSigma = 1 ;		// sigma \in [0,1]
 	double codeLengthSigma = log2l (rangeSigma/AOM) ;
 
 	int N = parameters.numFunctions ;
@@ -226,12 +229,41 @@ double Message :: encodeWeights (void)
 
 										
 	double wt = codeLengthMu + codeLengthSigma + codeLengthWeights ;	
-	cout << "bits/wt: " << wt/N << endl ;
+	//cout << "bits/wt: " << wt/N << endl ;
+	return wt ;
+}
+
+double Message :: encodeWeights_WallaceFreeman (void)
+{
+	Gaussian normal = normalDistribution<double>(weights) ;
+	//cout << "mu(w): " << normal.mean() << endl ;
+	//cout << "sigma(w): " << normal.standardDeviation() << endl ;
+
+  double mu = normal.mean() ;
+  double sigma = normal.standardDeviation() ;
+	if (sigma <= 3 * AOM)
+		sigma = 3 * AOM ;
+  size_t N = parameters.numFunctions ;
+	double pi = boost::math::constants::pi<double>() ;
+
+	double rangeMu = 2 ; // mu \in [-1,1]
+  double sigma_max = 1;
+  double sigma_min = AOM*3 ;
+  //::TODO:: ensure sigm_min is ALWAYS less than sigma_max
+	double rangeLogSigma = log2l(sigma_max)-log2l(sigma_min) ;	
+	double K2 = 5 / (36 * sqrt(3)) ;
+  
+	double wt = 0.5 * (N-1) * log2l ((sigma*sigma)*N/(N-1)) + 0.5 * (N-1) +
+							0.5 * N * log2l (2 * pi/(AOM * AOM)) +
+							0.5 * log2l (2 * N * N) + log2l (rangeMu * rangeLogSigma) +
+							1 + log2l (K2) ;
+	//cout << "bits/wt: " << wt/N << endl ;
 	return wt ;
 }
 
 double Message :: encodeOutput (void)
 {
+	double pi = boost::math::constants::pi<double>() ;
 	int N = parameters.numSamples ;
 	lcb::Vector<double> diff(N) ;
 	for (int i=0; i<N; i++)
@@ -241,19 +273,33 @@ double Message :: encodeOutput (void)
 	//cout << "sigma(dy) = " << normal.standardDeviation() << endl ;
 	
 	double rangeMu = 2 ; // mu \in [-1,1]
-	double codeLengthMu = log2l (rangeMu/AOM) ; 
+	//double codeLengthMu = log2l (rangeMu/AOM) ; 
+	double codeLengthMu = 0 ; // not sending mu - centre of distribution is f(x)
 	
-	double rangeSigma = 2 ; 	// sigma \in [0,2]
-	double codeLengthSigma = log2l (rangeSigma/AOM) ;
+	//double rangeSigma = 2 ;		// sigma \in [0,2]
+	//double codeLengthSigma = log2l (rangeSigma/AOM) ;
 
 	double sigma = normal.standardDeviation() ;
-	double pi = boost::math::constants::pi<double>() ;
-	double codeLengthDiff = N * log2l (sigma * sqrt(2*pi) / AOM) +
-													N * 0.5 / log(2) ;
+	if (sigma <= 3 * AOM)
+		sigma = 3 * AOM ;
+  double sigma_max = 2;
+  double sigma_min = AOM*3 ;
+  //::TODO:: ensure sigm_min is ALWAYS less than sigma_max
+	double rangeLogSigma = log2l(sigma_max)-log2l(sigma_min) ;	
+	double K2 = 5 / (36 * sqrt(3)) ;
+  
+	//double codeLengthDiff = N * log2l (sigma * sqrt(2*pi) / AOM) +
+	//												N * 0.5 / log(2) ;
+	
+	double codeLength = 0.5 * (N-1) * log2l ((sigma*sigma)*N/(N-1)) + 0.5 * (N-1) +
+											0.5 * N * log2l (2 * pi/(AOM * AOM)) +
+											0.5 * log2l (2 * N * N) + log2l (rangeMu * rangeLogSigma) +
+											1 + log2l (K2) ;
 
-	double msgDy = codeLengthMu + codeLengthSigma + codeLengthDiff ;	
-	cout << "bits/dy: " << msgDy/N << endl ;
-	return msgDy ;
+	//double msgDy = codeLengthMu + codeLengthSigma + codeLengthDiff ;	
+	//cout << "bits/dy: " << msgDy/N << endl ;
+	//return msgDy ;
+	return codeLength ;
 }
 
 /*!
@@ -266,24 +312,28 @@ double Message :: messageLength (void)
 	// encode numFunctions and numSamples
 	//cout << "encoding number of functions and number of samples ..." << endl ;
 	double part1 = encodeIntegers() ;
-	cout << "encoding #functions + #samples: " << part1 << endl ;
+	//cout << "encoding #functions + #samples: " << part1 << endl ;
 
 	// encode x's
 	//cout << "encoding X values ..." << endl ; 
-	double part2 = encodeX(xVals,parameters) ;
-	cout << "encoding X: " << part2 << endl ;
+	//double part2 = encodeX(xVals,parameters) ;
+	//cout << "encoding X: " << part2 << endl ;
 
 	// encode weights
 	//cout << "encoding weights ..." << endl ;
-	double part3 = encodeWeights() ;
-	cout << "encoding weights: " << part3 << endl ;
+	//double part3 = encodeWeights() ;
+	double part3_WF = encodeWeights_WallaceFreeman() ;
+	//cout << "encoding weights         : " << part3 << endl ;
+	//cout << "encoding weights(Freeman): " << part3_WF << endl ;
 
 	// encode delta_y values
 	//cout << "encoding difference in output ..." << endl ;
 	double part4 = encodeOutput() ;
-	cout << "encoding Y: " << part4 << endl ;
+	//cout << "encoding Y: " << part4 << endl ;
 
-	return part1 + part2 + part3 + part4 ;
+	//return part1 + part2 + part3 + part4 ;
+	cout << part1 << " " << part3_WF << " " << part4 << endl ;
+	return part1 + part3_WF + part4 ;
 }
 
 #endif

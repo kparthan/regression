@@ -18,6 +18,8 @@
 #include "Plot.h"
 #include "OrthogonalBasis.h"
 
+#define AOM 0.01
+
 using namespace std ;
 
 /*!
@@ -161,7 +163,10 @@ void RandomDataGenerator<T> :: generate ()
 	}
 
 	computeFunctionValues() ;
-	addNoise() ;
+	if (parameters.sigma <= AOM)
+		yVal = fxVal ;
+	else
+		addNoise() ;
 }
 
 /*!

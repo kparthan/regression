@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <cstdlib>
 #include <vector>
 #include <string>
@@ -211,52 +212,86 @@ void setPrecision(void)
 	cout.setf(ios::fixed,ios::floatfield) ;
 }
 
+template <class T>
+string convertToString(T number)
+{
+	ostringstream convert ;
+	convert << number ;
+	return convert.str() ;
+}
+
 int main(int argc, char **argv)
 {
 	setPrecision() ;
 	struct Parameters parameters = parseCommandLine(argc,argv) ;
-	RandomDataGenerator<double> dataGenerator (parameters) ;
+	/*RandomDataGenerator<double> dataGenerator (parameters) ;
 
 	dataGenerator.generate() ;
 	Data<double> randomX = dataGenerator.randomX() ;
-	Data<double> yValues = dataGenerator.yValues() ;
+	Data<double> yValues = dataGenerator.yValues() ;*/
 	//Data<double> yValues = dataGenerator.fxValues() ;
-	dataGenerator.plotData() ;
+	//dataGenerator.plotData() ;
 	//dataGenerator.plotDataWithNoise() ;
+	string filename ; 
 
-	//for (unsigned M=1; M<100; M++) {
-	//cout << "M = " << M << endl ;
-	unsigned M = parameters.numFunctions ;
-	lcb::Matrix<double> phi ;
-	OrthogonalBasis orthogonal (parameters.numFunctions,parameters.timePeriod,
-															parameters.function) ;
-	phi = orthogonal.designMatrix(randomX) ;
+	//int Samples[5] = {10,100,1000,10000,100000} ;
+	int Samples[1] = {10000} ;
+	double Noise[1] = {0.1} ;
+	//double Noise[1] = {0.25} ;
+	
+	for (unsigned i=0; i<1; i++)
+	{
+		parameters.numSamples = Samples[i] ;
+		for (unsigned j=0; j<1; j++)
+		{
+			filename = "Results_Pi/results_n" + convertToString<int>(Samples[i]) + "_s" ;
+			filename = filename + convertToString<double>(Noise[j]) + ".txt" ;
+			ofstream results ;
+			results.open(filename.c_str()) ;	
+			parameters.sigma = Noise[j] ;
 
-	lcb::Matrix<double> weights ;
-	weights = computeWeights<double>(phi,yValues) ;
-	weights.print() ;
+			RandomDataGenerator<double> dataGenerator (parameters) ;
+			dataGenerator.generate() ;
+			Data<double> randomX = dataGenerator.randomX() ;
+			Data<double> yValues = dataGenerator.yValues() ;
 
-	Data<double> predictions ;
-	predictions = dataGenerator.predict(M,weights,randomX) ;
-	dataGenerator.plotPredictions(randomX,yValues,predictions) ;
+			for (unsigned M=2; M<200; M++) 
+			{
+				cout << "N: " << parameters.numSamples << " " ;
+				cout << "S: " << parameters.sigma << " " ;
+				cout << "M: " << M << " " ;
+				//unsigned M = parameters.numFunctions ;
+				if (Samples[i] > M+15)
+				{
+					parameters.numFunctions = M ;
+					lcb::Matrix<double> phi ;
+					OrthogonalBasis orthogonal (parameters.numFunctions,
+					parameters.timePeriod,parameters.function) ;
+					phi = orthogonal.designMatrix(randomX) ;
 
-	double rmse = computeRMSE<double>(weights,phi,yValues) ;
-	//cout << "Error in fitting: " << rmse << endl ;
+					lcb::Matrix<double> weights ;
+					weights = computeWeights<double>(phi,yValues) ;
+					//weights.print() ;
 
-	Message msg (parameters,weights,randomX,yValues,predictions) ;
-	double msgLen = msg.messageLength() ;
-	cout << "Msg Len = " << msgLen << endl ;
+					Data<double> predictions ;
+					predictions = dataGenerator.predict(M,weights,randomX) ;
+					//dataGenerator.plotPredictions(randomX,yValues,predictions) ;
 
-	/*ofstream results ;
-	results.open("results.txt",ios::app) ;	
-	results << parameters.function << "\t" ;
-	results << parameters.numFunctions << "\t" ;
-	results << parameters.numSamples << "\t" ;
-	results << rmse << "\t" ;
-	results << msgLen << endl ;
-	results.close() ;*/
-	//}
+					double rmse = computeRMSE<double>(weights,phi,yValues) ;
+					//cout << "Error in fitting: " << rmse << endl ;
 
+					Message msg (parameters,weights,randomX,yValues,predictions) ;
+					double msgLen = msg.messageLength() ;
+					//cout << "Msg Len = " << msgLen << endl ;
+
+					results << parameters.numFunctions << "\t" ;
+					results << rmse << "\t" ;
+					results << msgLen << endl ;
+				}
+			}
+			results.close() ;
+		}
+	}
 	return 0 ;
 }
 

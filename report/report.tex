@@ -1,0 +1,85 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{textcomp}
+\usepackage{inputenc}
+\usepackage{fontenc}
+\usepackage{graphicx}
+\usepackage[a4paper]{geometry}
+
+\geometry{top=1.0in, bottom=1.0in, left=1.5in, right=1.5in} 
+
+\title{Regression Analysis}
+\author{}
+\date{27 July 2012}
+\begin{document}
+\maketitle
+%\begin{center}
+%\textbf{Regression Analysis} - 27 July 2012\\ 
+%\end{center}
+
+\noindent \textsc{Problem} \\
+We have a set of $N$ data points $\mathcal{D}=\{(x_1,y_1),(x_2,y_2),\ldots,(x_N,y_N)\}$. The idea is to come up with a best approximation fucntion that would predict the value of $y$ for a given value of $x$. The nature of the underlying function that defines the data or the details of how the data was generated is usually unknown. These data points might be totally random or may be related by a characteristic function. \\
+
+\noindent \textsc{Theory} \\
+In the absence of the underlying function, the data is treated to be a linear combination of some set of functions.
+\begin{align}
+y &=  \sum_{i=1}^M w_i \phi_i(x) \\
+  &=  \bar{w}^T \bar{\phi}(x)
+\end{align}
+where $M$ is the number of functions, 
+$\bar{w} = [w_1 w_2 \ldots w_M]^T, \rm{and}$
+$\bar{\phi}(x) = [\phi_1(x) \phi_2(x) \ldots \phi_M(x)]^T$.
+As a particular case, the set of functions $\{\phi_(x)\}$ belong to a set of orthogonal basis collection of functions. Any two functions in this orthogonal basis set satisy the following two criteria:-
+\[ 
+  \int\limits_{a}^{b}\phi_i(x)\phi_j(x) dx =  
+  \begin{cases}
+    1, & \text{if } i = j, \\
+    0, & \text{otherwise}.
+  \end{cases}
+\]
+
+\noindent $(1)$ is a \textit{linear model} for regression. Approximating the output values ${y_n}$ using the linear model results in an error. Minimizing this error forms the backbone of this approach. The error in approximation is given by $(y_n-\hat{y_n})^2$ where $\hat{y_n}$ is the estimated $y$ value. The combined error for all $N$ data points can then be written as
+\begin{equation}
+ \mathcal{E} = \sum_{n=1}^N (y_n-\hat{y_n})^2
+\end{equation} 
+The error given a $M$ and $\bar{w}$ is 
+\begin{equation}
+ \mathcal{E}(\bar{w}) = \sum_{n=1}^N (y_n-\sum_{i=1}^M w_i \phi_i(x_n))^2
+\end{equation} 
+
+The optimal set of weights are those that minimize $\mathcal{E}(\bar{w})$
+\[ \bar{w}^* = \displaystyle\operatorname*{argmin}_{\bar{w}} \mathcal{E}(\bar{w}) \]
+
+Differentiating $\mathcal{E}(\bar{w})$ with respect to $\bar{w}$, we have
+\begin{align*}
+ \frac{d}{d\bar{w}}\mathcal{E}(\bar{w}) &= \frac{d}{d\bar{w}}\sum_{n=1}^N (y_n-\bar{w}^T \bar{\phi}(x_n))^2 \\
+					 &= 2 \sum_{n=1}^N (y_n- \bar{\phi}(x_n)^T\bar{w})\bar{\phi}(x_n) 
+\end{align*}
+Now,
+\[ \frac{d}{d\bar{w}}\mathcal{E}(\bar{w}) = 0 \Rightarrow \sum_{n=1}^N (y_n - \bar{\phi}(x_n)^T\bar{w})\bar{\phi}(x_n) = 0 \]
+\begin{align}
+\therefore \sum_{n=1}^N y_n \bar{\phi}(x_n) &= \sum_{n=1}^N \bar{\phi}(x_n)^T \bar{w} \bar{\phi}(x_n)
+\end{align}
+If $
+    \bar{y} = \left[ 
+		      \begin{array}{c}
+		       y_1 \\ y_2 \\ . \\ . \\ . \\ y_N
+		      \end{array}
+	      \right]
+   $
+ and $
+      \Phi = \left[
+		      \begin{array}{c}
+		       \bar{\phi}(x_1)^T \\ \bar{\phi}(x_2)^T \\ . \\ . \\. \\ \bar{\phi}(x_N)^T
+		      \end{array}
+	     \right]_{N\times M} 
+     $,
+then $(5)$ can be expressed as
+\begin{align}
+(\Phi^T \Phi) \bar{w} &= \Phi^T \bar{y} \notag \\
+	      \bar{w} &= (\Phi^T \Phi)^{-1} \Phi^T \bar{y}
+\end{align}
+
+\end{document}

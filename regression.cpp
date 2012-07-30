@@ -60,6 +60,8 @@ struct Parameters parseCommandLine (int argc, char **argv)
 				function = 0 ;
 			else if (fname.compare("square") == 0)
 				function = 1 ;
+			else if(fname.compare("finlincomb") == 0)
+				function = 2 ;
 			else
 				error ("Function not supported ...") ;
 			paramFlags[4] = 1 ;
@@ -235,8 +237,8 @@ int main(int argc, char **argv)
 	string filename ; 
 
 	//int Samples[5] = {10,100,1000,10000,100000} ;
-	int Samples[1] = {10000} ;
-	double Noise[1] = {0.1} ;
+	int Samples[1] = {100} ;
+	double Noise[1] = {0.25} ;
 	//double Noise[1] = {0.25} ;
 	
 	for (unsigned i=0; i<1; i++)
@@ -244,7 +246,7 @@ int main(int argc, char **argv)
 		parameters.numSamples = Samples[i] ;
 		for (unsigned j=0; j<1; j++)
 		{
-			filename = "Results_Pi/results_n" + convertToString<int>(Samples[i]) + "_s" ;
+			filename = "Results/results_n" + convertToString<int>(Samples[i]) + "_s" ;
 			filename = filename + convertToString<double>(Noise[j]) + ".txt" ;
 			ofstream results ;
 			results.open(filename.c_str()) ;	
@@ -255,14 +257,14 @@ int main(int argc, char **argv)
 			Data<double> randomX = dataGenerator.randomX() ;
 			Data<double> yValues = dataGenerator.yValues() ;
 
-			for (unsigned M=2; M<200; M++) 
+			for (unsigned M=58; M<59; M++) 
 			{
-				cout << "N: " << parameters.numSamples << " " ;
-				cout << "S: " << parameters.sigma << " " ;
-				cout << "M: " << M << " " ;
+				cout << "N: " << parameters.numSamples << "\t" ;
+				cout << "S: " << parameters.sigma << "\t" ;
+				cout << "M: " << M << "\t" ;
 				//unsigned M = parameters.numFunctions ;
-				if (Samples[i] > M+15)
-				{
+				//if (Samples[i] > M+15)
+				//{
 					parameters.numFunctions = M ;
 					lcb::Matrix<double> phi ;
 					OrthogonalBasis orthogonal (parameters.numFunctions,
@@ -287,7 +289,7 @@ int main(int argc, char **argv)
 					results << parameters.numFunctions << "\t" ;
 					results << rmse << "\t" ;
 					results << msgLen << endl ;
-				}
+				//}
 			}
 			results.close() ;
 		}

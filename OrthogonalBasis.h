@@ -92,6 +92,7 @@ lcb::Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
 			}
 			break ;
 	}*/
+	double phase = (rand() / RAND_MAX) * 2 * pi ;
 	for (int i=0; i<numPoints; i++)
 	{
 		for (int j=0; j<numFunctions; j++)
@@ -99,9 +100,9 @@ lcb::Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
 			int k = j / 2 + 1 ;
 			double arg = 2 * pi * k * data[i].x() / timePeriod ;
 			if (j % 2 == 0)
-				phi[i][j] = sin (arg) ;
+				phi[i][j] = sin (arg+phase) ;
 			else
-				phi[i][j] = cos (arg) ;
+				phi[i][j] = cos (arg+phase) ;
 		}
 	}
 	return phi ;

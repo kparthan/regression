@@ -13,12 +13,22 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
+#include <liblcb/Vector.h>
 #include "Data.h"
 #include "Gaussian.h"
 #include "Plot.h"
 #include "OrthogonalBasis.h"
 
+//!	accuracy of measurement
 #define AOM 0.01
+
+//!	minimum number of terms used in data generation using a
+//!	finite linear combination model
+#define MIN_TERMS 3
+
+//!	maximum number of terms used in data generation using a
+//!	finite linear combination model
+#define MAX_TERMS 100
 
 using namespace std ;
 
@@ -315,6 +325,28 @@ double square (double x, double timePeriod, double peak)
 }
 
 /*!
+ *	\relates RandomDataGenerator
+ *	\brief 
+ */
+double finiteLinearCombination (double x, double timePeriod, 
+																lcb::Vector<double> weights)
+{
+	double pi = boost::math::constants::pi<double>() ;
+	int M = weights.length() ;
+	double arg,yVal = 0 ; // weights[0]
+	for (int j=0; j<M; j++)
+	{
+		int k = j / 2 + 1 ;
+		arg = 2 * pi * k * x / timePeriod ;
+		if (j % 2 == 0)
+			yVal += weights[j] * sin(arg) ;
+		else
+			yVal += weights[j] * cos(arg) ;
+	}
+	return yVal ;	
+}
+
+/*!
  *	\fn void RandomDataGenerator<T> :: computeFunctionValues (void)
  *	\brief This module is used to compute the corresponding function
  *	values for the X's generated randomly
@@ -324,6 +356,8 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 {
 	T *y ;
 	double slope ;
+	int M ;
+	lcb::Vector<double> weights ;
 	switch (parameters.function)
 	{
 		case 0:		// sawtooth
@@ -344,6 +378,24 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 				y[i] = square (randomX,parameters.timePeriod,parameters.peak) ;
 			}
 			fname = "SQUARE" ;
+			break ;
+		case 2:		// using a finite linear combination
+			srand (time(NULL)) ;
+			y = new T [parameters.numSamples] ;
+			// generate the number of terms (between 3 and 100)
+			M = rand() % (MAX_TERMS-MIN_TERMS+1) + MIN_TERMS ;
+			weights = lcb::Vector<double>(M) ;
+			for (int i=0; i<M; i++) {
+				weights[i] = 2 * (rand() /(double) RAND_MAX) - 1 ;
+			}
+			cout << "M_gen: " << M << endl ;
+			weights.print() ;
+			for (int i=0; i<xVal.nPoints(); i++)
+			{
+				double randomX = xVal[i].x() ;
+				y[i] = finiteLinearCombination(randomX,parameters.timePeriod,weights) ;
+			}
+			fname = "FINTITE LINEAR COMBINATION" ;
 			break ;
 		default:
 			error ("Function index not appropriate!") ;

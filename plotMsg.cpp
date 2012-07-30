@@ -30,7 +30,7 @@ void plot (const char *file, int numSamples, double noise)
 	string s = convertToString<double>(noise) ;
 	string title = "N = " + n + ", Sigma = " + s ;
 	script << "set title \"" << title << "\"" << endl ; 
-	script << "set xlabel \"# of basis functions\"" << endl ;
+	script << "set xlabel \"# of terms\"" << endl ;
 	script << "set ylabel \"Message Length\"" << endl ;
 	script << "set output \"./" << file << ".eps\"" << endl ;
 
@@ -41,15 +41,15 @@ void plot (const char *file, int numSamples, double noise)
 main()
 {			
 	string file ;
-  int Samples[1] = {10000} ;
-  double Noise[1] = {0.1} ;
+  int Samples[1] = {100} ;
+  double Noise[1] = {0} ;
   //double Noise[1] = {0.25} ;
 	
 	for (int i=0; i<1; i++)
 	{
 		for (int j=0; j<1; j++)
 		{
-			file = "Results_Pi/results_n" + convertToString<int>(Samples[i]) + "_s" ;
+			file = "Results/results_n" + convertToString<int>(Samples[i]) + "_s" ;
 			//file = "Results_Pi_extra/results_n" + convertToString<int>(Samples[i]) + "_s" ;
       file = file + convertToString<double>(Noise[j]) + ".txt" ;
 			plot(file.c_str(),Samples[i],Noise[j]) ;

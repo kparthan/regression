@@ -1,0 +1,515 @@
+Using default value for Gaussian Mean: 0.00
+Using default value for Gaussian sigma: 1.00
+Interval lower bound set to: 0.00
+Interval higher bound set to: 6.28
+Using default number of samples: 20
+Using default function to generate data: sawtooth
+Using default value for time period: 0.10
+Using default value for maximum amplitude of wave: 1.00
+Using default number of orthogonal functions: 3
+Using data generated randomly ...
+N: 100	S: 0.25	M: 3	sigma(w): 0.26
+
+sigma(dy) = 0.39
+Int: 25.00	X: 437.62	W: 24.38	Y: 721.24
+Message_1: 49.38
+Message_2: 1158.86
+N: 100	S: 0.25	M: 4	sigma(w): 0.26
+
+sigma(dy) = 0.39
+Int: 25.00	X: 437.62	W: 31.33	Y: 720.25
+Message_1: 56.33
+Message_2: 1157.87
+N: 100	S: 0.25	M: 5	sigma(w): 0.23
+
+sigma(dy) = 0.34
+Int: 25.00	X: 437.62	W: 37.53	Y: 700.31
+Message_1: 62.53
+Message_2: 1137.93
+N: 100	S: 0.25	M: 6	sigma(w): 0.23
+
+sigma(dy) = 0.34
+Int: 25.00	X: 437.62	W: 44.26	Y: 700.25
+Message_1: 69.26
+Message_2: 1137.87
+N: 100	S: 0.25	M: 7	sigma(w): 0.22
+
+sigma(dy) = 0.33
+Int: 25.00	X: 437.62	W: 50.35	Y: 694.58
+Message_1: 75.35
+Message_2: 1132.20
+N: 100	S: 0.25	M: 8	sigma(w): 0.22
+
+sigma(dy) = 0.33
+Int: 25.00	X: 437.62	W: 56.85	Y: 694.04
+Message_1: 81.85
+Message_2: 1131.66
+N: 100	S: 0.25	M: 9	sigma(w): 0.20
+
+sigma(dy) = 0.32
+Int: 25.00	X: 437.62	W: 62.47	Y: 691.29
+Message_1: 87.47
+Message_2: 1128.91
+N: 100	S: 0.25	M: 10	sigma(w): 0.20
+
+sigma(dy) = 0.32
+Int: 25.00	X: 437.62	W: 68.37	Y: 691.12
+Message_1: 93.37
+Message_2: 1128.74
+N: 100	S: 0.25	M: 11	sigma(w): 0.19
+
+sigma(dy) = 0.31
+Int: 25.00	X: 437.62	W: 73.75	Y: 686.10
+Message_1: 98.75
+Message_2: 1123.72
+N: 100	S: 0.25	M: 12	sigma(w): 0.18
+
+sigma(dy) = 0.31
+Int: 25.00	X: 437.62	W: 79.56	Y: 686.14
+Message_1: 104.56
+Message_2: 1123.76
+N: 100	S: 0.25	M: 13	sigma(w): 0.18
+
+sigma(dy) = 0.30
+Int: 25.00	X: 437.62	W: 85.83	Y: 681.67
+Message_1: 110.83
+Message_2: 1119.29
+N: 100	S: 0.25	M: 14	sigma(w): 0.18
+
+sigma(dy) = 0.30
+Int: 25.00	X: 437.62	W: 91.44	Y: 681.50
+Message_1: 116.44
+Message_2: 1119.12
+N: 100	S: 0.25	M: 15	sigma(w): 0.17
+
+sigma(dy) = 0.29
+Int: 25.00	X: 437.62	W: 96.67	Y: 679.87
+Message_1: 121.67
+Message_2: 1117.49
+N: 100	S: 0.25	M: 16	sigma(w): 0.17
+
+sigma(dy) = 0.29
+Int: 25.00	X: 437.62	W: 102.58	Y: 679.80
+Message_1: 127.58
+Message_2: 1117.42
+N: 100	S: 0.25	M: 17	sigma(w): 0.17
+
+sigma(dy) = 0.29
+Int: 25.00	X: 437.62	W: 107.93	Y: 679.47
+Message_1: 132.93
+Message_2: 1117.09
+N: 100	S: 0.25	M: 18	sigma(w): 0.16
+
+sigma(dy) = 0.29
+Int: 25.00	X: 437.62	W: 113.43	Y: 678.94
+Message_1: 138.43
+Message_2: 1116.56
+N: 100	S: 0.25	M: 19	sigma(w): 0.19
+
+sigma(dy) = 0.25
+Int: 25.00	X: 437.62	W: 123.26	Y: 659.02
+Message_1: 148.26
+Message_2: 1096.64
+N: 100	S: 0.25	M: 20	sigma(w): 0.19
+
+sigma(dy) = 0.25
+Int: 25.00	X: 437.62	W: 129.00	Y: 658.69
+Message_1: 154.00
+Message_2: 1096.31
+N: 100	S: 0.25	M: 21	sigma(w): 0.18
+
+sigma(dy) = 0.25
+Int: 25.00	X: 437.62	W: 134.26	Y: 656.33
+Message_1: 159.26
+Message_2: 1093.96
+N: 100	S: 0.25	M: 22	sigma(w): 0.18
+
+sigma(dy) = 0.25
+Int: 25.00	X: 437.62	W: 140.52	Y: 654.89
+Message_1: 165.52
+Message_2: 1092.51
+N: 100	S: 0.25	M: 23	sigma(w): 0.17
+
+sigma(dy) = 0.24
+Int: 25.00	X: 437.62	W: 144.62	Y: 653.31
+Message_1: 169.62
+Message_2: 1090.93
+N: 100	S: 0.25	M: 24	sigma(w): 0.17
+
+sigma(dy) = 0.24
+Int: 25.00	X: 437.62	W: 149.86	Y: 652.49
+Message_1: 174.86
+Message_2: 1090.11
+N: 100	S: 0.25	M: 25	sigma(w): 0.17
+
+sigma(dy) = 0.23
+Int: 25.00	X: 437.62	W: 156.66	Y: 646.94
+Message_1: 181.66
+Message_2: 1084.56
+N: 100	S: 0.25	M: 26	sigma(w): 0.17
+
+sigma(dy) = 0.23
+Int: 25.00	X: 437.62	W: 161.77	Y: 646.81
+Message_1: 186.77
+Message_2: 1084.43
+N: 100	S: 0.25	M: 27	sigma(w): 0.17
+
+sigma(dy) = 0.23
+Int: 25.00	X: 437.62	W: 167.72	Y: 642.60
+Message_1: 192.72
+Message_2: 1080.22
+N: 100	S: 0.25	M: 28	sigma(w): 0.16
+
+sigma(dy) = 0.23
+Int: 25.00	X: 437.62	W: 172.59	Y: 642.48
+Message_1: 197.59
+Message_2: 1080.10
+N: 100	S: 0.25	M: 29	sigma(w): 0.16
+
+sigma(dy) = 0.23
+Int: 25.00	X: 437.62	W: 178.88	Y: 642.23
+Message_1: 203.88
+Message_2: 1079.85
+N: 100	S: 0.25	M: 30	sigma(w): 0.16
+
+sigma(dy) = 0.23
+Int: 25.00	X: 437.62	W: 184.95	Y: 641.76
+Message_1: 209.95
+Message_2: 1079.38
+N: 100	S: 0.25	M: 31	sigma(w): 0.17
+
+sigma(dy) = 0.22
+Int: 25.00	X: 437.62	W: 191.16	Y: 641.10
+Message_1: 216.16
+Message_2: 1078.72
+N: 100	S: 0.25	M: 32	sigma(w): 0.16
+
+sigma(dy) = 0.22
+Int: 25.00	X: 437.62	W: 196.33	Y: 640.73
+Message_1: 221.33
+Message_2: 1078.35
+N: 100	S: 0.25	M: 33	sigma(w): 0.15
+
+sigma(dy) = 0.22
+Int: 25.00	X: 437.62	W: 199.11	Y: 637.44
+Message_1: 224.11
+Message_2: 1075.06
+N: 100	S: 0.25	M: 34	sigma(w): 0.15
+
+sigma(dy) = 0.22
+Int: 25.00	X: 437.62	W: 204.37	Y: 637.44
+Message_1: 229.37
+Message_2: 1075.06
+N: 100	S: 0.25	M: 35	sigma(w): 0.15
+
+sigma(dy) = 0.21
+Int: 25.00	X: 437.62	W: 208.31	Y: 634.63
+Message_1: 233.31
+Message_2: 1072.25
+N: 100	S: 0.25	M: 36	sigma(w): 0.14
+
+sigma(dy) = 0.21
+Int: 25.00	X: 437.62	W: 213.61	Y: 634.55
+Message_1: 238.61
+Message_2: 1072.17
+N: 100	S: 0.25	M: 37	sigma(w): 0.14
+
+sigma(dy) = 0.21
+Int: 25.00	X: 437.62	W: 217.84	Y: 633.66
+Message_1: 242.84
+Message_2: 1071.28
+N: 100	S: 0.25	M: 38	sigma(w): 0.14
+
+sigma(dy) = 0.21
+Int: 25.00	X: 437.62	W: 223.61	Y: 633.49
+Message_1: 248.61
+Message_2: 1071.11
+N: 100	S: 0.25	M: 39	sigma(w): 0.14
+
+sigma(dy) = 0.21
+Int: 25.00	X: 437.62	W: 228.99	Y: 628.74
+Message_1: 253.99
+Message_2: 1066.36
+N: 100	S: 0.25	M: 40	sigma(w): 0.14
+
+sigma(dy) = 0.20
+Int: 25.00	X: 437.62	W: 236.78	Y: 626.90
+Message_1: 261.78
+Message_2: 1064.52
+N: 100	S: 0.25	M: 41	sigma(w): 0.14
+
+sigma(dy) = 0.20
+Int: 25.00	X: 437.62	W: 239.45	Y: 626.13
+Message_1: 264.45
+Message_2: 1063.75
+N: 100	S: 0.25	M: 42	sigma(w): 0.13
+
+sigma(dy) = 0.20
+Int: 25.00	X: 437.62	W: 242.73	Y: 625.59
+Message_1: 267.73
+Message_2: 1063.21
+N: 100	S: 0.25	M: 43	sigma(w): 0.13
+
+sigma(dy) = 0.20
+Int: 25.00	X: 437.62	W: 247.02	Y: 623.29
+Message_1: 272.02
+Message_2: 1060.91
+N: 100	S: 0.25	M: 44	sigma(w): 0.12
+
+sigma(dy) = 0.20
+Int: 25.00	X: 437.62	W: 250.46	Y: 622.79
+Message_1: 275.46
+Message_2: 1060.41
+N: 100	S: 0.25	M: 45	sigma(w): 0.13
+
+sigma(dy) = 0.20
+Int: 25.00	X: 437.62	W: 256.25	Y: 622.46
+Message_1: 281.25
+Message_2: 1060.08
+N: 100	S: 0.25	M: 46	sigma(w): 0.12
+
+sigma(dy) = 0.20
+Int: 25.00	X: 437.62	W: 261.17	Y: 622.37
+Message_1: 286.17
+Message_2: 1059.99
+N: 100	S: 0.25	M: 47	sigma(w): 0.12
+
+sigma(dy) = 0.20
+Int: 25.00	X: 437.62	W: 266.88	Y: 620.94
+Message_1: 291.88
+Message_2: 1058.56
+N: 100	S: 0.25	M: 48	sigma(w): 0.13
+
+sigma(dy) = 0.19
+Int: 25.00	X: 437.62	W: 273.55	Y: 620.62
+Message_1: 298.55
+Message_2: 1058.24
+N: 100	S: 0.25	M: 49	sigma(w): 0.13
+
+sigma(dy) = 0.19
+Int: 25.00	X: 437.62	W: 278.43	Y: 620.62
+Message_1: 303.43
+Message_2: 1058.24
+N: 100	S: 0.25	M: 50	sigma(w): 0.13
+
+sigma(dy) = 0.19
+Int: 25.00	X: 437.62	W: 284.25	Y: 619.25
+Message_1: 309.25
+Message_2: 1056.87
+N: 100	S: 0.25	M: 51	sigma(w): 0.13
+
+sigma(dy) = 0.19
+Int: 25.00	X: 437.62	W: 291.78	Y: 617.82
+Message_1: 316.78
+Message_2: 1055.44
+N: 100	S: 0.25	M: 52	sigma(w): 0.12
+
+sigma(dy) = 0.19
+Int: 25.00	X: 437.62	W: 293.58	Y: 616.03
+Message_1: 318.58
+Message_2: 1053.65
+N: 100	S: 0.25	M: 53	sigma(w): 0.12
+
+sigma(dy) = 0.19
+Int: 25.00	X: 437.62	W: 298.95	Y: 616.03
+Message_1: 323.95
+Message_2: 1053.65
+N: 100	S: 0.25	M: 54	sigma(w): 0.12
+
+sigma(dy) = 0.19
+Int: 25.00	X: 437.62	W: 302.53	Y: 616.02
+Message_1: 327.53
+Message_2: 1053.64
+N: 100	S: 0.25	M: 55	sigma(w): 0.12
+
+sigma(dy) = 0.19
+Int: 25.00	X: 437.62	W: 305.60	Y: 615.75
+Message_1: 330.60
+Message_2: 1053.37
+N: 100	S: 0.25	M: 56	sigma(w): 0.12
+
+sigma(dy) = 0.19
+Int: 25.00	X: 437.62	W: 310.93	Y: 615.23
+Message_1: 335.93
+Message_2: 1052.85
+N: 100	S: 0.25	M: 57	sigma(w): 0.12
+
+sigma(dy) = 0.19
+Int: 25.00	X: 437.62	W: 317.40	Y: 614.72
+Message_1: 342.40
+Message_2: 1052.34
+N: 100	S: 0.25	M: 58	sigma(w): 0.13
+
+sigma(dy) = 0.19
+Int: 25.00	X: 437.62	W: 329.73	Y: 614.59
+Message_1: 354.73
+Message_2: 1052.21
+N: 100	S: 0.25	M: 59	sigma(w): 0.13
+
+sigma(dy) = 0.19
+Int: 25.00	X: 437.62	W: 337.49	Y: 614.54
+Message_1: 362.49
+Message_2: 1052.16
+N: 100	S: 0.25	M: 60	sigma(w): 0.15
+
+sigma(dy) = 0.19
+Int: 25.00	X: 437.62	W: 351.64	Y: 614.48
+Message_1: 376.64
+Message_2: 1052.10
+N: 100	S: 0.25	M: 61	sigma(w): 0.42
+
+sigma(dy) = 0.18
+Int: 25.00	X: 437.62	W: 449.53	Y: 613.19
+Message_1: 474.53
+Message_2: 1050.82
+N: 100	S: 0.25	M: 62	sigma(w): 0.49
+
+sigma(dy) = 0.18
+Int: 25.00	X: 437.62	W: 469.85	Y: 612.10
+Message_1: 494.85
+Message_2: 1049.72
+N: 100	S: 0.25	M: 63	sigma(w): 0.99
+
+sigma(dy) = 0.17
+Int: 25.00	X: 437.62	W: 539.97	Y: 601.91
+Message_1: 564.97
+Message_2: 1039.53
+N: 100	S: 0.25	M: 64	sigma(w): 1.03
+
+sigma(dy) = 0.17
+Int: 25.00	X: 437.62	W: 552.22	Y: 601.71
+Message_1: 577.22
+Message_2: 1039.33
+N: 100	S: 0.25	M: 65	sigma(w): 1.16
+
+sigma(dy) = 0.17
+Int: 25.00	X: 437.62	W: 572.05	Y: 600.55
+Message_1: 597.05
+Message_2: 1038.17
+N: 100	S: 0.25	M: 66	sigma(w): 1.12
+
+sigma(dy) = 0.17
+Int: 25.00	X: 437.62	W: 577.09	Y: 597.39
+Message_1: 602.09
+Message_2: 1035.01
+N: 100	S: 0.25	M: 67	sigma(w): 0.78
+
+sigma(dy) = 0.16
+Int: 25.00	X: 437.62	W: 551.85	Y: 594.97
+Message_1: 576.85
+Message_2: 1032.59
+N: 100	S: 0.25	M: 68	sigma(w): 0.49
+
+sigma(dy) = 0.16
+Int: 25.00	X: 437.62	W: 514.34	Y: 594.38
+Message_1: 539.34
+Message_2: 1032.00
+N: 100	S: 0.25	M: 69	sigma(w): 0.57
+
+sigma(dy) = 0.16
+Int: 25.00	X: 437.62	W: 537.05	Y: 594.08
+Message_1: 562.05
+Message_2: 1031.70
+N: 100	S: 0.25	M: 70	sigma(w): 0.76
+
+sigma(dy) = 0.16
+Int: 25.00	X: 437.62	W: 573.51	Y: 593.93
+Message_1: 598.51
+Message_2: 1031.55
+N: 100	S: 0.25	M: 71	sigma(w): 1.24
+
+sigma(dy) = 0.16
+Int: 25.00	X: 437.62	W: 630.96	Y: 589.49
+Message_1: 655.96
+Message_2: 1027.11
+N: 100	S: 0.25	M: 72	sigma(w): 0.85
+
+sigma(dy) = 0.16
+Int: 25.00	X: 437.62	W: 600.65	Y: 589.31
+Message_1: 625.65
+Message_2: 1026.93
+N: 100	S: 0.25	M: 73	sigma(w): 1.05
+
+sigma(dy) = 0.16
+Int: 25.00	X: 437.62	W: 631.30	Y: 589.29
+Message_1: 656.30
+Message_2: 1026.91
+N: 100	S: 0.25	M: 74	sigma(w): 1.29
+
+sigma(dy) = 0.16
+Int: 25.00	X: 437.62	W: 661.08	Y: 588.68
+Message_1: 686.08
+Message_2: 1026.30
+N: 100	S: 0.25	M: 75	sigma(w): 6.22
+
+sigma(dy) = 0.15
+Int: 25.00	X: 437.62	W: 838.05	Y: 587.29
+Message_1: 863.05
+Message_2: 1024.91
+N: 100	S: 0.25	M: 76	sigma(w): 7.64
+
+sigma(dy) = 0.15
+Int: 25.00	X: 437.62	W: 871.37	Y: 585.48
+Message_1: 896.37
+Message_2: 1023.10
+N: 100	S: 0.25	M: 77	sigma(w): 20.36
+
+sigma(dy) = 0.14
+Int: 25.00	X: 437.62	W: 990.24	Y: 577.90
+Message_1: 1015.24
+Message_2: 1015.52
+N: 100	S: 0.25	M: 78	sigma(w): 17.41
+
+sigma(dy) = 0.14
+Int: 25.00	X: 437.62	W: 985.69	Y: 577.82
+Message_1: 1010.69
+Message_2: 1015.44
+N: 100	S: 0.25	M: 79	sigma(w): 21.57
+
+sigma(dy) = 0.14
+Int: 25.00	X: 437.62	W: 1022.43	Y: 576.32
+Message_1: 1047.43
+Message_2: 1013.94
+N: 100	S: 0.25	M: 80	sigma(w): 185.51
+
+sigma(dy) = 0.14
+Int: 25.00	X: 437.62	W: 1280.60	Y: 570.98
+Message_1: 1305.60
+Message_2: 1008.60
+N: 100	S: 0.25	M: 81	sigma(w): 230.76
+
+sigma(dy) = 0.14
+Int: 25.00	X: 437.62	W: 1321.81	Y: 570.83
+Message_1: 1346.81
+Message_2: 1008.45
+N: 100	S: 0.25	M: 82	sigma(w): 303.95
+
+sigma(dy) = 0.14
+Int: 25.00	X: 437.62	W: 1370.34	Y: 570.18
+Message_1: 1395.34
+Message_2: 1007.80
+N: 100	S: 0.25	M: 83	sigma(w): 385.46
+
+sigma(dy) = 0.14
+Int: 25.00	X: 437.62	W: 1415.18	Y: 570.13
+Message_1: 1440.18
+Message_2: 1007.75
+N: 100	S: 0.25	M: 84	sigma(w): 1292.20
+
+sigma(dy) = 0.13
+Int: 25.00	X: 437.62	W: 1577.11	Y: 560.55
+Message_1: 1602.11
+Message_2: 998.17
+N: 100	S: 0.25	M: 85	sigma(w): 5450.31
+
+sigma(dy) = 0.12
+Int: 25.00	X: 437.62	W: 1770.36	Y: 557.09
+Message_1: 1795.36
+Message_2: 994.71
+N: 100	S: 0.25	M: 86	sigma(w): 4378.96
+
+sigma(dy) = 0.12
+Int: 25.00	X: 437.62	W: 1764.42	Y: 552.81
+Message_1: 1789.42
+Message_2: 990.43
+N: 100	S: 0.25	M: 87	

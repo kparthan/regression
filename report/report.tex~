@@ -91,7 +91,7 @@ Tests are done by simulating data from two functions in particular, namely, the 
 
 \item Corresponding to a particular function that is also specified at runtime, the function values $f(x)$ for the respective $x$'s are computed.
 
-\item \textit{Generating Y's} To the previously generated $f(x)$ values, some amount of \textit{Gaussian noise} is added to account for any errors in the actual experiment conducted. S
+\item \textit{Generating Y's} To the previously generated $f(x)$ values, some amount of \textit{Gaussian noise} is added to account for any errors in the actual experiment conducted. 
 \end{itemize}
 
 \end{document}

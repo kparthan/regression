@@ -58,13 +58,13 @@ using namespace std ;
  */
 struct Parameters 
 {
-	double mean ;
-  double sigma ;
-  double low ;
-  double high ; 
+	long double mean ;
+  long double sigma ;
+  long double low ;
+  long double high ; 
   int function ;
-  double timePeriod ;
-  double peak ;
+  long double timePeriod ;
+  long double peak ;
   int numSamples ;
   int numFunctions ;
 	string file ;
@@ -164,7 +164,7 @@ void RandomDataGenerator<T> :: generate ()
 			random = rand() / (T) RAND_MAX ;
 			randomValues[i] = parameters.low + random * range ;
 		}
-		/*double partition = range / parameters.numSamples ;
+		/*long double partition = range / parameters.numSamples ;
 		randomValues[0] = parameters.low ;
 		for (int i=1; i<parameters.numSamples; i++)
 			randomValues[i] = partition + randomValues[i-1] ;*/
@@ -207,13 +207,13 @@ void RandomDataGenerator<T> :: generate ()
  *	make sure that the harmonic is changed from sine to cosine in the file
  *	"OrthogonalBasis.h" in constructing the design matrix.
  *
- *  \param x a double
- *	\param timePeriod a double
- *  \param peak a double
- *	\param slope a double
+ *  \param x a long double
+ *	\param timePeriod a long double
+ *  \param peak a long double
+ *	\param slope a long double
  *	\return the sawtooth function value
  */
-double sawtooth (double x, double timePeriod, double peak, double slope)
+long double sawtooth (long double x, long double timePeriod, long double peak, long double slope)
 {
 	//	Sawtooth [1]
 	/*
@@ -244,7 +244,7 @@ double sawtooth (double x, double timePeriod, double peak, double slope)
 	}
 	else if (x == 0)
 	{
-		double random = (double)rand() / RAND_MAX ;
+		long double random = (long double)rand() / RAND_MAX ;
 		if (random <= 0.5)
 			return peak ;
 		else return (-1)*peak ;
@@ -280,12 +280,12 @@ double sawtooth (double x, double timePeriod, double peak, double slope)
  *	make sure that the harmonic is changed from sine to cosine in the file
  *	"OrthogonalBasis.h" in constructing the design matrix.
  *
- *  \param x a double
- *	\param timePeriod a double
- *	\param peak a double
+ *  \param x a long double
+ *	\param timePeriod a long double
+ *	\param peak a long double
  *	\return the square wave function value
  */
-double square (double x, double timePeriod, double peak)
+long double square (long double x, long double timePeriod, long double peak)
 {
 	// Square [1]
 	/*
@@ -316,7 +316,7 @@ double square (double x, double timePeriod, double peak)
 			return (-1) * peak ;
 		else
 		{
-			double random = (double)rand() / RAND_MAX ;
+			long double random = (long double)rand() / RAND_MAX ;
 			if (random <= 0.5)
 				return peak ;
 			else return (-1) * peak ;
@@ -328,12 +328,12 @@ double square (double x, double timePeriod, double peak)
  *	\relates RandomDataGenerator
  *	\brief 
  */
-double finiteLinearCombination (double x, double timePeriod, 
-																lcb::Vector<double> weights)
+long double finiteLinearCombination (long double x, long double timePeriod, 
+																lcb::Vector<long double> weights)
 {
-	double pi = boost::math::constants::pi<double>() ;
+	long double pi = boost::math::constants::pi<long double>() ;
 	int M = weights.length() ;
-	double arg,yVal = 0 ; // weights[0]
+	long double arg,yVal = 0 ; // weights[0]
 	for (int j=0; j<M; j++)
 	{
 		int k = j / 2 + 1 ;
@@ -355,9 +355,9 @@ template <class T>
 void RandomDataGenerator<T> :: computeFunctionValues (void)
 {
 	T *y ;
-	double slope ;
+	long double slope ;
 	int M ;
-	lcb::Vector<double> weights ;
+	lcb::Vector<long double> weights ;
 	switch (parameters.function)
 	{
 		case 0:		// sawtooth
@@ -365,7 +365,7 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 			slope = (2 * parameters.peak) / parameters.timePeriod ;
 			for (int i=0; i<xVal.nPoints(); i++)
 			{
-				double randomX = xVal[i].x() ;
+				long double randomX = xVal[i].x() ;
 				y[i] = sawtooth(randomX,parameters.timePeriod,parameters.peak,slope) ;
 			}	
 			fname = "SAWTOOTH" ;
@@ -374,7 +374,7 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 			y = new T [parameters.numSamples] ;
 			for (int i=0; i<xVal.nPoints(); i++)
 			{
-				double randomX = xVal[i].x() ;
+				long double randomX = xVal[i].x() ;
 				y[i] = square (randomX,parameters.timePeriod,parameters.peak) ;
 			}
 			fname = "SQUARE" ;
@@ -384,15 +384,15 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 			y = new T [parameters.numSamples] ;
 			// generate the number of terms (between 3 and 100)
 			M = rand() % (MAX_TERMS-MIN_TERMS+1) + MIN_TERMS ;
-			weights = lcb::Vector<double>(M) ;
+			weights = lcb::Vector<long double>(M) ;
 			for (int i=0; i<M; i++) {
-				weights[i] = 2 * (rand() /(double) RAND_MAX) - 1 ;
+				weights[i] = 2 * (rand() /(long double) RAND_MAX) - 1 ;
 			}
 			cout << "M_gen: " << M << endl ;
 			weights.print() ;
 			for (int i=0; i<xVal.nPoints(); i++)
 			{
-				double randomX = xVal[i].x() ;
+				long double randomX = xVal[i].x() ;
 				y[i] = finiteLinearCombination(randomX,parameters.timePeriod,weights) ;
 			}
 			fname = "FINTITE LINEAR COMBINATION" ;
@@ -417,7 +417,7 @@ void RandomDataGenerator<T> :: addNoise (void)
 	T *y = new T [parameters.numSamples] ;
 	for (int i=0; i<parameters.numSamples; i++)
 	{
-		vector<double> samples = noise.generate() ;
+		vector<long double> samples = noise.generate() ;
 		y[i] = fxVal[i].x()+samples[0] ;
 		if (i != parameters.numSamples - 1)
 		{
@@ -445,7 +445,7 @@ Data<T> RandomDataGenerator<T> :: predict (unsigned M, lcb::Matrix<T> &weights,
 	parameters.numFunctions = M ;
 	OrthogonalBasis orthogonal (parameters.numFunctions,parameters.timePeriod,
 															parameters.function) ;
-	lcb::Matrix<double> designMatrix ;
+	lcb::Matrix<long double> designMatrix ;
 	designMatrix = orthogonal.designMatrix(xVals) ;
 	lcb::Matrix<T> yEst = designMatrix * weights ; // column matrix
 	return Data<T>(yEst) ;
@@ -493,7 +493,7 @@ template <class T>
 void RandomDataGenerator<T> :: plotRandomX (void)
 {
 	vector<string> labels ;
-	double min,max ;
+	long double min,max ;
 	labels.push_back(fname) ;
 	labels.push_back("#") ;
 	labels.push_back("x") ;
@@ -501,7 +501,7 @@ void RandomDataGenerator<T> :: plotRandomX (void)
 	Plot graph ;
 	graph.label(labels) ;
 	
-	pair<double,double> xrange,yrange ;
+	pair<long double,long double> xrange,yrange ;
 	xrange = make_pair(1,parameters.numSamples) ;
 	yrange = make_pair(xVal.minimum()-0.5,xVal.maximum()+0.5) ;
 	graph.setRange(xrange,yrange) ;
@@ -517,7 +517,7 @@ template <class T>
 void RandomDataGenerator<T> :: plotData (void)
 {
 	vector<string> labels ;
-	double min,max ;
+	long double min,max ;
 	labels.push_back(fname) ;
 	labels.push_back("x") ;
 	labels.push_back("f(x)") ;
@@ -525,7 +525,7 @@ void RandomDataGenerator<T> :: plotData (void)
 	Plot graph ;
 	graph.label(labels) ;
 	
-	pair<double,double> xrange,yrange ;
+	pair<long double,long double> xrange,yrange ;
 	xrange = make_pair(parameters.low-0.5,parameters.high+0.5) ;
 	yrange = make_pair(fxVal.minimum()-0.5,fxVal.maximum()+0.5) ;
 	graph.setRange(xrange,yrange) ;
@@ -540,7 +540,7 @@ template <class T>
 void RandomDataGenerator<T> :: plotDataWithNoise (void)
 {
 	vector<string> labels ;
-	double min,max ;
+	long double min,max ;
 	labels.push_back(fname) ;
 	labels.push_back("x") ;
 	labels.push_back("y=f(x)+e") ;
@@ -548,9 +548,9 @@ void RandomDataGenerator<T> :: plotDataWithNoise (void)
 	Plot graph ;
 	graph.label(labels) ;
 	
-	pair<double,double> xrange,yrange ;
+	pair<long double,long double> xrange,yrange ;
 	xrange = make_pair(parameters.low-0.5,parameters.high+0.5) ;
-	double extreme[4] ;
+	long double extreme[4] ;
 	extreme[0] = fxVal.minimum() ;
 	extreme[1] = fxVal.maximum() ;
 	extreme[2] = yVal.minimum() ;
@@ -584,7 +584,7 @@ void RandomDataGenerator<T> :: plotPredictions (Data<T> &xVals, Data<T> &yVals,
 															 Data<T> &predictions) 
 {
 	vector<string> labels ;
-	double min,max ;
+	long double min,max ;
 	labels.push_back(fname) ;
 	labels.push_back("x") ;
 	labels.push_back("predictions") ;
@@ -592,9 +592,9 @@ void RandomDataGenerator<T> :: plotPredictions (Data<T> &xVals, Data<T> &yVals,
 	Plot graph ;
 	graph.label(labels) ;
 	
-	pair<double,double> xrange,yrange ;
+	pair<long double,long double> xrange,yrange ;
 	xrange = make_pair(parameters.low-0.5,parameters.high+0.5) ;
-	double extreme[4] ;
+	long double extreme[4] ;
 	extreme[0] = yVals.minimum() ;
 	extreme[1] = yVals.maximum() ;
 	extreme[2] = predictions.minimum() ;

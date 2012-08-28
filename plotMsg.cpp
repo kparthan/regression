@@ -14,7 +14,7 @@ string convertToString(T number)
   return convert.str() ;
 }
 
-void plot (const char *file, int numSamples, double noise)
+void plot (const char *file, int numSamples, long double noise)
 {
 	ofstream script ;
 	script.open("plotMsgLen.p") ;
@@ -27,7 +27,7 @@ void plot (const char *file, int numSamples, double noise)
   script << "# set ytics automatically" << endl ;
 
 	string n = convertToString<int>(numSamples) ;
-	string s = convertToString<double>(noise) ;
+	string s = convertToString<long double>(noise) ;
 	string title = "N = " + n + ", Sigma = " + s ;
 	script << "set title \"" << title << "\"" << endl ; 
 	script << "set xlabel \"# of terms\"" << endl ;
@@ -42,16 +42,15 @@ main()
 {			
 	string file ;
   int Samples[1] = {100} ;
-  double Noise[1] = {0} ;
-  //double Noise[1] = {0.25} ;
+  long double Noise[1] = {0.25} ;
+  //long double Noise[1] = {0.25} ;
 	
 	for (int i=0; i<1; i++)
 	{
 		for (int j=0; j<1; j++)
 		{
 			file = "Results/results_n" + convertToString<int>(Samples[i]) + "_s" ;
-			//file = "Results_Pi_extra/results_n" + convertToString<int>(Samples[i]) + "_s" ;
-      file = file + convertToString<double>(Noise[j]) + ".txt" ;
+      file = file + convertToString<long double>(Noise[j]) + ".txt" ;
 			plot(file.c_str(),Samples[i],Noise[j]) ;
 		}
 	}

@@ -27,21 +27,21 @@ using namespace std ;
 class Gaussian 
 {
 	private:
-		double mu ;
-		double sigma ;
+		long double mu ;
+		long double sigma ;
 	public:
 		//! null constructor
 		Gaussian() ;
 		//! constructor that sets value of parameters
-		Gaussian (double, double);
+		Gaussian (long double, long double);
 		//! value of function
-		double value(double) ;
+		long double value(long double) ;
 		//! generates a sample from the distribution
-		vector<double> generate () ;
+		vector<long double> generate () ;
 		//! returns the mean 
-		const double mean () ;
+		const long double mean () ;
 		//! returns the standard deviation
-		const double standardDeviation () ;
+		const long double standardDeviation () ;
 } ;
 
 /*!
@@ -54,32 +54,32 @@ Gaussian :: Gaussian () : mu(0), sigma(1)
 }
 
 /*!
- *  \fn Gaussian :: Gaussian (double mu, double sigma)
+ *  \fn Gaussian :: Gaussian (long double mu, long double sigma)
  *  \brief constructor function which sets the value of mean and 
  *  standard deviation of the distribution
- *  \param mu a double
- *  \param sigma a double
+ *  \param mu a long double
+ *  \param sigma a long double
  */
-Gaussian :: Gaussian (double mu, double sigma) : mu(mu), sigma(sigma)
+Gaussian :: Gaussian (long double mu, long double sigma) : mu(mu), sigma(sigma)
 {
 }
 
 /*!
- *  \fn double Gaussian :: value (double x)
+ *  \fn long double Gaussian :: value (long double x)
  *  \brief computes the function value of the distribution
- *  \param x a double
+ *  \param x a long double
  *  \return value of the function given x
  */
-double Gaussian :: value (double x)
+long double Gaussian :: value (long double x)
 {
-	double expNumerator = (-1) * (x-mu) * (x-mu) ;
-	double expDenominator = 2 * sigma * sigma ;
-	double pi = boost::math::constants::pi<double>() ;
+	long double expNumerator = (-1) * (x-mu) * (x-mu) ;
+	long double expDenominator = 2 * sigma * sigma ;
+	long double pi = boost::math::constants::pi<long double>() ;
 	return (exp (expNumerator/expDenominator)) / ((sqrt (2*pi)) * sigma) ;
 }
 
 /*!
- *	\fn vector<double> Gaussian :: generate (void)
+ *	\fn vector<long double> Gaussian :: generate (void)
  *  \brief This function generates a data point sampled from this 
  *	Gaussian distribution. Uses Box-Muller method to draw samples from the 
  *	standard normal distribution i.e., N(0,1)
@@ -91,37 +91,37 @@ double Gaussian :: value (double x)
  *	Z = mu + sigma * X, where X~N(0,1)
  *	\return a sample drawn from the normal distribution
  */
-vector<double> Gaussian :: generate (void)
+vector<long double> Gaussian :: generate (void)
 {
 	//srand(time(0)) ;
-	vector<double> samples (2) ;
-	double u = (double) rand() / RAND_MAX ;
-	double v = (double) rand() / RAND_MAX ;
-	double sqroot = sqrt(-2 * log(u)) ;
-	double _2piV = 2 * boost::math::constants::pi<double>() * v ;
-	double r1 = sqroot * cos (_2piV) ;
-	double r2 = sqroot * sin (_2piV) ;
+	vector<long double> samples (2) ;
+	long double u = (long double) rand() / RAND_MAX ;
+	long double v = (long double) rand() / RAND_MAX ;
+	long double sqroot = sqrt(-2 * log(u)) ;
+	long double _2piV = 2 * boost::math::constants::pi<long double>() * v ;
+	long double r1 = sqroot * cos (_2piV) ;
+	long double r2 = sqroot * sin (_2piV) ;
 	samples[0] = mu + sigma * r1 ;
 	samples[1] = mu + sigma * r2 ;
 	return samples ;
 }
 
 /*!
- *  \fn const double Gaussian :: mean (void)
+ *  \fn const long double Gaussian :: mean (void)
  *  \brief returns the mean of the distribution
  *  \return the mean of the distribution
  */
-const double Gaussian :: mean (void)
+const long double Gaussian :: mean (void)
 {
 	return mu ;
 }
 
 /*!
- *  \fn const double Gaussian :: standardDeviation (void)
+ *  \fn const long double Gaussian :: standardDeviation (void)
  *  \brief returns the standard deviation of the distribution
  *  \return the standard deviation of the distribution
  */
-const double Gaussian :: standardDeviation(void)
+const long double Gaussian :: standardDeviation(void)
 {
 	return sigma ;
 }

@@ -85,11 +85,17 @@ then $(5)$ can be expressed as
 \noindent \textsc{Experiment} \\
 Tests are done by simulating data from two functions in particular, namely, the \texttt{sawtooth} and \texttt{square} functions. Each of these functions can be represented using an infinite Fourier series representation.  \\
 
-\noindent \textsc{Data Generation} \\
-\textit{Step 1} The range from which the \texttt{x} values need to be generated is defined at runtime via command-line arguments using the parameters \texttt{low} and \texttt{high}. Number of samples (\texttt{nsamples}) is also specified at runtime. Using a random data generator, these \texttt{x} values are obtained. \\
+\noindent \textsc{Data Generation} 
+\begin{itemize}
+\item \textit{Generating X's:} The range from which the $x$ values need to be generated is defined at runtime via command-line arguments using the parameters \texttt{low} and \texttt{high}. Number of samples (\texttt{nsamples}) is also specified at runtime. Using a random data generator, these $x$ values are obtained. 
 
-\textit{Step 2} Corresponding to a particular function that is also specified at runtime, the function values for the respective \texttt{x}'s are computed.
+\item Corresponding to a particular function that is also specified at runtime, the function values $f(x)$ for the respective $x$'s are computed.
 
+\item \textit{Generating Y's:} To the previously generated $f(x)$ values, some amount of \textit{Gaussian noise} is added to account for any errors in the actual experiment conducted. 
+\[ y = f(x) + \epsilon \quad \textrm{and } \quad \epsilon \sim \mathcal{N}(\mu,\sigma) \]
+
+
+\end{itemize}
 
 \end{document}
 

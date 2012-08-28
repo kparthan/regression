@@ -17,14 +17,14 @@ using namespace std ;
 
 struct Parameters parseCommandLine (int argc, char **argv)
 {
-	double mean = 0 ;								// -gmean
-	double sigma = 1 ;							// -gsigma
-	double low = -1 ;								// -low
-	double high = 1 ;								// -high
+	long double mean = 0 ;								// -gmean
+	long double sigma = 1 ;							// -gsigma
+	long double low = -1 ;								// -low
+	long double high = 1 ;								// -high
 	string fname = "sawtooth" ;			// -fn
 	int function = 0 ;						  
-	double timePeriod = 0.1 ;				// -t
-	double peak = 1 ;								// -peak
+	long double timePeriod = 0.1 ;				// -t
+	long double peak = 1 ;								// -peak
 	int numSamples = 20 ;						// -nsamples
 	int numFunctions = 3 ;					// -nof
 	string file ;										// -file
@@ -226,20 +226,20 @@ int main(int argc, char **argv)
 {
 	setPrecision() ;
 	struct Parameters parameters = parseCommandLine(argc,argv) ;
-	/*RandomDataGenerator<double> dataGenerator (parameters) ;
+	/*RandomDataGenerator<long double> dataGenerator (parameters) ;
 
 	dataGenerator.generate() ;
-	Data<double> randomX = dataGenerator.randomX() ;
-	Data<double> yValues = dataGenerator.yValues() ;*/
-	//Data<double> yValues = dataGenerator.fxValues() ;
+	Data<long double> randomX = dataGenerator.randomX() ;
+	Data<long double> yValues = dataGenerator.yValues() ;*/
+	//Data<long double> yValues = dataGenerator.fxValues() ;
 	//dataGenerator.plotData() ;
 	//dataGenerator.plotDataWithNoise() ;
 	string filename ; 
 
 	//int Samples[5] = {10,100,1000,10000,100000} ;
 	int Samples[1] = {100} ;
-	double Noise[1] = {0.25} ;
-	//double Noise[1] = {0.25} ;
+	long double Noise[1] = {0.25} ;
+	//long double Noise[1] = {0.25} ;
 	
 	for (unsigned i=0; i<1; i++)
 	{
@@ -247,49 +247,49 @@ int main(int argc, char **argv)
 		for (unsigned j=0; j<1; j++)
 		{
 			filename = "Results/results_n" + convertToString<int>(Samples[i]) + "_s" ;
-			filename = filename + convertToString<double>(Noise[j]) + ".txt" ;
+			filename = filename + convertToString<long double>(Noise[j]) + ".txt" ;
 			ofstream results ;
 			results.open(filename.c_str()) ;	
 			parameters.sigma = Noise[j] ;
 
-			RandomDataGenerator<double> dataGenerator (parameters) ;
+			RandomDataGenerator<long double> dataGenerator (parameters) ;
 			dataGenerator.generate() ;
-			Data<double> randomX = dataGenerator.randomX() ;
-			Data<double> yValues = dataGenerator.yValues() ;
+			Data<long double> randomX = dataGenerator.randomX() ;
+			Data<long double> yValues = dataGenerator.yValues() ;
 
-			for (unsigned M=58; M<59; M++) 
+			for (unsigned M=3; M<100; M++) 
 			{
 				cout << "N: " << parameters.numSamples << "\t" ;
 				cout << "S: " << parameters.sigma << "\t" ;
 				cout << "M: " << M << "\t" ;
 				//unsigned M = parameters.numFunctions ;
-				//if (Samples[i] > M+15)
-				//{
+				if (Samples[i] > M+15)
+				{
 					parameters.numFunctions = M ;
-					lcb::Matrix<double> phi ;
+					lcb::Matrix<long double> phi ;
 					OrthogonalBasis orthogonal (parameters.numFunctions,
 					parameters.timePeriod,parameters.function) ;
 					phi = orthogonal.designMatrix(randomX) ;
 
-					lcb::Matrix<double> weights ;
-					weights = computeWeights<double>(phi,yValues) ;
+					lcb::Matrix<long double> weights ;
+					weights = computeWeights<long double>(phi,yValues) ;
 					//weights.print() ;
 
-					Data<double> predictions ;
+					Data<long double> predictions ;
 					predictions = dataGenerator.predict(M,weights,randomX) ;
 					//dataGenerator.plotPredictions(randomX,yValues,predictions) ;
 
-					double rmse = computeRMSE<double>(weights,phi,yValues) ;
+					long double rmse = computeRMSE<long double>(weights,phi,yValues) ;
 					//cout << "Error in fitting: " << rmse << endl ;
 
 					Message msg (parameters,weights,randomX,yValues,predictions) ;
-					double msgLen = msg.messageLength() ;
+					long double msgLen = msg.messageLength() ;
 					//cout << "Msg Len = " << msgLen << endl ;
 
 					results << parameters.numFunctions << "\t" ;
 					results << rmse << "\t" ;
 					results << msgLen << endl ;
-				//}
+				}
 			}
 			results.close() ;
 		}

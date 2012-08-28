@@ -16,6 +16,9 @@
 #include <liblcb/Matrix.h>
 #include <cmath>
 #include <boost/math/constants/constants.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/lu.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 //! bound on the number of data samples
 #define MAX_SAMPLES 100000
@@ -23,6 +26,7 @@
 //! bound on the maximum number of orthogonal basis functions
 #define MAX_FUNCTIONS 200
 
+using namespace boost::numeric::ublas ;
 using namespace std ;
 
 /*!
@@ -35,8 +39,8 @@ class Message
 {
 	private:
 		struct Parameters parameters ;
-		lcb::Vector<double> weights ;
-		Data<double> xVals, yVals, predictions ;
+		lcb::Vector<long double> weights ;
+		Data<long double> xVals, yVals, predictions ;
 	public:
 		//! constructor
 		template <class T>
@@ -46,19 +50,70 @@ class Message
 		template <class T>
 		Gaussian normalDistribution (lcb::Vector<T> &) ;
 		//! encodes the number of data samples and number of basis functions
-		double encodeIntegers () ;
+		long double encodeIntegers () ;
 		//! computes the message length using Wallace-Freeman formulation
-		double encodeUsingFreeman (int, double, double, double, double) ;
+		long double encodeUsingFreeman (int, long double, long double, long double, long double) ;
 		//! measures the information content of data
 		template <class T>
-		double encodeX (Data<T>, struct Parameters) ;
+		long double encodeX (Data<T>, struct Parameters) ;
 		//! encodes the coefficients of the basis functions
-		double encodeWeights() ;
+		long double encodeWeights() ;
 		//! encodes the y values
-		double encodeOutput() ;
+		long double encodeOutput() ;
 		//! computes the message length
-		double messageLength() ;
+		long double messageLength() ;
 } ;
+
+matrix<long double> make_matrix(lcb::Matrix<long double> &M, int dimension)
+{
+	matrix<long double> m(dimension,dimension) ;
+	for (unsigned i=0; i<m.size1(); i++)
+	{
+		matrix_row<matrix<long double> > mr(m,i) ;
+		for(unsigned j=0; j<mr.size(); j++)
+			mr(j) = M[i][j] ;
+	}
+	return m ;
+}
+
+/* Matrix inversion routine.
+ Uses lu_factorize and lu_substitute in uBLAS to invert a matrix */
+template<class T>
+bool InvertMatrix(const matrix<T>& input, matrix<T>& inverse)
+{
+	typedef permutation_matrix<std::size_t> pmatrix;
+
+	// create a working copy of the input
+	matrix<T> A(input);
+
+	// create a permutation matrix for the LU-factorization
+	pmatrix pm(A.size1());
+
+	// perform LU-factorization
+	int res = lu_factorize(A, pm);
+	if (res != 0)
+		return false;
+
+	// create identity matrix of "inverse"
+	inverse.assign(identity_matrix<T> (A.size1()));
+
+	// backsubstitute to get the inverse
+	lu_substitute(A, pm, inverse);
+
+	return true;
+}
+
+lcb::Matrix<long double> make_my_matrix(matrix<long double> &m, int dimension)
+{
+	lcb::Matrix<long double> result(dimension,dimension) ;
+	for (unsigned i=0; i<m.size1(); i++)
+	{
+		matrix_row<matrix<long double> > mr(m,i) ;
+		for (unsigned j=0; j<mr.size(); j++)
+			result[i][j] = mr(j) ;
+	}
+	return result ;
+}
 
 /*!
  *	\fn lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues)
@@ -73,10 +128,20 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues)
 	lcb::Matrix<T> phiT = phi.transpose() ;
 	lcb::Matrix<T> phiTphi = phiT * phi ;
 	lcb::Matrix<T> pseudoInv = phiTphi.inverse() ;
+	unsigned dim = phiTphi.rows() ;
+
+	/* boost::ublas stuff  *//*
+	matrix<long double> A(dim,dim),Z(dim,dim) ;
+	A = make_matrix(phiTphi,dim) ;	
+	InvertMatrix(A,Z) ;
+	lcb::Matrix<long double> pseudoInv = make_my_matrix(Z,dim) ;*/
+	/* boost::ublas stuff  */
+
 	lcb::Matrix<T> temp = pseudoInv * phiT ;
 
 	lcb::Matrix<T> y = yValues.convertToMatrix() ;
 	lcb::Matrix<T> weights = temp * y ;
+
 
 	ofstream phiFile ;
 	phiFile.open("phi") ;
@@ -102,7 +167,7 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues)
 }
 
 /*!
- *	\fn double computeRMSE (lcb::Matrix<T> &weights, lcb::Matrix<T> &phi, 
+ *	\fn long double computeRMSE (lcb::Matrix<T> &weights, lcb::Matrix<T> &phi, 
  *	Data<T> &yVals)
  *	Computes the root mean squared error in approximating the data with a
  *	linear combination of given number of basis functions.
@@ -112,11 +177,11 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues)
  *	\return the root mean squared error
  */
 template <class T>
-double computeRMSE (lcb::Matrix<T> &weights, lcb::Matrix<T> &phi, 
+long double computeRMSE (lcb::Matrix<T> &weights, lcb::Matrix<T> &phi, 
 										Data<T> &yVals)
 {
   lcb::Matrix<T> yEst = phi * weights ; // column matrix
-	double diff, error = 0 ;
+	long double diff, error = 0 ;
 	int numSamples = phi.rows() ;
 	for (int i=0; i<numSamples; i++)
 	{
@@ -145,16 +210,16 @@ Message :: Message (struct Parameters params, lcb::Matrix<T> &w,
 }
 
 /*!
- *	\fn double Message :: encodeIntegers(void)
+ *	\fn long double Message :: encodeIntegers(void)
  *	\brief The function is used to encode the number of data samples
  *	transmitted and the number of orthogonal basis functions used.
  *	\return The message length to transmit the number of data points and
  *	the number of orthogonal basis functions.
  */
-double Message :: encodeIntegers(void)
+long double Message :: encodeIntegers(void)
 {
-	double R = (double) MAX_FUNCTIONS * (double) MAX_SAMPLES ;
-	double logR = log2(R) ;
+	long double R = (long double) MAX_FUNCTIONS * (long double) MAX_SAMPLES ;
+	long double logR = log2(R) ;
 	return ceil(logR) ;
 }
 
@@ -168,7 +233,7 @@ double Message :: encodeIntegers(void)
 template <class T>
 Gaussian Message :: normalDistribution (lcb::Vector<T> &samples)
 {
-	double mean = 0, sigmaSq = 0 ;
+	long double mean = 0, sigmaSq = 0 ;
 	int i,numSamples = samples.length() ;
 	for (i=0; i<numSamples; i++) {
 		mean += samples[i] ;
@@ -179,27 +244,27 @@ Gaussian Message :: normalDistribution (lcb::Vector<T> &samples)
 		sigmaSq += (samples[i]-mean) * (samples[i]-mean) ;
 	sigmaSq = sigmaSq/numSamples ;
 
-	double sigma = sqrt(sigmaSq) ;
+	long double sigma = sqrt(sigmaSq) ;
 	return Gaussian(mean,sigma) ;
 }
 
 /*!
- *	\fn double encodeUsingFreeman (int N, double sigma, double rangeMu, 
- *	double rangeLogSigma, double Kn)
+ *	\fn long double encodeUsingFreeman (int N, long double sigma, long double rangeMu, 
+ *	long double rangeLogSigma, long double Kn)
  *	\brief Computes the message length used to encode data and parameters
  *	using the Wallace-Freeman approach
  *	\param N an integer
- *	\param sigma a double
- *	\param rangeMu	a double
- *	\param rangeLogSigma a double
- *	\param Kn a double
+ *	\param sigma a long double
+ *	\param rangeMu	a long double
+ *	\param rangeLogSigma a long double
+ *	\param Kn a long double
  *	\return the length of the encoding based on Wallace Freeman approach
  */
-double Message :: encodeUsingFreeman (int N, double sigma, double rangeMu, 
-																		double rangeLogSigma, double Kn)
+long double Message :: encodeUsingFreeman (int N, long double sigma, long double rangeMu, 
+																		long double rangeLogSigma, long double Kn)
 {
-	double pi = boost::math::constants::pi<double>() ;
-	double msgLen = 0.5 * (N-1) * log2l ((N * sigma * sigma)/(N-1)) + 0.5 * (N-1) +
+	long double pi = boost::math::constants::pi<long double>() ;
+	long double msgLen = 0.5 * (N-1) * log2l ((N * sigma * sigma)/(N-1)) + 0.5 * (N-1) +
 									0.5 * N * log2l (2 * pi / (AOM * AOM)) +
 									0.5 * log2l (2 * N * N) + log2l (rangeLogSigma) +
 									1 + log2l (Kn) ;
@@ -209,7 +274,7 @@ double Message :: encodeUsingFreeman (int N, double sigma, double rangeMu,
 }
 
 /*!
- *	\fn double Message :: encodeX (Data<T> data, struct Parameters parameters)
+ *	\fn long double Message :: encodeX (Data<T> data, struct Parameters parameters)
  *	\brief This function is used to encode the random X values generated.
  *	These values are first sorted to arrange in increasing order. The minimum
  *	(the first) value after this arrangement is then subtracted from all the
@@ -222,7 +287,7 @@ double Message :: encodeUsingFreeman (int N, double sigma, double rangeMu,
  *	\return message length of Xs
  */
 template <class T>
-double Message :: encodeX (Data<T> data, struct Parameters parameters)
+long double Message :: encodeX (Data<T> data, struct Parameters parameters)
 {
 	int numSamples = data.nPoints() ;
 	data.sortElements() ;
@@ -238,116 +303,116 @@ double Message :: encodeX (Data<T> data, struct Parameters parameters)
 	//cout << "mu(dx) = " << normal.mean() << endl ;
 	//cout << "sigma(dx) = " << normal.standardDeviation() << endl ;
 	long N = numSamples - 1 ; 
-	double sigma = normal.standardDeviation() ;
+	long double sigma = normal.standardDeviation() ;
 	if (sigma <= 3 * AOM)
 	{
 		sigma = 3 * AOM ;
 	}
-	double rangeMu = 2 * (parameters.high - parameters.low) ;
-	double logSigmaLowerBound = log2l(3*AOM) ;
-	double logSigmaUpperBound = log2l(rangeMu) ;
-	double rangeLogSigma = logSigmaUpperBound - logSigmaLowerBound ;
-	double K2 = 5 / (36 * sqrt(3)) ;
+	long double rangeMu = 2 * (parameters.high - parameters.low) ;
+	long double logSigmaLowerBound = log2l(3*AOM) ;
+	long double logSigmaUpperBound = log2l(rangeMu) ;
+	long double rangeLogSigma = logSigmaUpperBound - logSigmaLowerBound ;
+	long double K2 = 5 / (36 * sqrt(3)) ;
 	
-	double msgLen = encodeUsingFreeman(N,sigma,rangeMu,rangeLogSigma,K2) ;
+	long double msgLen = encodeUsingFreeman(N,sigma,rangeMu,rangeLogSigma,K2) ;
 	//cout << "bits/sample: " << msgLen/N << endl ;
 	return msgLen ;
 }
 
 /*	uses Wallace-Boulton formulation
-double Message :: encodeWeights (void)
+long double Message :: encodeWeights (void)
 {
-	Gaussian normal = normalDistribution<double>(weights) ;
+	Gaussian normal = normalDistribution<long double>(weights) ;
 	//cout << "mu(w): " << normal.mean() << endl ;
 	//cout << "sigma(w): " << normal.standardDeviation() << endl ;
 
-	double rangeMu = 2 ; // mu \in [-1,1]
-	double codeLengthMu = log2l (rangeMu/AOM) ; 
+	long double rangeMu = 2 ; // mu \in [-1,1]
+	long double codeLengthMu = log2l (rangeMu/AOM) ; 
 	
-	double rangeSigma = 1 ;		// sigma \in [0,1]
-	double codeLengthSigma = log2l (rangeSigma/AOM) ;
+	long double rangeSigma = 1 ;		// sigma \in [0,1]
+	long double codeLengthSigma = log2l (rangeSigma/AOM) ;
 
 	int N = parameters.numFunctions ;
-	double sigma = normal.standardDeviation() ;
-	double pi = boost::math::constants::pi<double>() ;
-	double codeLengthWeights = N * log2l (sigma * sqrt(2*pi) / AOM) +
+	long double sigma = normal.standardDeviation() ;
+	long double pi = boost::math::constants::pi<long double>() ;
+	long double codeLengthWeights = N * log2l (sigma * sqrt(2*pi) / AOM) +
 														 N * 0.5 / log(2) ;
 
 										
-	double wt = codeLengthMu + codeLengthSigma + codeLengthWeights ;	
+	long double wt = codeLengthMu + codeLengthSigma + codeLengthWeights ;	
 	//cout << "bits/wt: " << wt/N << endl ;
 	return wt ;
 }
 */
 
 /*!
- *	\fn double Message :: encodeWeights (void)
+ *	\fn long double Message :: encodeWeights (void)
  *	\brief Computes the message length of encoding the coefficients of the 
  *	basis functions used to approximate the data using Wallace-Freeman
  *	formulation.
  *	\return length of encoding the weights
  */
-double Message :: encodeWeights (void)
+long double Message :: encodeWeights (void)
 {
 	weights.print() ;
-	Gaussian normal = normalDistribution<double>(weights) ;
+	Gaussian normal = normalDistribution<long double>(weights) ;
 	cout << "mu(w): " << normal.mean() << endl ;
 	//cout << "\nsigma(w): " << normal.standardDeviation() << endl ;
 
-  double mu = normal.mean() ;
-  double sigma = normal.standardDeviation() ;
+  long double mu = normal.mean() ;
+  long double sigma = normal.standardDeviation() ;
 	if (sigma <= 3 * AOM) {
 		sigma = 3 * AOM ;
 	}
 	cout << "sigma(w): " << sigma << endl ;
   size_t N = parameters.numFunctions ;
-	double rangeMu = 2 ; // mu \in [-1,1]
-  double sigma_max = 1 ;
-  double sigma_min = AOM * 3 ;
+	long double rangeMu = 2 ; // mu \in [-1,1]
+  long double sigma_max = 1 ;
+  long double sigma_min = AOM * 3 ;
 	if (sigma_min > sigma_max) {
 		throw std::domain_error("minimum sigma value exceeds set maximum limit") ;
 	}
-	double rangeLogSigma = log2l(sigma_max)-log2l(sigma_min) ;	
-	double K2 = 5 / (36 * sqrt(3)) ;
+	long double rangeLogSigma = log2l(sigma_max)-log2l(sigma_min) ;	
+	long double K2 = 5 / (36 * sqrt(3)) ;
   
-	double msgLen = encodeUsingFreeman(N,sigma,rangeMu,rangeLogSigma,K2) ;
+	long double msgLen = encodeUsingFreeman(N,sigma,rangeMu,rangeLogSigma,K2) ;
 	//cout << "bits/wt: " << wt/N << endl ;
 	return msgLen ;
 }
 
 /*!
- *	\fn double Message :: encodeOutput (void)
+ *	\fn long double Message :: encodeOutput (void)
  *	\brief Computes the message length of encoding the difference in the output
  *	y values and the approximated versions using Wallace-Freeman formulation.
  *	\return length of encoding the output
  */
-double Message :: encodeOutput (void)
+long double Message :: encodeOutput (void)
 {
 	int N = parameters.numSamples ;
-	lcb::Vector<double> diff(N) ;
+	lcb::Vector<long double> diff(N) ;
 	for (int i=0; i<N; i++)
 		diff[i] = yVals[i].x() - predictions[i].x() ;
-	Gaussian normal = normalDistribution<double>(diff) ;
+	Gaussian normal = normalDistribution<long double>(diff) ;
 	//cout << "mu(dy) = " << normal.mean() << endl ;
 	//cout << "\nsigma(dy) = " << normal.standardDeviation() << endl ;
 	
-	double rangeMu = 2 ; // mu \in [-1,1]
-	double sigma = normal.standardDeviation() ;
+	long double rangeMu = 2 ; // mu \in [-1,1]
+	long double sigma = normal.standardDeviation() ;
 	if (sigma <= 3 * AOM) {
 		sigma = 3 * AOM ;
 	}
 	cout << "\nsigma(dy) = " << sigma << endl ;
-  double sigma_max = 2;
-  double sigma_min = AOM * 3 ;
+  long double sigma_max = 2;
+  long double sigma_min = AOM * 3 ;
 	if (sigma_min > sigma_max) {
 		throw std::domain_error("minimum sigma value exceeds set maximum limit") ;
 	}
-	double rangeLogSigma = log2l(sigma_max)-log2l(sigma_min) ;	
-	double K1 = 1.0 / 12 ;
-	//double K2 = 5 / (36 * sqrt(3)) ;
+	long double rangeLogSigma = log2l(sigma_max)-log2l(sigma_min) ;	
+	long double K1 = 1.0 / 12 ;
+	//long double K2 = 5 / (36 * sqrt(3)) ;
 
 	// rangeMu = 0 because not sending mu - centre of distribution is f(x)
-	double msgLen = encodeUsingFreeman(N,sigma,0,rangeLogSigma,K1) ;
+	long double msgLen = encodeUsingFreeman(N,sigma,0,rangeLogSigma,K1) ;
 
 	//cout << "bits/dy: " << msgDy/N << endl ;
 	return msgLen ;
@@ -358,26 +423,26 @@ double Message :: encodeOutput (void)
  *	\brief This function computes the message length (in bits)
  *	MessageLength = length(parameters) + length(data|parameters)
  */
-double Message :: messageLength (void)
+long double Message :: messageLength (void)
 {
 	/*	encode numFunctions and numSamples	*/
 	//cout << "encoding number of functions and number of samples ..." << endl ;
-	double part1 = encodeIntegers() ;
+	long double part1 = encodeIntegers() ;
 	//cout << "encoding #functions + #samples: " << part1 << endl ;
 
 	/*	encode x's	*/
 	//cout << "encoding X values ..." << endl ; 
-	double part2 = encodeX(xVals,parameters) ;
+	long double part2 = encodeX(xVals,parameters) ;
 	//cout << "encoding X: " << part2 << endl ;
 
 	/*	encode weights	*/
 	//cout << "encoding weights ..." << endl ;
-	double part3 = encodeWeights() ;
+	long double part3 = encodeWeights() ;
 	//cout << "encoding weights         : " << part3 << endl ;
 
 	/*	encode delta_y values	*/
 	//cout << "encoding difference in output ..." << endl ;
-	double part4 = encodeOutput() ;
+	long double part4 = encodeOutput() ;
 	//cout << "encoding Y: " << part4 << endl ;
 
 	cout << "Int: " << part1 << "\tX: " << part2 << "\tW: " << part3 << "\tY: " << part4 << endl ;

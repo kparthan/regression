@@ -17,18 +17,19 @@ using namespace std ;
 
 struct Parameters parseCommandLine (int argc, char **argv)
 {
-	long double mean = 0 ;								// -gmean
+	long double mean = 0 ;              // -gmean
 	long double sigma = 1 ;							// -gsigma
-	long double low = -1 ;								// -low
-	long double high = 1 ;								// -high
-	string fname = "sawtooth" ;			// -fn
+	long double low = -1 ;							// -low
+	long double high = 1 ;							// -high
+	string fname = "sawtooth" ;			    // -fn
 	int function = 0 ;						  
-	long double timePeriod = 0.1 ;				// -t
-	long double peak = 1 ;								// -peak
-	int numSamples = 20 ;						// -nsamples
-	int numFunctions = 3 ;					// -nof
-	string file ;										// -file
-	bool paramFlags[10] = {0} ;
+	long double timePeriod = 0.1 ;		  // -t
+	long double peak = 1 ;							// -peak
+	int numSamples = 20 ;						    // -nsamples
+	int numFunctions = 3 ;					    // -nof
+	string file ;										    // -file
+  int choice = 0 ;                    // -choice
+	bool paramFlags[11] = {0} ;
 	int i = 1 ;
 
 	while (i < argc)
@@ -94,6 +95,11 @@ struct Parameters parseCommandLine (int argc, char **argv)
 		{
 			file = argv[i+1] ;
 			paramFlags[9] = 1 ;
+		}
+		else if (string(argv[i]).compare("-choice") == 0)
+		{
+			choice = atoi(argv[i+1]) ;
+			paramFlags[10] = 1 ;
 		}
 		else
 		{
@@ -191,6 +197,9 @@ struct Parameters parseCommandLine (int argc, char **argv)
 	else
 		cout << "Using data from file: " << file << "..."  << endl ; 
 
+  if (paramFlags[10] == 1)
+    cout << "Iterating over different values of parameters ..." << endl ; 
+
 	struct Parameters params ;
 	params.mean = mean ;
 	params.sigma = sigma ;
@@ -202,6 +211,7 @@ struct Parameters parseCommandLine (int argc, char **argv)
 	params.numSamples = numSamples ;
 	params.numFunctions = numFunctions ;
 	params.file = file ;
+  params.choice = choice ;
 
 	return params ;
 }
@@ -226,74 +236,97 @@ int main(int argc, char **argv)
 {
 	setPrecision() ;
 	struct Parameters parameters = parseCommandLine(argc,argv) ;
-	/*RandomDataGenerator<long double> dataGenerator (parameters) ;
+  RandomDataGenerator<long double> dataGenerator ;//(parameters) ;
+	lcb::Matrix<long double> phi ;
+	lcb::Matrix<long double> weights ;
+  long double rmse,msgLen ;
+	Data<long double> predictions ;
 
-	dataGenerator.generate() ;
-	Data<long double> randomX = dataGenerator.randomX() ;
-	Data<long double> yValues = dataGenerator.yValues() ;*/
-	//Data<long double> yValues = dataGenerator.fxValues() ;
-	//dataGenerator.plotData() ;
-	//dataGenerator.plotDataWithNoise() ;
-	string filename ; 
-
-	//int Samples[5] = {10,100,1000,10000,100000} ;
-	int Samples[1] = {100} ;
-	long double Noise[1] = {0.25} ;
-	//long double Noise[1] = {0.25} ;
-	
-	for (unsigned i=0; i<1; i++)
-	{
-		parameters.numSamples = Samples[i] ;
-		for (unsigned j=0; j<1; j++)
-		{
-			filename = "Results/results_n" + convertToString<int>(Samples[i]) + "_s" ;
-			filename = filename + convertToString<long double>(Noise[j]) + ".txt" ;
-			ofstream results ;
-			results.open(filename.c_str()) ;	
-			parameters.sigma = Noise[j] ;
-
-			RandomDataGenerator<long double> dataGenerator (parameters) ;
-			dataGenerator.generate() ;
-			Data<long double> randomX = dataGenerator.randomX() ;
-			Data<long double> yValues = dataGenerator.yValues() ;
-
-			for (unsigned M=3; M<100; M++) 
-			{
-				cout << "N: " << parameters.numSamples << "\t" ;
-				cout << "S: " << parameters.sigma << "\t" ;
-				cout << "M: " << M << "\t" ;
-				//unsigned M = parameters.numFunctions ;
-				if (Samples[i] > M+15)
-				{
-					parameters.numFunctions = M ;
-					lcb::Matrix<long double> phi ;
-					OrthogonalBasis orthogonal (parameters.numFunctions,
+  switch(parameters.choice) 
+  {
+    case 0:
+      dataGenerator = RandomDataGenerator<long double>(parameters) ;
+	    dataGenerator.generate() ;
+	    Data<long double> randomX = dataGenerator.randomX() ;
+	    Data<long double> yValues = dataGenerator.yValues() ;
+	    //Data<long double> yValues = dataGenerator.fxValues() ;
+	    //dataGenerator.plotData() ;
+	    //dataGenerator.plotDataWithNoise() ;
+			OrthogonalBasis orthogonal (parameters.numFunctions,
 					parameters.timePeriod,parameters.function) ;
-					phi = orthogonal.designMatrix(randomX) ;
+			phi = orthogonal.designMatrix(randomX) ;
 
-					lcb::Matrix<long double> weights ;
-					weights = computeWeights<long double>(phi,yValues) ;
-					//weights.print() ;
+			weights = computeWeights<long double>(phi,yValues) ;
 
-					Data<long double> predictions ;
-					predictions = dataGenerator.predict(M,weights,randomX) ;
-					//dataGenerator.plotPredictions(randomX,yValues,predictions) ;
+			predictions = dataGenerator.predict(parameters.numFunctions,weights,
+                                          randomX) ;
+			//dataGenerator.plotPredictions(randomX,yValues,predictions) ;
+	  	rmse = computeRMSE<long double>(weights,phi,yValues) ;
+			//cout << "Error in fitting: " << rmse << endl ;
+			Message msg (parameters,weights,randomX,yValues,predictions) ;
+			msgLen = msg.messageLength() ;
+			//cout << "Msg Len = " << msgLen << endl ;
+      break ;
 
-					long double rmse = computeRMSE<long double>(weights,phi,yValues) ;
-					//cout << "Error in fitting: " << rmse << endl ;
+    case 1:
+	    string filename ; 
+      int Samples[1] = {100} ;
+	    long double Noise[1] = {0.25} ;
+	
+	    for (unsigned i=0; i<1; i++) 
+      {
+		    parameters.numSamples = Samples[i] ;
+		    for (unsigned j=0; j<1; j++)
+		    {
+			    filename = "results_n" + convertToString<int>(Samples[i]) + "_s" ;
+			    filename = filename + convertToString<long double>(Noise[j]) + 
+                      ".txt" ;
+			    ofstream results ;
+			    results.open(filename.c_str()) ;	
+			    parameters.sigma = Noise[j] ;
 
-					Message msg (parameters,weights,randomX,yValues,predictions) ;
-					long double msgLen = msg.messageLength() ;
-					//cout << "Msg Len = " << msgLen << endl ;
+          dataGenerator = RandomDataGenerator<long double>(parameters) ;
+	        //RandomDataGenerator<long double> dataGenerator (parameters) ;
+			    dataGenerator.generate() ;
+			    Data<long double> randomX = dataGenerator.randomX() ;
+			    Data<long double> yValues = dataGenerator.yValues() ;
 
-					results << parameters.numFunctions << "\t" ;
-					results << rmse << "\t" ;
-					results << msgLen << endl ;
-				}
+			    for (unsigned M=3; M<100; M++) 
+			    {
+				    cout << "N: " << parameters.numSamples << "\t" ;
+				    cout << "S: " << parameters.sigma << "\t" ;
+				    cout << "M: " << M << "\t" ;
+				    if (Samples[i] > M+15)
+				    {
+					    parameters.numFunctions = M ;
+					    OrthogonalBasis orthogonal (parameters.numFunctions,
+					            parameters.timePeriod,parameters.function) ;
+					    phi = orthogonal.designMatrix(randomX) ;
+					    weights = computeWeights<long double>(phi,yValues) ;
+					    //weights.print() ;
+					    predictions = dataGenerator.predict(M,weights,randomX) ;
+					  //dataGenerator.plotPredictions(randomX,yValues,predictions) ;
+
+					    rmse = computeRMSE<long double>
+                                (weights,phi,yValues) ;
+					    //cout << "Error in fitting: " << rmse << endl ;
+
+					    Message msg (parameters,weights,randomX,yValues,predictions) ;
+					    msgLen = msg.messageLength() ;
+					    //cout << "Msg Len = " << msgLen << endl ;
+					    results << parameters.numFunctions << "\t" ;
+					    results << rmse << "\t" ;
+					    results << msgLen << endl ;
+				    }
+          }
+          results.close() ;
+        }
 			}
-			results.close() ;
-		}
-	}
+		  break ;
+    default:
+      error("Wrong choice entered ...") ;
+      break ;
+  }
 	return 0 ;
 }
 

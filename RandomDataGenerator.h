@@ -68,6 +68,7 @@ struct Parameters
   int numSamples ;
   int numFunctions ;
 	string file ;
+  int choice ;
 } ;
 
 /*!
@@ -120,8 +121,7 @@ class RandomDataGenerator
  *  the values of x are sampled
  */
 template <class T>
-RandomDataGenerator<T> :: RandomDataGenerator (struct Parameters parameters) : 
-																parameters (parameters)
+RandomDataGenerator<T> :: RandomDataGenerator (struct Parameters parameters) : parameters (parameters)
 {
 	xVal = Data<T>() ;
 	fxVal = Data<T>() ;
@@ -366,7 +366,8 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 			for (int i=0; i<xVal.nPoints(); i++)
 			{
 				long double randomX = xVal[i].x() ;
-				y[i] = sawtooth(randomX,parameters.timePeriod,parameters.peak,slope) ;
+				y[i] = sawtooth(randomX,parameters.timePeriod,parameters.peak,
+                        slope) ;
 			}	
 			fname = "SAWTOOTH" ;
 			break ;
@@ -393,7 +394,8 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 			for (int i=0; i<xVal.nPoints(); i++)
 			{
 				long double randomX = xVal[i].x() ;
-				y[i] = finiteLinearCombination(randomX,parameters.timePeriod,weights) ;
+				y[i] = finiteLinearCombination(randomX,parameters.timePeriod,
+                                       weights) ;
 			}
 			fname = "FINTITE LINEAR COMBINATION" ;
 			break ;

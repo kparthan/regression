@@ -22,5 +22,5 @@ test_Matrix.o: test_Matrix.cpp
 	g++ -c $(CFLAGS) $< -o $@
 
 clean:
-	rm -f *.o regression a.out test_Vector test_Matrix
+	rm -f *.o *~ regression a.out test_Vector test_Matrix
 

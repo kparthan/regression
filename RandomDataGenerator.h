@@ -68,7 +68,8 @@ struct Parameters
   int numSamples ;
   int numFunctions ;
 	string file ;
-  int choice ;
+  int iterate ;
+  int inverse ;
 } ;
 
 /*!
@@ -87,6 +88,8 @@ class RandomDataGenerator
 		Data<T> yVal ;
 		string fname ;
 	public:
+    //! null constructor
+    RandomDataGenerator() ;
 		//! constructor
 		RandomDataGenerator(struct Parameters) ;
 		//! generates data randomly
@@ -115,6 +118,14 @@ class RandomDataGenerator
 		void print() ;
 } ;
 
+template <class T>
+RandomDataGenerator<T> :: RandomDataGenerator()
+{
+	xVal = Data<T>() ;
+	fxVal = Data<T>() ;
+	yVal = Data<T>() ;
+}
+
 /*!
  *  \fn RandomDataGenerator<T> :: RandomDataGenerator ()
  *  \brief The null constructor sets the default interval from which
@@ -136,7 +147,7 @@ template <class T>
 void RandomDataGenerator<T> :: generate ()
 {
 	//srand ((unsigned)time(0)) ;
-	srand (0) ;
+	srand (100000) ;
 	if (!parameters.file.empty())
 	{
 		ifstream dataFile (parameters.file.c_str()) ;
@@ -159,24 +170,25 @@ void RandomDataGenerator<T> :: generate ()
 		T range = parameters.high - parameters.low ;
 		T random ;
 		T *randomValues = new T [parameters.numSamples] ;
-		for (int i=0; i<parameters.numSamples; i++)
+		/*for (int i=0; i<parameters.numSamples; i++)
 		{
 			random = rand() / (T) RAND_MAX ;
 			randomValues[i] = parameters.low + random * range ;
-		}
-		/*long double partition = range / parameters.numSamples ;
+		}*/
+		long double partition = range / parameters.numSamples ;
 		randomValues[0] = parameters.low ;
 		for (int i=1; i<parameters.numSamples; i++)
-			randomValues[i] = partition + randomValues[i-1] ;*/
+			randomValues[i] = partition + randomValues[i-1] ;
 		xVal = Data<T> (randomValues,parameters.numSamples) ;
 		delete[] randomValues ;
 	}
 
 	computeFunctionValues() ;
-	if (parameters.sigma <= AOM)
+	addNoise() ;
+  /*if (parameters.sigma <= AOM)
 		yVal = fxVal ;
 	else
-		addNoise() ;
+		addNoise() ;*/
 }
 
 /*!

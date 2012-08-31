@@ -41,15 +41,14 @@ void plot (const char *file, int numSamples, long double noise)
 main()
 {			
 	string file ;
-  int Samples[1] = {100} ;
-  long double Noise[1] = {0.25} ;
-  //long double Noise[1] = {0.25} ;
+  int Samples[1] = {1000} ;
+  long double Noise[1] = {0.75} ;
 	
 	for (int i=0; i<1; i++)
 	{
 		for (int j=0; j<1; j++)
 		{
-			file = "Results/results_n" + convertToString<int>(Samples[i]) + "_s" ;
+			file = "results/results_n" + convertToString<int>(Samples[i]) + "_s" ;
       file = file + convertToString<long double>(Noise[j]) + ".txt" ;
 			plot(file.c_str(),Samples[i],Noise[j]) ;
 		}

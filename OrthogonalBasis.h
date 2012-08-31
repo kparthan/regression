@@ -32,12 +32,22 @@ class OrthogonalBasis
 		double timePeriod ;
 		int functionIndex ;
 	public:
+    //! null constructor
+    OrthogonalBasis() ;
 		//! constructor
 		OrthogonalBasis (int, double, int) ;
 		//! computes the design matrix
 		template <class T>
 		lcb::Matrix<T> designMatrix (Data<T> &) ;
 } ;
+
+/*!
+ *  \brief Null constructor for the OrthogonalBasis class
+ */
+OrthogonalBasis :: OrthogonalBasis () : numFunctions(0),
+                   timePeriod(0), functionIndex(-1)
+{
+}
 
 /*!
  *	\fn OrthogonalBasis :: OrthogonalBasis (int)
@@ -92,7 +102,7 @@ lcb::Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
 			}
 			break ;
 	}*/
-	double phase = (rand() / RAND_MAX) * 2 * pi ;
+	//double phase = (rand() / RAND_MAX) * 2 * pi ;
 	for (int i=0; i<numPoints; i++)
 	{
 		for (int j=0; j<numFunctions; j++)
@@ -100,9 +110,9 @@ lcb::Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
 			int k = j / 2 + 1 ;
 			double arg = 2 * pi * k * data[i].x() / timePeriod ;
 			if (j % 2 == 0)
-				phi[i][j] = sin (arg+phase) ;
+				phi[i][j] = sin (arg) ;
 			else
-				phi[i][j] = cos (arg+phase) ;
+				phi[i][j] = cos (arg) ;
 		}
 	}
 	return phi ;

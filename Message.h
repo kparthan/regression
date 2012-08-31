@@ -42,6 +42,8 @@ class Message
 		lcb::Vector<long double> weights ;
 		Data<long double> xVals, yVals, predictions ;
 	public:
+    //! null constructor
+    Message() ;
 		//! constructor
 		template <class T>
 		Message (struct Parameters, lcb::Matrix<T> &, Data<T> &, Data<T> &, 
@@ -116,32 +118,44 @@ lcb::Matrix<long double> make_my_matrix(matrix<long double> &m, int dimension)
 }
 
 /*!
- *	\fn lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues)
+ *	\fn lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues, int invChoice)
  *	\brief Computes the coefficients of the basis functions
  *	\param phi a reference to a Matrix object
  *	\param yValues a reference to a Data object
  *	\return a matrix object of weights
  */
 template <class T>
-lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues)
+lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues, int invChoice)
 {
 	lcb::Matrix<T> phiT = phi.transpose() ;
 	lcb::Matrix<T> phiTphi = phiT * phi ;
-	lcb::Matrix<T> pseudoInv = phiTphi.inverse() ;
-	unsigned dim = phiTphi.rows() ;
+	unsigned dim = phiTphi.rows() ; 
+  lcb::Matrix<long double> pseudoInv ;
+  matrix<long double> A,Z ;
 
-	/* boost::ublas stuff  *//*
-	matrix<long double> A(dim,dim),Z(dim,dim) ;
-	A = make_matrix(phiTphi,dim) ;	
-	InvertMatrix(A,Z) ;
-	lcb::Matrix<long double> pseudoInv = make_my_matrix(Z,dim) ;*/
-	/* boost::ublas stuff  */
+  cout << "det = " << phiTphi.determinant() << endl ;
+  switch(invChoice)
+  {
+    case 0:
+      /* my implementation of matrix inverse */
+	    pseudoInv = phiTphi.inverse() ;
+      break ;
+    case 1:
+      /* boost::ublas implementation of matrix inverse */
+  	  A = matrix<long double> (dim,dim) ;
+  	  Z = matrix<long double> (dim,dim) ;
+	    A = make_matrix(phiTphi,dim) ;	
+	    InvertMatrix(A,Z) ;
+	    pseudoInv = make_my_matrix(Z,dim) ;
+      break ;
+    default:
+      error("Invalid choice of matrix inverse.") ;
+      break ;
+  }
 
 	lcb::Matrix<T> temp = pseudoInv * phiT ;
-
 	lcb::Matrix<T> y = yValues.convertToMatrix() ;
 	lcb::Matrix<T> weights = temp * y ;
-
 
 	ofstream phiFile ;
 	phiFile.open("phi") ;
@@ -189,6 +203,18 @@ long double computeRMSE (lcb::Matrix<T> &weights, lcb::Matrix<T> &phi,
 		error += diff * diff ;
 	}
 	return sqrt(error/numSamples) ;
+}
+
+/*!
+ *  Null constructor for the Message class
+ */
+//template <class T>
+Message :: Message ()
+{
+  /*xVals = Data<T>() ;
+  yVals = Data<T>() ;
+  predictions = Data<T>() ;
+  weights = lcb::Matrix<T>() ;*/
 }
 
 /*!
@@ -268,8 +294,9 @@ long double Message :: encodeUsingFreeman (int N, long double sigma, long double
 									0.5 * N * log2l (2 * pi / (AOM * AOM)) +
 									0.5 * log2l (2 * N * N) + log2l (rangeLogSigma) +
 									1 + log2l (Kn) ;
-	if (rangeMu == 0)
+	if (rangeMu == 0) {
 		return msgLen ;
+  }
 	else return msgLen + log2l (rangeMu) ;
 }
 
@@ -292,20 +319,21 @@ long double Message :: encodeX (Data<T> data, struct Parameters parameters)
 	int numSamples = data.nPoints() ;
 	data.sortElements() ;
 	Data<T> sortedX(data.sortedList()) ;
-	for (int i=1; i<numSamples; i++)
+	for (int i=1; i<numSamples; i++) {
 		sortedX[i] = sortedX[i] - sortedX[0] ;
+  }
 	sortedX[0] = 0 ;
 	lcb::Vector<T> diff (numSamples-1) ;
-	for (int i=0; i<numSamples-1; i++)
+	for (int i=0; i<numSamples-1; i++) {
 		diff[i] = sortedX[i+1].x() - sortedX[i].x() ;
+  }
 	
 	Gaussian normal = normalDistribution<T>(diff) ;
 	//cout << "mu(dx) = " << normal.mean() << endl ;
 	//cout << "sigma(dx) = " << normal.standardDeviation() << endl ;
 	long N = numSamples - 1 ; 
 	long double sigma = normal.standardDeviation() ;
-	if (sigma <= 3 * AOM)
-	{
+	if (sigma <= 3 * AOM) {
 		sigma = 3 * AOM ;
 	}
 	long double rangeMu = 2 * (parameters.high - parameters.low) ;
@@ -354,9 +382,9 @@ long double Message :: encodeWeights (void)
  */
 long double Message :: encodeWeights (void)
 {
-	weights.print() ;
+	//weights.print() ;
 	Gaussian normal = normalDistribution<long double>(weights) ;
-	cout << "mu(w): " << normal.mean() << endl ;
+	//cout << "mu(w): " << normal.mean() << endl ;
 	//cout << "\nsigma(w): " << normal.standardDeviation() << endl ;
 
   long double mu = normal.mean() ;
@@ -364,7 +392,6 @@ long double Message :: encodeWeights (void)
 	if (sigma <= 3 * AOM) {
 		sigma = 3 * AOM ;
 	}
-	cout << "sigma(w): " << sigma << endl ;
   size_t N = parameters.numFunctions ;
 	long double rangeMu = 2 ; // mu \in [-1,1]
   long double sigma_max = 1 ;
@@ -390,8 +417,9 @@ long double Message :: encodeOutput (void)
 {
 	int N = parameters.numSamples ;
 	lcb::Vector<long double> diff(N) ;
-	for (int i=0; i<N; i++)
+	for (int i=0; i<N; i++) {
 		diff[i] = yVals[i].x() - predictions[i].x() ;
+  }
 	Gaussian normal = normalDistribution<long double>(diff) ;
 	//cout << "mu(dy) = " << normal.mean() << endl ;
 	//cout << "\nsigma(dy) = " << normal.standardDeviation() << endl ;
@@ -401,7 +429,7 @@ long double Message :: encodeOutput (void)
 	if (sigma <= 3 * AOM) {
 		sigma = 3 * AOM ;
 	}
-	cout << "\nsigma(dy) = " << sigma << endl ;
+	//cout << "\nsigma(dy) = " << sigma << endl ;
   long double sigma_max = 2;
   long double sigma_min = AOM * 3 ;
 	if (sigma_min > sigma_max) {
@@ -409,7 +437,6 @@ long double Message :: encodeOutput (void)
 	}
 	long double rangeLogSigma = log2l(sigma_max)-log2l(sigma_min) ;	
 	long double K1 = 1.0 / 12 ;
-	//long double K2 = 5 / (36 * sqrt(3)) ;
 
 	// rangeMu = 0 because not sending mu - centre of distribution is f(x)
 	long double msgLen = encodeUsingFreeman(N,sigma,0,rangeLogSigma,K1) ;
@@ -430,24 +457,25 @@ long double Message :: messageLength (void)
 	long double part1 = encodeIntegers() ;
 	//cout << "encoding #functions + #samples: " << part1 << endl ;
 
-	/*	encode x's	*/
-	//cout << "encoding X values ..." << endl ; 
-	long double part2 = encodeX(xVals,parameters) ;
-	//cout << "encoding X: " << part2 << endl ;
-
 	/*	encode weights	*/
 	//cout << "encoding weights ..." << endl ;
-	long double part3 = encodeWeights() ;
+	long double part2 = encodeWeights() ;
 	//cout << "encoding weights         : " << part3 << endl ;
+
+	/*	encode x's	*/
+	//cout << "encoding X values ..." << endl ; 
+	long double part3 = encodeX(xVals,parameters) ;
+	//cout << "encoding X: " << part2 << endl ;
 
 	/*	encode delta_y values	*/
 	//cout << "encoding difference in output ..." << endl ;
 	long double part4 = encodeOutput() ;
 	//cout << "encoding Y: " << part4 << endl ;
 
-	cout << "Int: " << part1 << "\tX: " << part2 << "\tW: " << part3 << "\tY: " << part4 << endl ;
-	cout << "Message_1: " << part1 + part3 << endl ;
-	cout << "Message_2: " << part2 + part4 << endl ;
+	cout << "Int: " << part1 << "\tW: " << part2 << "\tX: " << part3 << "\tY: " << part4 << endl ;
+	cout << "Message_1: " << part1 + part2 << endl ;
+	cout << "Message_2: " << part3 + part4 << endl ;
+  cout << "Total msgLen: " << part1 + part2 + part3 + part4 << endl ;
 	return part1 + part2 + part3 + part4 ;
 }
 

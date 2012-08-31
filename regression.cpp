@@ -25,11 +25,15 @@ struct Parameters parseCommandLine (int argc, char **argv)
 	int function = 0 ;						  
 	long double timePeriod = 0.1 ;		  // -t
 	long double peak = 1 ;							// -peak
-	int numSamples = 20 ;						    // -nsamples
+	int numSamples = 100 ;						  // -nsamples
 	int numFunctions = 3 ;					    // -nof
 	string file ;										    // -file
-  int choice = 0 ;                    // -choice
-	bool paramFlags[11] = {0} ;
+  int iterate = 0 ;                   // -iterate 
+                                      //  [1 for yes, 0 for no]
+  int inverse = 0 ;                   // -inv
+                                      // 0 -- my implementation
+                                      // 1 -- from boost 
+	bool paramFlags[12] = {0} ;
 	int i = 1 ;
 
 	while (i < argc)
@@ -96,10 +100,15 @@ struct Parameters parseCommandLine (int argc, char **argv)
 			file = argv[i+1] ;
 			paramFlags[9] = 1 ;
 		}
-		else if (string(argv[i]).compare("-choice") == 0)
+		else if (string(argv[i]).compare("-iterate") == 0)
 		{
-			choice = atoi(argv[i+1]) ;
+			iterate = atoi(argv[i+1]) ;
 			paramFlags[10] = 1 ;
+		}
+		else if (string(argv[i]).compare("-inv") == 0)
+		{
+			inverse = atoi(argv[i+1]) ;
+			paramFlags[11] = 1 ;
 		}
 		else
 		{
@@ -115,6 +124,8 @@ struct Parameters parseCommandLine (int argc, char **argv)
 			cout << "\t [-nsamples] number of data samples to be used" << endl ;
 			cout << "\t [-nof] number of orthogonal basis functions to use" << endl ;
 			cout << "\t [-file] input file containing data samples" << endl ;
+      cout << "\t [-iterate] choice of iteration over different values" << endl ;
+      cout << "\t [-inv] choice of matrix inverse" << endl ;
 			error ("Invalid command line argument ...") ;
 		}
 		i += 2 ;
@@ -197,9 +208,23 @@ struct Parameters parseCommandLine (int argc, char **argv)
 	else
 		cout << "Using data from file: " << file << "..."  << endl ; 
 
-  if (paramFlags[10] == 1)
+  if (paramFlags[10] == 0)
+    cout << "Running an instance of regression fit ..." << endl ;
+  else
     cout << "Iterating over different values of parameters ..." << endl ; 
 
+  switch(paramFlags[11]) {
+    case 0:
+      cout << "Using my implementation of inverse [using partial pivoting] ..." << endl ;
+      break ;
+    case 1:
+      cout << "Using BOOST library implmentation of matrix inverse ..." << endl ;
+      break ;
+    default:
+      error("Invalid choice of matrix inverse.") ;
+      break ;
+  }
+  
 	struct Parameters params ;
 	params.mean = mean ;
 	params.sigma = sigma ;
@@ -211,7 +236,8 @@ struct Parameters parseCommandLine (int argc, char **argv)
 	params.numSamples = numSamples ;
 	params.numFunctions = numFunctions ;
 	params.file = file ;
-  params.choice = choice ;
+  params.iterate = iterate ;
+  params.inverse = inverse ;
 
 	return params ;
 }
@@ -236,49 +262,53 @@ int main(int argc, char **argv)
 {
 	setPrecision() ;
 	struct Parameters parameters = parseCommandLine(argc,argv) ;
-  RandomDataGenerator<long double> dataGenerator ;//(parameters) ;
+  RandomDataGenerator<long double> dataGenerator ;
 	lcb::Matrix<long double> phi ;
 	lcb::Matrix<long double> weights ;
   long double rmse,msgLen ;
-	Data<long double> predictions ;
-
-  switch(parameters.choice) 
+	Data<long double> randomX,yValues,predictions ;
+  OrthogonalBasis orthogonal ;
+  Message msg ;
+	string filename ; 
+  int sampVals[] = {1000} ;
+  std::vector<int> Samples (sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
+  long double noiseVals[] = {0.75} ;
+  std::vector<long double> Noise (noiseVals,noiseVals+sizeof(noiseVals)/sizeof(long double)) ;
+	
+  switch(parameters.iterate) 
   {
     case 0:
       dataGenerator = RandomDataGenerator<long double>(parameters) ;
 	    dataGenerator.generate() ;
-	    Data<long double> randomX = dataGenerator.randomX() ;
-	    Data<long double> yValues = dataGenerator.yValues() ;
-	    //Data<long double> yValues = dataGenerator.fxValues() ;
-	    //dataGenerator.plotData() ;
+	    randomX = dataGenerator.randomX() ;
+	    //yValues = dataGenerator.yValues() ;
+	    yValues = dataGenerator.fxValues() ;
+	    dataGenerator.plotData() ;
 	    //dataGenerator.plotDataWithNoise() ;
-			OrthogonalBasis orthogonal (parameters.numFunctions,
+			orthogonal = OrthogonalBasis (parameters.numFunctions,
 					parameters.timePeriod,parameters.function) ;
 			phi = orthogonal.designMatrix(randomX) ;
 
-			weights = computeWeights<long double>(phi,yValues) ;
+			weights = computeWeights<long double>(phi,yValues,parameters.inverse) ;
+      //weights.print() ;
 
 			predictions = dataGenerator.predict(parameters.numFunctions,weights,
                                           randomX) ;
-			//dataGenerator.plotPredictions(randomX,yValues,predictions) ;
+			dataGenerator.plotPredictions(randomX,yValues,predictions) ;
 	  	rmse = computeRMSE<long double>(weights,phi,yValues) ;
-			//cout << "Error in fitting: " << rmse << endl ;
-			Message msg (parameters,weights,randomX,yValues,predictions) ;
+			cout << "Error in fitting: " << rmse << endl ;
+			msg = Message (parameters,weights,randomX,yValues,predictions) ;
 			msgLen = msg.messageLength() ;
 			//cout << "Msg Len = " << msgLen << endl ;
       break ;
 
     case 1:
-	    string filename ; 
-      int Samples[1] = {100} ;
-	    long double Noise[1] = {0.25} ;
-	
-	    for (unsigned i=0; i<1; i++) 
+	    for (unsigned i=0; i<Samples.size(); i++) 
       {
 		    parameters.numSamples = Samples[i] ;
-		    for (unsigned j=0; j<1; j++)
+		    for (unsigned j=0; j<Noise.size(); j++)
 		    {
-			    filename = "results_n" + convertToString<int>(Samples[i]) + "_s" ;
+			    filename = "results/results_n" + convertToString<int>(Samples[i]) + "_s" ;
 			    filename = filename + convertToString<long double>(Noise[j]) + 
                       ".txt" ;
 			    ofstream results ;
@@ -286,10 +316,9 @@ int main(int argc, char **argv)
 			    parameters.sigma = Noise[j] ;
 
           dataGenerator = RandomDataGenerator<long double>(parameters) ;
-	        //RandomDataGenerator<long double> dataGenerator (parameters) ;
 			    dataGenerator.generate() ;
-			    Data<long double> randomX = dataGenerator.randomX() ;
-			    Data<long double> yValues = dataGenerator.yValues() ;
+			    randomX = dataGenerator.randomX() ;
+			    yValues = dataGenerator.yValues() ;
 
 			    for (unsigned M=3; M<100; M++) 
 			    {
@@ -299,21 +328,23 @@ int main(int argc, char **argv)
 				    if (Samples[i] > M+15)
 				    {
 					    parameters.numFunctions = M ;
-					    OrthogonalBasis orthogonal (parameters.numFunctions,
+					    orthogonal = OrthogonalBasis (parameters.numFunctions,
 					            parameters.timePeriod,parameters.function) ;
 					    phi = orthogonal.designMatrix(randomX) ;
-					    weights = computeWeights<long double>(phi,yValues) ;
-					    //weights.print() ;
+					    weights = computeWeights<long double>(phi,yValues,parameters.inverse) ;
 					    predictions = dataGenerator.predict(M,weights,randomX) ;
-					  //dataGenerator.plotPredictions(randomX,yValues,predictions) ;
 
-					    rmse = computeRMSE<long double>
-                                (weights,phi,yValues) ;
+					    rmse = computeRMSE<long double> (weights,phi,yValues) ;
 					    //cout << "Error in fitting: " << rmse << endl ;
 
-					    Message msg (parameters,weights,randomX,yValues,predictions) ;
+					    msg = Message (parameters,weights,randomX,yValues,
+                              predictions) ;
 					    msgLen = msg.messageLength() ;
 					    //cout << "Msg Len = " << msgLen << endl ;
+              /*if (M > 48)i
+              {
+                cout << "det@M = " << M << " is " << 
+              }*/
 					    results << parameters.numFunctions << "\t" ;
 					    results << rmse << "\t" ;
 					    results << msgLen << endl ;

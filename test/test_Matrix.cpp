@@ -4,7 +4,8 @@
 #include <boost/test/unit_test.hpp>
 
 #include <stdexcept>
-#include <liblcb/liblcb.h>
+#include <liblcb/Vector.h>
+#include <liblcb/Matrix.h>
 
 BOOST_AUTO_TEST_CASE( Matrix_null )
 {

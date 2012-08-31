@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cmath>
+#include <vector>
 
 using namespace std ;
 
@@ -34,9 +35,17 @@ int main(int argc, char **argv)
 		strcpy(x,"copied-2") ;
 		cout << x << endl ;
 	}*/
-	int x = 2 + 3 +
+	/*int x = 2 + 3 +
 					5 + 9 ;
 	cout << "x = " << x << endl ;
-	cout << "log(2) = " << log2(1024.0) << endl ;
+	cout << "log(2) = " << log2(1024.0) << endl ;*/
+
+  int x[] = {1,4,5,8,77} ;
+  vector<int> xv (x, x+sizeof(x)/sizeof(int)) ;
+  cout << xv.size() << endl ;
+  
+  long double y[] = {1.77,4,5,8,7,8798.7} ;
+  vector<long double> yv (y, y+sizeof(y)/sizeof(long double)) ;
+  cout << yv.size() << endl ;
 }
 

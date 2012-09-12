@@ -55,7 +55,7 @@ class Plot
 Plot :: Plot ()
 {
 	//	default specifications
-	script.open("plotScript.p") ;
+	script.open("temp/plotScript.p") ;
 	script << "# Gnuplot script file for plotting data in file \"data\"\n\n" ;
 	script << "set terminal png small" << endl ;
 	script << "set autoscale\t" ;
@@ -75,7 +75,7 @@ Plot :: Plot ()
  */
 void Plot :: label (vector<string> &labels)
 {
-	script.open("plotScript.p",ios::app) ;
+	script.open("temp/plotScript.p",ios::app) ;
 	script << "set title \"" << labels[0] << "\"" << endl ;
 	script << "set xlabel \"" << labels[1] << "\"" << endl ;
 	script << "set ylabel \"" << labels[2] << "\"" << endl ;
@@ -92,7 +92,7 @@ void Plot :: label (vector<string> &labels)
 template <class T, class U>
 void Plot :: setRange (pair<T,T> xrange, pair<U,U> yrange)
 {
-	script.open("plotScript.p",ios::app) ;
+	script.open("temp/plotScript.p",ios::app) ;
 	script << "set xr [" << xrange.first << ":" << xrange.second << "]"  << endl ;
 	script << "set yr [" << yrange.first << ":" << yrange.second << "]"  << endl ;
 	script.close() ;
@@ -107,20 +107,20 @@ template <class T>
 void Plot :: sketch (Data<T> &randomData)
 {
 	ofstream dataFile ;
-	dataFile.open("data.txt") ;
+	dataFile.open("temp/data.txt") ;
 	int numPoints = randomData.nPoints() ;
 
 	for (int i=0; i<numPoints; i++)
 		dataFile << i+1 << "\t" << randomData[i].x() << endl ;		
 	dataFile.close() ;
 
-	script.open("plotScript.p",ios::app) ;
-	script << "set output \"file_X.png\"" << endl ;
-	script << "plot \"data.txt\" using 1:2 title 'random Column' \\" << endl ;
+	script.open("temp/plotScript.p",ios::app) ;
+	script << "set output \"temp/file_X.png\"" << endl ;
+	script << "plot \"temp/data.txt\" using 1:2 title 'random Column' \\" << endl ;
 	script << "with linespoints" << endl ;
 	script.close() ;
 
-  system ("gnuplot -persist plotScript.p") ;	
+  system ("gnuplot -persist temp/plotScript.p") ;	
 }
 
 /*!
@@ -137,19 +137,19 @@ void Plot :: sketch (Data<T> &xVal, Data<U> &fxVal)
 		error ("Number of points mismatch!") ;
 	int numPoints = xVal.nPoints() ;
 	ofstream dataFile ;
-	dataFile.open("data_XfX.txt") ;
+	dataFile.open("temp/data_XfX.txt") ;
 
 	for (int i=0; i<numPoints; i++)
 		dataFile << xVal[i].x() << "\t" << fxVal[i].x() << endl ;
 	dataFile.close() ;
 
-	script.open("plotScript.p",ios::app) ;
-	script << "set output \"file_XfX.png\"" << endl ;
-	script << "plot \"data_XfX.txt\" using 1:2 title 'f(x)' \\" << endl ;
+	script.open("temp/plotScript.p",ios::app) ;
+	script << "set output \"temp/file_XfX.png\"" << endl ;
+	script << "plot \"temp/data_XfX.txt\" using 1:2 title 'f(x)' \\" << endl ;
 	script << "with linespoints" << endl ;
 	script.close() ;
 
-  system ("gnuplot -persist plotScript.p") ;	
+  system ("gnuplot -persist temp/plotScript.p") ;	
 }
 
 /*!
@@ -169,7 +169,7 @@ void Plot :: sketch (Data<T> &xVal, Data<U> &fxVal, Data<V> &yVal)
 	if (numPoints != yVal.nPoints())
 		error ("Number of points mismatch!") ;
 	ofstream dataFile ;
-	dataFile.open("data_XY.txt") ;
+	dataFile.open("temp/data_XY.txt") ;
 
 	for (int i=0; i<numPoints; i++)
 	{
@@ -178,17 +178,17 @@ void Plot :: sketch (Data<T> &xVal, Data<U> &fxVal, Data<V> &yVal)
 	}
 	dataFile.close() ;
 
-	script.open("plotScript.p",ios::app) ;
+	script.open("temp/plotScript.p",ios::app) ;
 	//script << "set nokey" << endl ;
-	script << "set output \"file_XY.png\"" << endl ;
+	script << "set output \"temp/file_XY.png\"" << endl ;
 	script << "set multiplot" << endl ;
-	script << "plot \"data_XY.txt\" using 1:2 title 'f(x)' \\" << endl ;
+	script << "plot \"temp/data_XY.txt\" using 1:2 title 'f(x)' \\" << endl ;
 	script << "with linespoints lc rgb \"red\", \\" << endl ;
-	script << "\"data_XY.txt\" using 1:3 title 'f(x)+e' \\" << endl ;
+	script << "\"temp/data_XY.txt\" using 1:3 title 'f(x)+e' \\" << endl ;
 	script << "with linespoints lc rgb \"blue\"" << endl ;
 	script.close() ;
 
-  system ("gnuplot -persist plotScript.p") ;	
+  system ("gnuplot -persist temp/plotScript.p") ;	
 }
 
 #endif

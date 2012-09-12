@@ -101,8 +101,10 @@ vector<long double> Gaussian :: generate (void)
 	long double _2piV = 2 * boost::math::constants::pi<long double>() * v ;
 	long double r1 = sqroot * cos (_2piV) ;
 	long double r2 = sqroot * sin (_2piV) ;
+  //cout << sigma << endl ;
 	samples[0] = mu + sigma * r1 ;
 	samples[1] = mu + sigma * r2 ;
+  //cout << samples[0] << " " << samples[1] << endl ;
 	return samples ;
 }
 

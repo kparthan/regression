@@ -130,10 +130,20 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues, int invCho
 	lcb::Matrix<T> phiT = phi.transpose() ;
 	lcb::Matrix<T> phiTphi = phiT * phi ;
 	unsigned dim = phiTphi.rows() ; 
+<<<<<<< HEAD
+  lcb::Matrix<long double> pseudoInv,temp,y,weights,constants ;
+  matrix<long double> A,Z ;
+
+ // cout << scientific << "det = " << phiTphi.determinant() << endl ;
+ // cout << fixed ;
+
+	y = yValues.convertToMatrix() ;
+=======
   lcb::Matrix<long double> pseudoInv ;
   matrix<long double> A,Z ;
 
   cout << "det = " << phiTphi.determinant() << endl ;
+>>>>>>> 57d61fedf3014331915abae9f24ac44ddf0b747b
   switch(invChoice)
   {
     case 0:
@@ -148,11 +158,44 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues, int invCho
 	    InvertMatrix(A,Z) ;
 	    pseudoInv = make_my_matrix(Z,dim) ;
       break ;
+<<<<<<< HEAD
+    case 2:
+      constants = phiT * y ;
+      weights = phiTphi.solveLinearSystem(constants) ;
+      break ;
+=======
+>>>>>>> 57d61fedf3014331915abae9f24ac44ddf0b747b
     default:
       error("Invalid choice of matrix inverse.") ;
       break ;
   }
 
+<<<<<<< HEAD
+  if (invChoice != 2)
+  {
+	  temp = pseudoInv * phiT ;
+	  weights = temp * y ;
+	  ofstream phiFile ;
+	  phiFile.open("temp/phi") ;
+	  for (int i=0; i<phi.rows(); i++)
+	  {
+		  for (int j=0; j<phi.columns(); j++)
+			  phiFile << phi[i][j] << " " ;
+		  phiFile << endl ;
+	  }
+	  phiFile.close() ;
+
+	  ofstream invFile ;
+	  invFile.open("temp/inverse") ;
+	  for (int i=0; i<pseudoInv.rows(); i++)
+	  {
+		  for (int j=0; j<pseudoInv.columns(); j++)
+			  invFile << pseudoInv[i][j] << " " ;
+		  invFile << endl ;
+	  }
+	  invFile.close() ;
+  }
+=======
 	lcb::Matrix<T> temp = pseudoInv * phiT ;
 	lcb::Matrix<T> y = yValues.convertToMatrix() ;
 	lcb::Matrix<T> weights = temp * y ;
@@ -176,6 +219,7 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues, int invCho
 		invFile << endl ;
 	}
 	invFile.close() ;
+>>>>>>> 57d61fedf3014331915abae9f24ac44ddf0b747b
 
 	return weights ;
 }
@@ -260,7 +304,7 @@ template <class T>
 Gaussian Message :: normalDistribution (lcb::Vector<T> &samples)
 {
 	long double mean = 0, sigmaSq = 0 ;
-	int i,numSamples = samples.length() ;
+	int i,numSamples = samples.size() ;
 	for (i=0; i<numSamples; i++) {
 		mean += samples[i] ;
 	}
@@ -472,10 +516,17 @@ long double Message :: messageLength (void)
 	long double part4 = encodeOutput() ;
 	//cout << "encoding Y: " << part4 << endl ;
 
+<<<<<<< HEAD
+	/*cout << "Int: " << part1 << "\tW: " << part2 << "\tX: " << part3 << "\tY: " << part4 << endl ;
+	cout << "Message_1: " << part1 + part2 << endl ;
+	cout << "Message_2: " << part3 + part4 << endl ;
+  cout << "Total msgLen: " << part1 + part2 + part3 + part4 << endl ;*/
+=======
 	cout << "Int: " << part1 << "\tW: " << part2 << "\tX: " << part3 << "\tY: " << part4 << endl ;
 	cout << "Message_1: " << part1 + part2 << endl ;
 	cout << "Message_2: " << part3 + part4 << endl ;
   cout << "Total msgLen: " << part1 + part2 + part3 + part4 << endl ;
+>>>>>>> 57d61fedf3014331915abae9f24ac44ddf0b747b
 	return part1 + part2 + part3 + part4 ;
 }
 

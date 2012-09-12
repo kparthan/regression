@@ -1,4 +1,4 @@
-/*! 
+/*/ 
  *  \file RandomDataGenerator.h
  *  \details Implementation of RandomDataGenerator class
  *  \author Parthan Kasarapu
@@ -246,7 +246,7 @@ long double sawtooth (long double x, long double timePeriod, long double peak, l
 		return 0 ;
 	*/
 	//	Sawtooth [2]
-	if (x < 0)
+	/*if (x < 0)
 		return (-1) * sawtooth (-x,timePeriod,peak,slope) ;
 	else if (x > 0)
 	{
@@ -261,6 +261,22 @@ long double sawtooth (long double x, long double timePeriod, long double peak, l
 			return peak ;
 		else return (-1)*peak ;
 	}
+  */
+  //  Sawtooth [3]
+  if (x >= 0 && x < timePeriod)
+    return x * peak / timePeriod ;
+  else if (x > timePeriod)
+	{
+		while (x > timePeriod)
+			x = x - timePeriod ;
+    return sawtooth(x,timePeriod,peak,slope) ;
+	}
+  else if (x < 0)
+  {
+    while (x < 0)
+      x = x + timePeriod ;
+    return sawtooth(x,timePeriod,peak,slope) ;
+  }  
 }
 
 /*!
@@ -344,16 +360,23 @@ long double finiteLinearCombination (long double x, long double timePeriod,
 																lcb::Vector<long double> weights)
 {
 	long double pi = boost::math::constants::pi<long double>() ;
-	int M = weights.length() ;
-	long double arg,yVal = 0 ; // weights[0]
-	for (int j=0; j<M; j++)
+	int M = weights.size(),k ;
+	long double arg,yVal = weights[0] ;
+  arg = 2 * pi * x / timePeriod ;
+	for (int i=1; i<M; i++)
 	{
-		int k = j / 2 + 1 ;
-		arg = 2 * pi * k * x / timePeriod ;
-		if (j % 2 == 0)
-			yVal += weights[j] * sin(arg) ;
-		else
-			yVal += weights[j] * cos(arg) ;
+    if (i % 2 == 1)
+    {   
+      k = i / 2 + 1 ; 
+      arg *= k  ;
+      yVal += weights[i] * sin (arg) ;
+    }   
+    else
+    {   
+      k = i / 2 ; 
+      arg *= k ;
+      yVal += weights[i] * cos (arg) ;
+    }
 	}
 	return yVal ;	
 }
@@ -380,6 +403,7 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 				long double randomX = xVal[i].x() ;
 				y[i] = sawtooth(randomX,parameters.timePeriod,parameters.peak,
                         slope) ;
+        //cout << randomX << " " << y[i] << endl ;
 			}	
 			fname = "SAWTOOTH" ;
 			break ;
@@ -396,7 +420,8 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 			srand (time(NULL)) ;
 			y = new T [parameters.numSamples] ;
 			// generate the number of terms (between 3 and 100)
-			M = rand() % (MAX_TERMS-MIN_TERMS+1) + MIN_TERMS ;
+			//M = rand() % (MAX_TERMS-MIN_TERMS+1) + MIN_TERMS ;
+      M = 5 ;
 			weights = lcb::Vector<long double>(M) ;
 			for (int i=0; i<M; i++) {
 				weights[i] = 2 * (rand() /(long double) RAND_MAX) - 1 ;
@@ -409,7 +434,7 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 				y[i] = finiteLinearCombination(randomX,parameters.timePeriod,
                                        weights) ;
 			}
-			fname = "FINTITE LINEAR COMBINATION" ;
+			fname = "FINITE LINEAR COMBINATION" ;
 			break ;
 		default:
 			error ("Function index not appropriate!") ;

@@ -6,12 +6,16 @@ set xtic auto	# set xtics automatically
 set ytic auto	# set ytics automatically
 set title "SAWTOOTH"
 set xlabel "x"
-set ylabel "predictions"
+set ylabel "f(x)"
 set xr [-1.5:1.5]
+<<<<<<< HEAD:test/plotScript.p
+set yr [-0.5:1.5]
+set output "file_XfX.png"
+=======
 set yr [-1.5:1.5]
 set output "file_XY.png"
+>>>>>>> 57d61fedf3014331915abae9f24ac44ddf0b747b:plotScript.p
 set multiplot
-plot "data_XY.txt" using 1:2 title 'f(x)' \
-with linespoints lc rgb "red", \
-"data_XY.txt" using 1:3 title 'f(x)+e' \
-with linespoints lc rgb "blue"
+plot "fun.txt" using 1:2 title 'f(x)' \
+with linespoints lc rgb "red"
+

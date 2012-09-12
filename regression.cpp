@@ -280,10 +280,10 @@ int main(int argc, char **argv)
   OrthogonalBasis orthogonal ;
   Message msg ;
 	string filename ; 
-  int sampVals[] = {100} ;
+  int sampVals[] = {10000} ;
   std::vector<int> Samples (sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
+  long double noiseVals[] = {0} ;
   //long double noiseVals[] = {0.1,0.2,0.3,0.4,0.5} ;
-  long double noiseVals[] = {0.5} ;
   std::vector<long double> Noise (noiseVals,noiseVals+sizeof(noiseVals)/sizeof(long double)) ;
 	
   switch(parameters.iterate) 
@@ -292,8 +292,8 @@ int main(int argc, char **argv)
       dataGenerator = RandomDataGenerator<long double>(parameters) ;
 	    dataGenerator.generate() ;
 	    randomX = dataGenerator.randomX() ;
-	    //yValues = dataGenerator.yValues() ;
-	    yValues = dataGenerator.fxValues() ;
+	    yValues = dataGenerator.yValues() ;
+	    //yValues = dataGenerator.fxValues() ;
 	    dataGenerator.plotData() ;
 	    //dataGenerator.plotDataWithNoise() ;
 			orthogonal = OrthogonalBasis (parameters.numFunctions,
@@ -336,7 +336,7 @@ int main(int argc, char **argv)
 				    cout << "N: " << parameters.numSamples << "\t" ;
 				    cout << "S: " << parameters.sigma << "\t" ;
 				    cout << "M: " << M << endl ;
-				    if (Samples[i] > M+15)
+				    if (Samples[i] > M+5)
 				    {
 					    parameters.numFunctions = M ;
 					    orthogonal = OrthogonalBasis (parameters.numFunctions,

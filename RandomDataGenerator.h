@@ -170,15 +170,15 @@ void RandomDataGenerator<T> :: generate ()
 		T range = parameters.high - parameters.low ;
 		T random ;
 		T *randomValues = new T [parameters.numSamples] ;
-		/*for (int i=0; i<parameters.numSamples; i++)
+		for (int i=0; i<parameters.numSamples; i++)
 		{
 			random = rand() / (T) RAND_MAX ;
 			randomValues[i] = parameters.low + random * range ;
-		}*/
-		long double partition = range / parameters.numSamples ;
+		}
+		/*long double partition = range / parameters.numSamples ;
 		randomValues[0] = parameters.low ;
 		for (int i=1; i<parameters.numSamples; i++)
-			randomValues[i] = partition + randomValues[i-1] ;
+			randomValues[i] = partition + randomValues[i-1] ;*/
 		xVal = Data<T> (randomValues,parameters.numSamples) ;
 		delete[] randomValues ;
 	}
@@ -417,11 +417,12 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 			fname = "SQUARE" ;
 			break ;
 		case 2:		// using a finite linear combination
-			srand (time(NULL)) ;
+			//srand (time(NULL)) ;
+      srand(100) ;
 			y = new T [parameters.numSamples] ;
 			// generate the number of terms (between 3 and 100)
 			//M = rand() % (MAX_TERMS-MIN_TERMS+1) + MIN_TERMS ;
-      M = 5 ;
+      M = 10 ;
 			weights = lcb::Vector<long double>(M) ;
 			for (int i=0; i<M; i++) {
 				weights[i] = 2 * (rand() /(long double) RAND_MAX) - 1 ;

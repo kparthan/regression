@@ -42,26 +42,17 @@ void plot (const char *file, int numSamples, long double noise)
 main()
 {			
 	string file ;
-<<<<<<< HEAD
-  int sampVals[] = {100} ;
+  int sampVals[] = {10000} ;
   std::vector<int> Samples (sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
-  //long double noiseVals[] = {0.1,0.2,0.3,0.4,0.5} ;
-  long double noiseVals[] = {0.5} ;
+  long double noiseVals[] = {0,0.1,0.2,0.3,0.4,0.5} ;
+  //long double noiseVals[] = {0} ;
   std::vector<long double> Noise (noiseVals,noiseVals+sizeof(noiseVals)/sizeof(long double)) ;
-=======
-  int Samples[1] = {1000} ;
-  long double Noise[1] = {0.75} ;
->>>>>>> 57d61fedf3014331915abae9f24ac44ddf0b747b
 	
 	for (int i=0; i<Samples.size(); i++)
 	{
 		for (int j=0; j<Noise.size(); j++)
 		{
-<<<<<<< HEAD
 			file = "temp/results_n" + convertToString<int>(Samples[i]) + "_s" ;
-=======
-			file = "results/results_n" + convertToString<int>(Samples[i]) + "_s" ;
->>>>>>> 57d61fedf3014331915abae9f24ac44ddf0b747b
       file = file + convertToString<long double>(Noise[j]) + ".txt" ;
 			plot(file.c_str(),Samples[i],Noise[j]) ;
 		}

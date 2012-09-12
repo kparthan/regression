@@ -32,12 +32,8 @@ struct Parameters parseCommandLine (int argc, char **argv)
                                       //  [1 for yes, 0 for no]
   int inverse = 0 ;                   // -inv
                                       // 0 -- my implementation
-<<<<<<< HEAD
                                       // 1 -- from boost
                                       // 2 -- LU decomposition
-=======
-                                      // 1 -- from boost 
->>>>>>> 57d61fedf3014331915abae9f24ac44ddf0b747b
 	bool paramFlags[12] = {0} ;
 	int i = 1 ;
 
@@ -219,7 +215,6 @@ struct Parameters parseCommandLine (int argc, char **argv)
   else
     cout << "Iterating over different values of parameters ..." << endl ; 
 
-<<<<<<< HEAD
   if(paramFlags[11]) {
     switch(inverse) {
       case 0:
@@ -239,22 +234,6 @@ struct Parameters parseCommandLine (int argc, char **argv)
         break ;
     }
   }
-  else
-    cout << "Using my implementation of inverse [using \
-    partial pivoting] ..." << endl ;
-=======
-  switch(paramFlags[11]) {
-    case 0:
-      cout << "Using my implementation of inverse [using partial pivoting] ..." << endl ;
-      break ;
-    case 1:
-      cout << "Using BOOST library implmentation of matrix inverse ..." << endl ;
-      break ;
-    default:
-      error("Invalid choice of matrix inverse.") ;
-      break ;
-  }
->>>>>>> 57d61fedf3014331915abae9f24ac44ddf0b747b
   
 	struct Parameters params ;
 	params.mean = mean ;
@@ -301,16 +280,10 @@ int main(int argc, char **argv)
   OrthogonalBasis orthogonal ;
   Message msg ;
 	string filename ; 
-<<<<<<< HEAD
   int sampVals[] = {100} ;
   std::vector<int> Samples (sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
   //long double noiseVals[] = {0.1,0.2,0.3,0.4,0.5} ;
   long double noiseVals[] = {0.5} ;
-=======
-  int sampVals[] = {1000} ;
-  std::vector<int> Samples (sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
-  long double noiseVals[] = {0.75} ;
->>>>>>> 57d61fedf3014331915abae9f24ac44ddf0b747b
   std::vector<long double> Noise (noiseVals,noiseVals+sizeof(noiseVals)/sizeof(long double)) ;
 	
   switch(parameters.iterate) 
@@ -328,11 +301,7 @@ int main(int argc, char **argv)
 			phi = orthogonal.designMatrix(randomX) ;
 
 			weights = computeWeights<long double>(phi,yValues,parameters.inverse) ;
-<<<<<<< HEAD
       weights.print() ;
-=======
-      //weights.print() ;
->>>>>>> 57d61fedf3014331915abae9f24ac44ddf0b747b
 
 			predictions = dataGenerator.predict(parameters.numFunctions,weights,
                                           randomX) ;
@@ -350,11 +319,7 @@ int main(int argc, char **argv)
 		    parameters.numSamples = Samples[i] ;
 		    for (unsigned j=0; j<Noise.size(); j++)
 		    {
-<<<<<<< HEAD
 			    filename = "temp/results_n" + convertToString<int>(Samples[i]) + "_s" ;
-=======
-			    filename = "results/results_n" + convertToString<int>(Samples[i]) + "_s" ;
->>>>>>> 57d61fedf3014331915abae9f24ac44ddf0b747b
 			    filename = filename + convertToString<long double>(Noise[j]) + 
                       ".txt" ;
 			    ofstream results ;
@@ -386,14 +351,6 @@ int main(int argc, char **argv)
 					    msg = Message (parameters,weights,randomX,yValues,
                               predictions) ;
 					    msgLen = msg.messageLength() ;
-<<<<<<< HEAD
-=======
-					    //cout << "Msg Len = " << msgLen << endl ;
-              /*if (M > 48)i
-              {
-                cout << "det@M = " << M << " is " << 
-              }*/
->>>>>>> 57d61fedf3014331915abae9f24ac44ddf0b747b
 					    results << parameters.numFunctions << "\t" ;
 					    results << rmse << "\t" ;
 					    results << msgLen << endl ;

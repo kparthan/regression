@@ -70,6 +70,7 @@ struct Parameters
 	string file ;
   int iterate ;
   int inverse ;
+  int basis ;
 } ;
 
 /*!

@@ -125,7 +125,8 @@ lcb::Matrix<long double> make_my_matrix(matrix<long double> &m, int dimension)
  *	\return a matrix object of weights
  */
 template <class T>
-lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues, int invChoice)
+lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues, 
+                                int invChoice)
 {
 	lcb::Matrix<T> phiT = phi.transpose() ;
 	lcb::Matrix<T> phiTphi = phiT * phi ;
@@ -164,7 +165,7 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues, int invCho
   {
 	  temp = pseudoInv * phiT ;
 	  weights = temp * y ;
-	  ofstream phiFile ;
+	  /*ofstream phiFile ;
 	  phiFile.open("temp/phi") ;
 	  for (int i=0; i<phi.rows(); i++)
 	  {
@@ -182,7 +183,7 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues, int invCho
 			  invFile << pseudoInv[i][j] << " " ;
 		  invFile << endl ;
 	  }
-	  invFile.close() ;
+	  invFile.close() ;*/
   }
 
 	return weights ;

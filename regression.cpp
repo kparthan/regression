@@ -34,7 +34,9 @@ struct Parameters parseCommandLine (int argc, char **argv)
                                       // 0 -- my implementation
                                       // 1 -- from boost
                                       // 2 -- LU decomposition
-	bool paramFlags[12] = {0} ;
+  int basis = 0 ;                     // 0 -- sines & cosines
+                                      // 1 -- Legendre Polynomials
+	bool paramFlags[13] = {0} ;
 	int i = 1 ;
 
 	while (i < argc)
@@ -111,6 +113,11 @@ struct Parameters parseCommandLine (int argc, char **argv)
 			inverse = atoi(argv[i+1]) ;
 			paramFlags[11] = 1 ;
 		}
+		else if (string(argv[i]).compare("-basis") == 0)
+		{
+			inverse = atoi(argv[i+1]) ;
+			paramFlags[12] = 1 ;
+		}
 		else
 		{
 			cout << "Usage: " << argv[0] << " [options]" << endl ;
@@ -127,6 +134,7 @@ struct Parameters parseCommandLine (int argc, char **argv)
 			cout << "\t [-file] input file containing data samples" << endl ;
       cout << "\t [-iterate] choice of iteration over different values" << endl ;
       cout << "\t [-inv] choice of matrix inverse" << endl ;
+      cout << "\t [-basis] choice of orthogonal basis set" << endl ;
 			error ("Invalid command line argument ...") ;
 		}
 		i += 2 ;
@@ -233,6 +241,23 @@ struct Parameters parseCommandLine (int argc, char **argv)
         error("Invalid choice of matrix inverse.") ;
         break ;
     }
+
+  if(paramFlags[12]) {
+    switch(basis) {
+      case 0:
+        cout << "Using sine/cosine as orthogonal basis functions ..." 
+        << endl ;
+        break ;
+      case 1:
+        cout << "Using Legendre Polynomials as orthogonal basis functions " 
+        "..." << endl ;
+        break ;
+      default:
+        error("Invalid choice of orthogonal basis set.") ;
+        break ;
+    }
+  }
+
   }
   
 	struct Parameters params ;
@@ -248,6 +273,7 @@ struct Parameters parseCommandLine (int argc, char **argv)
 	params.file = file ;
   params.iterate = iterate ;
   params.inverse = inverse ;
+  params.basis = basis ;
 
 	return params ;
 }
@@ -296,7 +322,7 @@ int main(int argc, char **argv)
 	    //yValues = dataGenerator.fxValues() ;
 	    dataGenerator.plotData() ;
 	    //dataGenerator.plotDataWithNoise() ;
-			orthogonal = OrthogonalBasis (parameters.numFunctions,
+			orthogonal = OrthogonalBasis(parameters.basis,parameters.numFunctions,
 					parameters.timePeriod,parameters.function) ;
 			phi = orthogonal.designMatrix(randomX) ;
 
@@ -339,8 +365,8 @@ int main(int argc, char **argv)
 				    if (Samples[i] > M+5)
 				    {
 					    parameters.numFunctions = M ;
-					    orthogonal = OrthogonalBasis (parameters.numFunctions,
-					            parameters.timePeriod,parameters.function) ;
+					    orthogonal = OrthogonalBasis (parameters.basis,
+parameters.numFunctions,parameters.timePeriod,parameters.function) ;
 					    phi = orthogonal.designMatrix(randomX) ;
 					    weights = computeWeights<long double>(phi,yValues,parameters.inverse) ;
 					    predictions = dataGenerator.predict(M,weights,randomX) ;

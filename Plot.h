@@ -117,7 +117,7 @@ void Plot :: sketch (Data<T> &randomData)
 	script.open("temp/plotScript.p",ios::app) ;
 	script << "set output \"temp/file_X.png\"" << endl ;
 	script << "plot \"temp/data.txt\" using 1:2 title 'random Column' \\" << endl ;
-	script << "with linespoints" << endl ;
+	script << "with points" << endl ;
 	script.close() ;
 
   system ("gnuplot -persist temp/plotScript.p") ;	
@@ -146,7 +146,7 @@ void Plot :: sketch (Data<T> &xVal, Data<U> &fxVal)
 	script.open("temp/plotScript.p",ios::app) ;
 	script << "set output \"temp/file_XfX.png\"" << endl ;
 	script << "plot \"temp/data_XfX.txt\" using 1:2 title 'f(x)' \\" << endl ;
-	script << "with linespoints" << endl ;
+	script << "with points" << endl ;
 	script.close() ;
 
   system ("gnuplot -persist temp/plotScript.p") ;	
@@ -183,9 +183,9 @@ void Plot :: sketch (Data<T> &xVal, Data<U> &fxVal, Data<V> &yVal)
 	script << "set output \"temp/file_XY.png\"" << endl ;
 	script << "set multiplot" << endl ;
 	script << "plot \"temp/data_XY.txt\" using 1:2 title 'f(x)' \\" << endl ;
-	script << "with linespoints lc rgb \"red\", \\" << endl ;
+	script << "with points lc rgb \"red\", \\" << endl ;
 	script << "\"temp/data_XY.txt\" using 1:3 title 'f(x)+e' \\" << endl ;
-	script << "with linespoints lc rgb \"blue\"" << endl ;
+	script << "with points lc rgb \"blue\"" << endl ;
 	script.close() ;
 
   system ("gnuplot -persist temp/plotScript.p") ;	

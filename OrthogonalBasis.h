@@ -117,7 +117,7 @@ lcb::Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
 	}*/
   int k ;
   long double arg ;
-	for (int i=0; i<numPoints; i++)
+	/*for (int i=0; i<numPoints; i++)
 	{
     phi[i][0] = 1.0 ;
 		for (int j=1; j<numFunctions; j++)
@@ -125,14 +125,31 @@ lcb::Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
 			if (j % 2 == 1)
       {
         k = j / 2 + 1 ; 
-        arg = 2 * pi * k * data[i].x() / timePeriod ;
+        arg =  k * data[i].x() / timePeriod ;
 				phi[i][j] = sin (arg) ;
       }
 			else
       {
         k = j / 2 ; 
-        arg = 2 * pi * k * data[i].x() / timePeriod ;
+        arg = k * data[i].x() / timePeriod ;
 				phi[i][j] = cos (arg) ;
+      }
+		}
+	}*/
+	for (int i=0; i<numPoints; i++)
+	{
+    phi[i][0] = 1.0 ;
+		for (int j=0; j<numFunctions-1; j++)
+		{
+      k = j / 2 + 1 ; 
+      arg =  k * data[i].x() / timePeriod ;
+			if (j % 2 == 0)
+      {
+				phi[i][j+1] = sin (arg) ;
+      }
+			else
+      {
+				phi[i][j+1] = cos (arg) ;
       }
 		}
 	}

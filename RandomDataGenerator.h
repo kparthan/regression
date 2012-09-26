@@ -20,7 +20,7 @@
 #include "OrthogonalBasis.h"
 
 //!	accuracy of measurement
-#define AOM 0.01
+#define AOM 0.00001
 
 //!	minimum number of terms used in data generation using a
 //!	finite linear combination model
@@ -362,20 +362,30 @@ long double finiteLinearCombination (long double x, long double timePeriod,
 	long double pi = boost::math::constants::pi<long double>() ;
 	int M = weights.size(),k ;
 	long double arg,yVal = weights[0] ;
-  arg = 2 * pi * x / timePeriod ;
+  //arg = 2 * pi * x / timePeriod ;
+  //arg = x / timePeriod ;
 	for (int i=1; i<M; i++)
 	{
+    arg = x / timePeriod ;
     if (i % 2 == 1)
     {   
       k = i / 2 + 1 ; 
       arg *= k  ;
+      //cout << "sin(" << k<< "*" << x/timePeriod << ") = " << sin(arg) << endl;
       yVal += weights[i] * sin (arg) ;
+      /*cout << "w = " << weights[i] << endl ;
+      cout << "w*sin(" << k<< "*" << x/timePeriod << ") = " << weights[i]*sin(arg) << endl;
+      cout << "yVal:" << yVal << endl;*/
     }   
     else
     {   
       k = i / 2 ; 
       arg *= k ;
+      //cout << "cos(" << k<< "*" << x/timePeriod << ") = " << cos(arg) << endl;
       yVal += weights[i] * cos (arg) ;
+      /*cout << "w = " << weights[i] << endl ;
+      cout << "w*cos(" << k<< "*" << x/timePeriod << ") = " << weights[i]*cos(arg) << endl;
+      cout << "yVal:" << yVal << endl;*/
     }
 	}
 	return yVal ;	
@@ -417,23 +427,27 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 			fname = "SQUARE" ;
 			break ;
 		case 2:		// using a finite linear combination
-			//srand (time(NULL)) ;
-      srand(100) ;
+			srand (time(NULL)) ;
+      //srand(100) ;
 			y = new T [parameters.numSamples] ;
 			// generate the number of terms (between 3 and 100)
 			//M = rand() % (MAX_TERMS-MIN_TERMS+1) + MIN_TERMS ;
-      M = 10 ;
+      M = 5 ;
 			weights = lcb::Vector<long double>(M) ;
 			for (int i=0; i<M; i++) {
+        // weights are generated randomly in [-1,1]
 				weights[i] = 2 * (rand() /(long double) RAND_MAX) - 1 ;
 			}
+      //weights[0] = 0;
 			cout << "M_gen: " << M << endl ;
 			weights.print() ;
 			for (int i=0; i<xVal.nPoints(); i++)
 			{
 				long double randomX = xVal[i].x() ;
+        //cout << "X: " << randomX << endl ;
 				y[i] = finiteLinearCombination(randomX,parameters.timePeriod,
                                        weights) ;
+        //cout << "exiting ..." << endl ; exit(0) ;
 			}
 			fname = "FINITE LINEAR COMBINATION" ;
 			break ;

@@ -280,7 +280,7 @@ int main(int argc, char **argv)
   OrthogonalBasis orthogonal ;
   Message msg ;
 	string filename ; 
-  int sampVals[] = {10000} ;
+  int sampVals[] = {1000} ;
   std::vector<int> Samples (sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
   long double noiseVals[] = {0} ;
   //long double noiseVals[] = {0.1,0.2,0.3,0.4,0.5} ;
@@ -310,7 +310,7 @@ int main(int argc, char **argv)
 			cout << "Error in fitting: " << rmse << endl ;
 			msg = Message (parameters,weights,randomX,yValues,predictions) ;
 			msgLen = msg.messageLength() ;
-			//cout << "Msg Len = " << msgLen << endl ;
+			cout << "Msg Len = " << msgLen << endl ;
       break ;
 
     case 1:
@@ -331,7 +331,7 @@ int main(int argc, char **argv)
 			    randomX = dataGenerator.randomX() ;
 			    yValues = dataGenerator.yValues() ;
 
-			    for (unsigned M=1; M<100; M++) 
+			    for (unsigned M=1; M<50; M++) 
 			    {
 				    cout << "N: " << parameters.numSamples << "\t" ;
 				    cout << "S: " << parameters.sigma << "\t" ;

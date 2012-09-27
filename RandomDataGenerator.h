@@ -20,7 +20,7 @@
 #include "OrthogonalBasis.h"
 
 //!	accuracy of measurement
-#define AOM 0.00001
+#define AOM 0.001
 
 //!	minimum number of terms used in data generation using a
 //!	finite linear combination model
@@ -433,7 +433,7 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 			y = new T [parameters.numSamples] ;
 			// generate the number of terms (between 3 and 100)
 			//M = rand() % (MAX_TERMS-MIN_TERMS+1) + MIN_TERMS ;
-      M = 5 ;
+      M = 2 ;
 			weights = lcb::Vector<long double>(M) ;
 			for (int i=0; i<M; i++) {
         // weights are generated randomly in [-1,1]
@@ -498,8 +498,8 @@ Data<T> RandomDataGenerator<T> :: predict (unsigned M, lcb::Matrix<T> &weights,
 																					 Data<T> &xVals)
 {
 	parameters.numFunctions = M ;
-	OrthogonalBasis orthogonal (parameters.numFunctions,parameters.timePeriod,
-															parameters.function) ;
+	OrthogonalBasis orthogonal (parameters.basis,parameters.numFunctions,
+                              parameters.timePeriod,parameters.function) ;
 	lcb::Matrix<long double> designMatrix ;
 	designMatrix = orthogonal.designMatrix(xVals) ;
 	lcb::Matrix<T> yEst = designMatrix * weights ; // column matrix

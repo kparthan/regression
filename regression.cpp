@@ -115,7 +115,7 @@ struct Parameters parseCommandLine (int argc, char **argv)
 		}
 		else if (string(argv[i]).compare("-basis") == 0)
 		{
-			inverse = atoi(argv[i+1]) ;
+			basis = atoi(argv[i+1]) ;
 			paramFlags[12] = 1 ;
 		}
 		else
@@ -223,42 +223,38 @@ struct Parameters parseCommandLine (int argc, char **argv)
   else
     cout << "Iterating over different values of parameters ..." << endl ; 
 
-  if(paramFlags[11]) {
-    switch(inverse) {
-      case 0:
-        cout << "Using my implementation of inverse [using " 
-        "partial pivoting] ..." << endl ;
-        break ;
-      case 1:
-        cout << "Using BOOST library implmentation of matrix inverse " 
-        "..." << endl ;
-        break ;
-      case 2:
-        cout << "Using my implementation of LU Decomposition to " 
-        "solve linear system ..." << endl ;
-        break ;
-      default:
-        error("Invalid choice of matrix inverse.") ;
-        break ;
-    }
-
-  if(paramFlags[12]) {
-    switch(basis) {
-      case 0:
-        cout << "Using sine/cosine as orthogonal basis functions ..." 
-        << endl ;
-        break ;
-      case 1:
-        cout << "Using Legendre Polynomials as orthogonal basis functions " 
-        "..." << endl ;
-        break ;
-      default:
-        error("Invalid choice of orthogonal basis set.") ;
-        break ;
-    }
+  switch(inverse) {
+    case 0:
+      cout << "Using my implementation of inverse [using " 
+      "partial pivoting] ..." << endl ;
+      break ;
+    case 1:
+      cout << "Using BOOST library implmentation of matrix inverse " 
+      "..." << endl ;
+      break ;
+    case 2:
+      cout << "Using my implementation of LU Decomposition to " 
+      "solve linear system ..." << endl ;
+      break ;
+    default:
+      error("Invalid choice of matrix inverse.") ;
+      break ;
   }
 
+  switch(basis) {
+    case 0:
+      cout << "Using sine/cosine as orthogonal basis functions ..." 
+      << endl ;
+      break ;
+    case 1:
+      cout << "Using Legendre Polynomials as orthogonal basis functions " 
+      "..." << endl ;
+      break ;
+    default:
+      error("Invalid choice of orthogonal basis set.") ;
+      break ;
   }
+
   
 	struct Parameters params ;
 	params.mean = mean ;
@@ -306,7 +302,7 @@ int main(int argc, char **argv)
   OrthogonalBasis orthogonal ;
   Message msg ;
 	string filename ; 
-  int sampVals[] = {1000} ;
+  int sampVals[] = {150} ;
   std::vector<int> Samples (sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
   long double noiseVals[] = {0} ;
   //long double noiseVals[] = {0.1,0.2,0.3,0.4,0.5} ;
@@ -340,6 +336,7 @@ int main(int argc, char **argv)
       break ;
 
     case 1:
+      system("rm temp/test_msglen");
 	    for (unsigned i=0; i<Samples.size(); i++) 
       {
 		    parameters.numSamples = Samples[i] ;
@@ -357,18 +354,19 @@ int main(int argc, char **argv)
 			    randomX = dataGenerator.randomX() ;
 			    yValues = dataGenerator.yValues() ;
 
-			    for (unsigned M=1; M<50; M++) 
+			    for (unsigned M=1; M<100; M++) 
 			    {
-				    cout << "N: " << parameters.numSamples << "\t" ;
+				    cout << "\nN: " << parameters.numSamples << "\t" ;
 				    cout << "S: " << parameters.sigma << "\t" ;
 				    cout << "M: " << M << endl ;
-				    if (Samples[i] > M+5)
-				    {
+				    //if (Samples[i] > M+5)
+				    //{
 					    parameters.numFunctions = M ;
 					    orthogonal = OrthogonalBasis (parameters.basis,
 parameters.numFunctions,parameters.timePeriod,parameters.function) ;
 					    phi = orthogonal.designMatrix(randomX) ;
 					    weights = computeWeights<long double>(phi,yValues,parameters.inverse) ;
+              weights.print() ;
 					    predictions = dataGenerator.predict(M,weights,randomX) ;
 
 					    rmse = computeRMSE<long double> (weights,phi,yValues) ;
@@ -380,7 +378,7 @@ parameters.numFunctions,parameters.timePeriod,parameters.function) ;
 					    results << parameters.numFunctions << "\t" ;
 					    results << rmse << "\t" ;
 					    results << msgLen << endl ;
-				    }
+				    //}
           }
           results.close() ;
         }

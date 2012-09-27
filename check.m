@@ -1,28 +1,23 @@
-%phi = load('phi_ublas') ;
 phi = load('temp/phi') ;
 y = load('temp/y') ;
 disp('size(phi): ') ;
-size(phi) 
-
+size(phi) ;
+format long;
 phi_trans = phi' ;
 A = phi_trans * phi ;
-A_inv = inv(A) ;
+matlab_inv = inv(A) ;
+
+I2 = A * matlab_inv;
+print('temp/I2',I2);
+
+print('temp/matlab_inv',matlab_inv);
 disp('size(A_inv): ') ;
-size(A_inv) 
-weights = inv(A) * phi_trans * y
+size(matlab_inv) ;
+weights = matlab_inv * phi_trans * y 
 
-%inv_computed = load('inverse_ublas') ;
-inv_computed = load('temp/inverse') ;
-inv_diff = inv_computed - A_inv ;
+computed_inv = load('temp/inverse') ;
 
-%fd = fopen('diff_inv_ublas_50.txt','w') ;
-%fd = fopen('diff_inv_50.txt','w') ;
-
-% for i=1:size(A_inv,1)
-%     for j=1:size(A_inv,2)
-%         fprintf(fd,'%f ',inv_diff(i,j)) ;
-%     end    
-%     fprintf(fd,'\n') ;
-% end    
-% 
-% fclose(fd) ;
+I1 = A * computed_inv;
+print('temp/I1',I1);
+inv_diff = computed_inv - matlab_inv ;
+print('temp/inv_diff',inv_diff);

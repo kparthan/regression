@@ -8,6 +8,7 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
+#include <iomanip>
 #include "Data.h"
 #include "RandomDataGenerator.h"
 #include "Error.h"
@@ -165,7 +166,7 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues,
   {
 	  temp = pseudoInv * phiT ;
 	  weights = temp * y ;
-	  /*ofstream phiFile ;
+	  ofstream phiFile ;
 	  phiFile.open("temp/phi") ;
 	  for (int i=0; i<phi.rows(); i++)
 	  {
@@ -180,10 +181,10 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues,
 	  for (int i=0; i<pseudoInv.rows(); i++)
 	  {
 		  for (int j=0; j<pseudoInv.columns(); j++)
-			  invFile << pseudoInv[i][j] << " " ;
+			  invFile << std::fixed << std::setprecision(7) << pseudoInv[i][j] << " " ;
 		  invFile << endl ;
 	  }
-	  invFile.close() ;*/
+	  invFile.close() ; 
   }
 
 	return weights ;
@@ -274,6 +275,9 @@ Gaussian Message :: normalDistribution (lcb::Vector<T> &samples)
 		mean += samples[i] ;
 	}
 	mean = mean / numSamples ;
+  /*if (mean < AOM) {
+    mean = 0 ;
+  }*/
 	//cout << "Mean(w): " <<
 	for (i=0; i<numSamples; i++)
 		sigmaSq += (samples[i]-mean) * (samples[i]-mean) ;
@@ -295,14 +299,16 @@ Gaussian Message :: normalDistribution (lcb::Vector<T> &samples)
  *	\param Kn a long double
  *	\return the length of the encoding based on Wallace Freeman approach
  */
-long double Message :: encodeUsingFreeman (int N, long double sigma, long double rangeMu, 
-																		long double rangeLogSigma, long double Kn)
+long double Message :: encodeUsingFreeman (int N, long double sigma, 
+                       long double rangeMu, long double rangeLogSigma, 
+                       long double Kn)
 {
 	long double pi = boost::math::constants::pi<long double>() ;
-	long double msgLen = 0.5 * (N-1) * log2l ((N * sigma * sigma)/(N-1)) + 0.5 * (N-1) +
-									0.5 * N * log2l (2 * pi / (AOM * AOM)) +
-									0.5 * log2l (2 * N * N) + log2l (rangeLogSigma) +
-									1 + log2l (Kn) ;
+	long double msgLen = 0.5 * (N-1) * log2l ((N * sigma * sigma)/(N-1)) + 
+                       0.5 * (N-1) +
+									     0.5 * N * (log2l (2 * pi) - 2* log2l(AOM)) +
+									     0.5 * log2l (2 * N * N) + log2l (rangeLogSigma) +
+									     1 + log2l (Kn) ;
 	if (rangeMu == 0) {
 		return msgLen ;
   }
@@ -398,9 +404,25 @@ long double Message :: encodeWeights (void)
 
   long double mu = normal.mean() ;
   long double sigma = normal.standardDeviation() ;
-	if (sigma <= 3 * AOM) {
-		sigma = 3 * AOM ;
+	/*if (fabs(mu) <= 3 * AOM) {
+    if (mu > 0) {
+		  mu = 3 * AOM ;
+    } else {
+      mu = -3 * AOM ;
+    }
+	}*/
+	if (fabs(sigma) <= 3 * AOM) {
+    if (sigma > 0) {
+		  sigma = 3 * AOM ;
+    } else {
+      sigma = -3 * AOM ;
+    }
 	}
+	/*if (sigma <= 3 * AOM) {
+		sigma = 3 * AOM ;
+	}*/
+	cout << "mu(w): " << mu << endl ;
+	cout << "sigma(w) = " << sigma << endl ;
   size_t N = parameters.numFunctions ;
 	long double rangeMu = 2 ; // mu \in [-1,1]
   long double sigma_max = 1 ;
@@ -435,10 +457,18 @@ long double Message :: encodeOutput (void)
 	
 	long double rangeMu = 2 ; // mu \in [-1,1]
 	long double sigma = normal.standardDeviation() ;
-	if (sigma <= 3 * AOM) {
-		sigma = 3 * AOM ;
+	if (fabs(sigma) <= 3 * AOM) {
+    if (sigma > 0) {
+		  sigma = 3 * AOM ;
+    } else {
+      sigma = -3 * AOM ;
+    }
 	}
-	//cout << "\nsigma(dy) = " << sigma << endl ;
+	/*if (sigma <= 3 * AOM) {
+		sigma = 3 * AOM ;
+	}*/
+  cout << "mu(dy) = " << normal.mean() << endl ;
+	cout << "sigma(dy) = " << sigma << endl ;
   long double sigma_max = 2;
   long double sigma_min = AOM * 3 ;
 	if (sigma_min > sigma_max) {
@@ -485,7 +515,13 @@ long double Message :: messageLength (void)
 	cout << "Message_1: " << part1 + part2 << endl ;
 	cout << "Message_2: " << part3 + part4 << endl ;
   cout << "Total msgLen: " << part1 + part2 + part3 + part4 << endl ;*/
-	return part1 + part2 + part3 + part4 ;
+
+  ofstream test;
+  test.open("temp/test_msglen",ios::app);
+  test << parameters.numFunctions << " " << part1 << " " << part2 << " " << part3 << " " << part4 << " " << part2+part4 << endl ;
+  test.close();
+
+	return part2 + part4 ;
 }
 
 #endif

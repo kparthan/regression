@@ -8,37 +8,59 @@
 \usepackage{graphicx}
 \usepackage[a4paper]{geometry}
 
+%\renewcommand{\thesection}{\Roman{section}} 
+%\renewcommand{\thesubsection}{\thesection.\Roman{subsection}}
+\makeatletter
+\newcommand*{\rom}[1]{\expandafter\@slowromancap\romannumeral #1@}
+\makeatother
+
 \geometry{top=1.0in, bottom=1.0in, left=1.5in, right=1.5in} 
 
 \title{Regression Analysis}
 \author{}
-\date{27 July 2012}
+\date{1 Oct 2012}
 \begin{document}
 \maketitle
 %\begin{center}
 %\textbf{Regression Analysis} - 27 July 2012\\ 
 %\end{center}
 
-\noindent \textsc{Problem} \\
-We have a set of $N$ data points $\mathcal{D}=\{(x_1,y_1),(x_2,y_2),\ldots,(x_N,y_N)\}$. The idea is to come up with a best approximation fucntion that would predict the value of $y$ for a given value of $x$. The nature of the underlying function that defines the data or the details of how the data was generated is usually unknown. These data points might be totally random or may be related by a characteristic function. \\
+\noindent (\rom{1}) \textsc{Problem} \\
+\hspace*{5mm} The problem is as follows: Given a set of $N$ data points \[\mathcal{D}=\{(x_1,y_1),(x_2,y_2),\ldots,(x_N,y_N)\},\] find a function that best approximates the underlying function $f(x_i) = y_i$ which relates the data. The nature of the underlying function that defines the data or the details of how the data was generated is usually unknown. These data points might be totally random or may be related by a characteristic function. \\
 
-\noindent \textsc{Theory} \\
-In the absence of the underlying function, the data is treated to be a linear combination of some set of functions.
+\noindent (\rom{2}) \textsc{Theory} \\
+\hspace*{5mm} In the absence of the underlying function, one could treat the data as a linear combination of some set of functions.
 \begin{align}
 y &=  \sum_{i=1}^M w_i \phi_i(x) \\
-  &=  \bar{w}^T \bar{\phi}(x)
+  &=  \bar{w}^T \bar{\phi}(x), 
 \end{align}
-where $M$ is the number of functions, 
-$\bar{w} = [w_1 w_2 \ldots w_M]^T, \rm{and}$
-$\bar{\phi}(x) = [\phi_1(x) \phi_2(x) \ldots \phi_M(x)]^T$.
-As a particular case, the set of functions $\{\phi_(x)\}$ belong to a set of orthogonal basis collection of functions. Any two functions in this orthogonal basis set satisy the following two criteria:-
-\[ 
-  \int\limits_{a}^{b}\phi_i(x)\phi_j(x) dx =  
-  \begin{cases}
-    1, & \text{if } i = j, \\
-    0, & \text{otherwise}.
-  \end{cases}
-\]
+where $M$ is the number of terms, $\bar{w} = [w_1 w_2 \ldots w_M]^T$ (superscript $T$ refers to the matrix transpose), and $\bar{\phi}(x) = [\phi_1(x) \phi_2(x) \ldots \phi_M(x)]^T$. Here, $w_i$ is the weight corresponding to the function $\phi_i$. \\
+
+\noindent \rom{2}.\rom{1} \textsc{Orthogonal Functions} \\
+\hspace*{5mm} Consider two functions $\phi_1(x)$ and $\phi_2(x)$ defined over the range $[a,b]$. The \textit{inner product} of these functions is defined as
+\[ <\phi_1,\phi_2> = \int_{a}^{b} \phi_1(x) \phi_2(x) \]
+$\phi_1$ and $\phi_2$ are said to be \textit{orthogonal} if $<\phi_1,\phi_2> = 0$. If there is a set of functions $\{\phi_1,\phi_2,\ldots,\phi_M\}$ defined over a range, then these functions form an orthogonal set if the inner product of any pair of these orthogonal functions $<\phi_i,\phi_j> = 0$ for $i \neq j$. \\
+
+\noindent \rom{2}.\rom{2} \textsc{Fourier Series} \\
+\hspace*{5mm} A Fourier series is a decomposition of a periodic function into a sum of infinite sine/cosine functions. Any periodic function $f(x)$ with fundamental period $T$ can be represented using Fourier series as:
+\[ f(x) = a_0 + \sum_{n=1}^{\infty} \left( a_n cos \frac{2 n\pi x}{T} + b_n sin \frac{2 n \pi x}{T} \right) \]
+The Fourier coefficients $a_n$ and $b_n$ can be determined from the following integrals:
+\begin{align}
+ a_0 &= \frac{2}{T} \int_{0}^{T} f(x) dx \\
+ a_n &= \frac{2}{T} \int_{0}^{T} f(x) cos \frac{2 n\pi x}{T} dx \\ 
+ b_n &= \frac{2}{T} \int_{0}^{T} f(x) sin \frac{2 n\pi x}{T} dx 
+\end{align}
+
+\textsc{Fourier series representation of a Sawtooth wave}
+
+% \hspace*{5mm} As a particular case, the set of functions $\{\phi_i(x)\}$ belong to a set of orthogonal basis collection of functions. Any two functions in this orthogonal basis set satisy the following two criteria:-
+% \[ 
+%   \int\limits_{a}^{b}\phi_i(x)\phi_j(x) dx =  
+%   \begin{cases}
+%     1, & \text{if } i = j, \\
+%     0, & \text{otherwise}.
+%   \end{cases}
+% \]
 
 \noindent $(1)$ is a \textit{linear model} for regression. Approximating the output values ${y_n}$ using the linear model results in an error. Minimizing this error forms the backbone of this approach. The error in approximation is given by $(y_n-\hat{y_n})^2$ where $\hat{y_n}$ is the estimated $y$ value. The combined error for all $N$ data points can then be written as
 \begin{equation}
@@ -93,6 +115,7 @@ Tests are done by simulating data from two functions in particular, namely, the 
 
 \item \textit{Generating Y's:} To the previously generated $f(x)$ values, some amount of \textit{Gaussian noise} is added to account for any errors in the actual experiment conducted. 
 \[ y = f(x) + \epsilon \quad \textrm{and } \quad \epsilon \sim \mathcal{N}(\mu,\sigma) \]
+
 
 
 \end{itemize}

@@ -42,7 +42,7 @@ void plot (const char *file, int numSamples, long double noise)
 main()
 {			
 	string file ;
-  int sampVals[] = {150} ;
+  int sampVals[] = {100} ;
   std::vector<int> Samples (sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
   //long double noiseVals[] = {0,0.1,0.2,0.3,0.4,0.5} ;
   long double noiseVals[] = {0} ;

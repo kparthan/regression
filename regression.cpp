@@ -302,7 +302,7 @@ int main(int argc, char **argv)
   OrthogonalBasis orthogonal ;
   Message msg ;
 	string filename ; 
-  int sampVals[] = {150} ;
+  int sampVals[] = {100} ;
   std::vector<int> Samples (sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
   long double noiseVals[] = {0} ;
   //long double noiseVals[] = {0.1,0.2,0.3,0.4,0.5} ;
@@ -337,6 +337,7 @@ int main(int argc, char **argv)
 
     case 1:
       system("rm temp/test_msglen");
+      system("rm temp/determinant");
 	    for (unsigned i=0; i<Samples.size(); i++) 
       {
 		    parameters.numSamples = Samples[i] ;
@@ -356,7 +357,7 @@ int main(int argc, char **argv)
 
 			    for (unsigned M=1; M<100; M++) 
 			    {
-				    cout << "\nN: " << parameters.numSamples << "\t" ;
+				    cout << "N: " << parameters.numSamples << "\t" ;
 				    cout << "S: " << parameters.sigma << "\t" ;
 				    cout << "M: " << M << endl ;
 				    //if (Samples[i] > M+5)
@@ -366,6 +367,7 @@ int main(int argc, char **argv)
 parameters.numFunctions,parameters.timePeriod,parameters.function) ;
 					    phi = orthogonal.designMatrix(randomX) ;
 					    weights = computeWeights<long double>(phi,yValues,parameters.inverse) ;
+              cout << "WEIGHTS:" << endl ;
               weights.print() ;
 					    predictions = dataGenerator.predict(M,weights,randomX) ;
 

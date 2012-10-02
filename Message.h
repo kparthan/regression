@@ -118,6 +118,35 @@ lcb::Matrix<long double> make_my_matrix(matrix<long double> &m, int dimension)
 	return result ;
 }
 
+int determinant_sign(const permutation_matrix<size_t> &pm)
+{
+  int pm_sign=1;
+  size_t size = pm.size();
+  for (size_t i = 0; i < size; ++i) {
+    if (i != pm(i)) {
+      pm_sign *= -1.0; // swap_rows would swap a pair of rows here, so we change sign
+    }
+  }
+  return pm_sign;
+}
+
+template<class T>
+long double determinantBoost(lcb::Matrix<T> &M)
+{
+  matrix<long double> m = make_matrix(M,M.columns());
+  permutation_matrix<size_t> pm(m.size1());
+  long double det = 1.0;
+  if(lu_factorize(m,pm) ) {
+    det = 0.0;
+  } else {
+    for(int i = 0; i < m.size1(); i++) {
+      det *= m(i,i); // multiply by elements on diagonal
+    }
+    det = det * determinant_sign( pm );
+  }
+  return det;
+}
+
 /*!
  *	\fn lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues, int invChoice)
  *	\brief Computes the coefficients of the basis functions
@@ -135,8 +164,9 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues,
   lcb::Matrix<long double> pseudoInv,temp,y,weights,constants ;
   matrix<long double> A,Z ;
 
- // cout << scientific << "det = " << phiTphi.determinant() << endl ;
- // cout << fixed ;
+  ofstream detFile("temp/determinant",ios::app);
+  detFile << scientific << phiTphi.determinant() << " ";
+  detFile << fixed ;
 
 	y = yValues.convertToMatrix() ;
   switch(invChoice)
@@ -144,6 +174,11 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues,
     case 0:
       /* my implementation of matrix inverse */
 	    pseudoInv = phiTphi.inverse() ;
+      detFile << scientific << pseudoInv.determinant() << " ";
+      detFile << fixed ;
+      detFile << scientific << determinantBoost(phiTphi) << endl;
+      detFile << fixed ;
+      detFile.close() ;
       break ;
     case 1:
       /* boost::ublas implementation of matrix inverse */
@@ -511,17 +546,18 @@ long double Message :: messageLength (void)
 	long double part4 = encodeOutput() ;
 	//cout << "encoding Y: " << part4 << endl ;
 
-	/*cout << "Int: " << part1 << "\tW: " << part2 << "\tX: " << part3 << "\tY: " << part4 << endl ;
-	cout << "Message_1: " << part1 + part2 << endl ;
-	cout << "Message_2: " << part3 + part4 << endl ;
-  cout << "Total msgLen: " << part1 + part2 + part3 + part4 << endl ;*/
+	cout << "# of terms & # of samples: " << part1 << ";\tW: " << part2 << ";\tX: " << part3 << ";\tY: " << part4 << endl ;
+	cout << "Message (M+N+W) [PART 1]: " << part1 << " + " << part2 << " = " << part1 + part2 << endl ;
+	cout << "Message (X+Y) [PART 2]: " << part3 << " + " << part4 << " = " << part3 + part4 << endl ;
+  cout << "Total msgLen: " << part1 + part2 << " + " << part3+part4 << " = " << part1 + part2 + part3 + part4 << endl << endl ;
 
   ofstream test;
   test.open("temp/test_msglen",ios::app);
-  test << parameters.numFunctions << " " << part1 << " " << part2 << " " << part3 << " " << part4 << " " << part2+part4 << endl ;
+  test << parameters.numFunctions << "\t\t" << part1 << "\t\t" << part2 << "\t\t" << part3 << "\t\t" << part4 << "\t\t" ;
+  test << part1+part2 << "\t\t" << part3+part4 << "\t\t" << part1+part2+part3+part4 << endl ;
   test.close();
 
-	return part2 + part4 ;
+	return part1 + part2 + part3 + part4 ;
 }
 
 #endif

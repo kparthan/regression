@@ -10,3 +10,4 @@ function [] = print (fileName,matrix)
     
     fclose(fw);
 end
+

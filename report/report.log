@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.7.12)  2 OCT 2012 12:17
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.7.12)  3 OCT 2012 10:37
 entering extended mode
  %&-line parsing enabled.
 **report.tex
@@ -319,41 +319,41 @@ Underfull \hbox (badness 10000) in paragraph at lines 41--43
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2]
-Underfull \hbox (badness 10000) in paragraph at lines 107--109
+Underfull \hbox (badness 10000) in paragraph at lines 123--125
 
  []
 
 
-Overfull \hbox (5.69981pt too wide) in paragraph at lines 116--117
+Overfull \hbox (5.69981pt too wide) in paragraph at lines 132--133
 []\OT1/cmr/m/it/12 Generating Y's: \OT1/cmr/m/n/12 To the pre-vi-ously gen-er-a
 ted $\OML/cmm/m/it/12 f\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 x\OT1/cmr/m/n/12 )$ va
 l-ues, some amount
  []
 
-[3] (./report.aux) ) 
+[3] [4] (./report.aux) ) 
 Here is how much of TeX's memory you used:
  2855 strings out of 493857
  35553 string characters out of 1153305
- 92209 words of memory out of 3000000
+ 90209 words of memory out of 3000000
  6116 multiletter control sequences out of 15000+50000
  12337 words of font info for 48 fonts, out of 3000000 for 9000
  714 hyphenation exceptions out of 8191
  27i,10n,24p,478b,192s stack positions out of 5000i,500n,10000p,200000b,50000s
- </home/pkas7/.texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm12
-00.600pk></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmcsc10.pfb><
-/usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/
-texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texmf-texli
-ve/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texmf-texlive/fonts/typ
-e1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-texlive/fonts/type1/public/am
-sfonts/cm/cmr17.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cm
-r8.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy10.pfb></us
-r/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texm
-f-texlive/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texmf-texlive/f
-onts/type1/public/amsfonts/cm/cmtt12.pfb></usr/share/texmf-texlive/fonts/type1/
-public/amsfonts/symbols/msam10.pfb>
-Output written on report.pdf (3 pages, 136762 bytes).
+ </home/pkas7/.texmf-var/fonts/pk/ljfour/jknappen/ec/tc
+rm1200.600pk></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmcsc10.p
+fb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/sh
+are/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texmf-t
+exlive/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texmf-texlive/fonts
+/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-texlive/fonts/type1/publi
+c/amsfonts/cm/cmr17.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/c
+m/cmr8.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
+</usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/
+texmf-texlive/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texmf-texli
+ve/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/share/texmf-texlive/fonts/ty
+pe1/public/amsfonts/symbols/msam10.pfb>
+Output written on report.pdf (4 pages, 139082 bytes).
 PDF statistics:
- 65 PDF objects out of 1000 (max. 8388607)
+ 68 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

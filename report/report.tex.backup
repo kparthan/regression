@@ -36,22 +36,38 @@ y &=  \sum_{i=1}^M w_i \phi_i(x) \\
 \end{align}
 where $M$ is the number of terms, $\bar{w} = [w_1 w_2 \ldots w_M]^T$ (superscript $T$ refers to the matrix transpose), and $\bar{\phi}(x) = [\phi_1(x) \phi_2(x) \ldots \phi_M(x)]^T$. Here, $w_i$ is the weight corresponding to the function $\phi_i$. \\
 
-\noindent \rom{2}.\rom{1} \textsc{Orthogonal Functions} \\
+\noindent (\rom{2}.\rom{1}) \textsc{Orthogonal Functions} \\
 \hspace*{5mm} Consider two functions $\phi_1(x)$ and $\phi_2(x)$ defined over the range $[a,b]$. The \textit{inner product} of these functions is defined as
 \[ <\phi_1,\phi_2> = \int_{a}^{b} \phi_1(x) \phi_2(x) \]
 $\phi_1$ and $\phi_2$ are said to be \textit{orthogonal} if $<\phi_1,\phi_2> = 0$. If there is a set of functions $\{\phi_1,\phi_2,\ldots,\phi_M\}$ defined over a range, then these functions form an orthogonal set if the inner product of any pair of these orthogonal functions $<\phi_i,\phi_j> = 0$ for $i \neq j$. \\
 
-\noindent \rom{2}.\rom{2} \textsc{Fourier Series} \\
+\noindent (\rom{2}.\rom{2}) \textsc{Fourier Series} \\
 \hspace*{5mm} A Fourier series is a decomposition of a periodic function into a sum of infinite sine/cosine functions. Any periodic function $f(x)$ with fundamental period $T$ can be represented using Fourier series as:
 \[ f(x) = a_0 + \sum_{n=1}^{\infty} \left( a_n cos \frac{2 n\pi x}{T} + b_n sin \frac{2 n \pi x}{T} \right) \]
 The Fourier coefficients $a_n$ and $b_n$ can be determined from the following integrals:
-\begin{align}
- a_0 &= \frac{2}{T} \int_{0}^{T} f(x) dx \\
+\begin{align*}
+ a_0 &= \frac{1}{T} \int_{0}^{T} f(x) dx \\
  a_n &= \frac{2}{T} \int_{0}^{T} f(x) cos \frac{2 n\pi x}{T} dx \\ 
  b_n &= \frac{2}{T} \int_{0}^{T} f(x) sin \frac{2 n\pi x}{T} dx 
-\end{align}
+\end{align*}
 
 \textsc{Fourier series representation of a Sawtooth wave}
+Consider the sawtooth function below with a peak value of 1.
+
+The functional form of this wave is \[ f(x) = \frac{x}{T} \] The sawtooth wave is a periodic function (time period $T$) and hence can be decomposed using Fourier series representation. The components of the Fourier series are therefore given by:
+\begin{align}
+ a_0 &= \frac{1}{T} \int_{0}^{T} \frac{x}{T} dx  \notag\\
+     &= \frac{1}{2} \\
+ a_n &= \frac{2}{T} \int_{0}^{T} \frac{x}{T} cos \left( \frac{2n\pi x}{T} \right) dx  \notag\\
+     &= 0 \\
+ b_n &= \frac{2}{T} \int_{0}^{T} \frac{x}{T} sin \left( \frac{2n\pi x}{T} \right) dx  \notag\\
+     &= -\frac{1}{n\pi}      
+\end{align}
+The Fourier series is therefore given by
+\begin{equation}
+ f(x) = \frac{1}{2} - \frac{1}{\pi} \sum_{n=1}^{\infty}\frac{1}{n}sin\left(\frac{2n\pi x}{T}\right)
+\end{equation}
+
 
 % \hspace*{5mm} As a particular case, the set of functions $\{\phi_i(x)\}$ belong to a set of orthogonal basis collection of functions. Any two functions in this orthogonal basis set satisy the following two criteria:-
 % \[ 

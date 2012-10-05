@@ -57,7 +57,7 @@ Plot :: Plot ()
 	//	default specifications
 	script.open("temp/plotScript.p") ;
 	script << "# Gnuplot script file for plotting data in file \"data\"\n\n" ;
-	script << "set terminal png small" << endl ;
+	script << "set terminal post eps" << endl ;
 	script << "set autoscale\t" ;
 	script << "# scale axes automatically" << endl ;
 	script << "set xtic auto\t" ;
@@ -182,9 +182,9 @@ void Plot :: sketch (Data<T> &xVal, Data<U> &fxVal, Data<V> &yVal)
 	//script << "set nokey" << endl ;
 	script << "set output \"temp/file_XY.png\"" << endl ;
 	script << "set multiplot" << endl ;
-	script << "plot \"temp/data_XY.txt\" using 1:2 title 'f(x)' \\" << endl ;
+	script << "plot \"temp/data_XY.txt\" using 1:2 title 'original data(y)' \\" << endl ;
 	script << "with points lc rgb \"red\", \\" << endl ;
-	script << "\"temp/data_XY.txt\" using 1:3 title 'f(x)+e' \\" << endl ;
+	script << "\"temp/data_XY.txt\" using 1:3 title 'regression fit(y_estimate)' \\" << endl ;
 	script << "with points lc rgb \"blue\"" << endl ;
 	script.close() ;
 

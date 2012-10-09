@@ -36,90 +36,94 @@ struct Parameters parseCommandLine (int argc, char **argv)
                                       // 2 -- LU decomposition
   int basis = 0 ;                     // 0 -- sines & cosines
                                       // 1 -- Legendre Polynomials
-	bool paramFlags[13] = {0} ;
+  long double m_triangle = 2.0 ;      // determines point at which a 
+                                      // triangle wave reaches its peak
+                                      // value
+	bool paramFlags[14] = {0} ;
 	int i = 1 ;
 
 	while (i < argc)
 	{
-		if (string(argv[i]).compare("-gmean") == 0)
-		{
+		if (string(argv[i]).compare("-gmean") == 0) {
 			mean = atof(argv[i+1]) ;
 			paramFlags[0] = 1 ;
 		}
-		else if (string(argv[i]).compare("-gsigma") == 0)
-		{
+		else if (string(argv[i]).compare("-gsigma") == 0) {
 			sigma = atof(argv[i+1]) ;
 			paramFlags[1] = 1 ;
 		}
-		else if (string(argv[i]).compare("-low") == 0)
-		{
+		else if (string(argv[i]).compare("-low") == 0) {
 			low = atof(argv[i+1]) ;
 			paramFlags[2] = 1 ;
 		}
-		else if (string(argv[i]).compare("-high") == 0)
-		{
+		else if (string(argv[i]).compare("-high") == 0) {
 			high = atof(argv[i+1]) ;
 			paramFlags[3] = 1 ;
 		}
-		else if (string(argv[i]).compare("-fn") == 0)
-		{
+		else if (string(argv[i]).compare("-fn") == 0) {
 			fname = argv[i+1] ;
-			if (fname.compare("sawtooth") == 0)
+			if (fname.compare("sawtooth") == 0) {
 				function = 0 ;
-			else if (fname.compare("square") == 0)
+      } 
+      else if (fname.compare("square") == 0) {
 				function = 1 ;
-			else if(fname.compare("finlincomb") == 0)
+      }
+			else if(fname.compare("triangle") == 0) {
 				function = 2 ;
-			else
+      }
+			else if(fname.compare("finlincomb") == 0) {
+				function = 3 ;
+      } else {
 				error ("Function not supported ...") ;
+      }
 			paramFlags[4] = 1 ;
 		}
-		else if (string(argv[i]).compare("-t") == 0)
-		{
+		else if (string(argv[i]).compare("-t") == 0) {
 			timePeriod = atof(argv[i+1]) ;
 			paramFlags[5] = 1 ;
 		}
-		else if (string(argv[i]).compare("-peak") == 0)
-		{
+		else if (string(argv[i]).compare("-peak") == 0) {
 			peak = atof(argv[i+1]) ;
 			paramFlags[6] = 1 ;
 		}
-		else if (string(argv[i]).compare("-nsamples") == 0)
-		{
+		else if (string(argv[i]).compare("-nsamples") == 0) {
 			numSamples = atoi(argv[i+1]) ;
-			if (numSamples <= 0)
+			if (numSamples <= 0) {
 				error ("# of data samples should be non-negative ...") ;
+      }
 			paramFlags[7] = 1 ;
 		}
-		else if (string(argv[i]).compare("-nof") == 0)
-		{
+		else if (string(argv[i]).compare("-nof") == 0) {
 			numFunctions = atoi(argv[i+1]) ;
-			if (numFunctions <= 0)
+			if (numFunctions <= 0) {
 				error ("# of orthogonal functions should be non-negative ...") ;
+      }
 			paramFlags[8] = 1 ;
 		}
-		else if (string(argv[i]).compare("-file") == 0)
-		{
+		else if (string(argv[i]).compare("-file") == 0) {
 			file = argv[i+1] ;
 			paramFlags[9] = 1 ;
 		}
-		else if (string(argv[i]).compare("-iterate") == 0)
-		{
+		else if (string(argv[i]).compare("-iterate") == 0) {
 			iterate = atoi(argv[i+1]) ;
 			paramFlags[10] = 1 ;
 		}
-		else if (string(argv[i]).compare("-inv") == 0)
-		{
+		else if (string(argv[i]).compare("-inv") == 0) {
 			inverse = atoi(argv[i+1]) ;
 			paramFlags[11] = 1 ;
 		}
-		else if (string(argv[i]).compare("-basis") == 0)
-		{
+		else if (string(argv[i]).compare("-basis") == 0) {
 			basis = atoi(argv[i+1]) ;
 			paramFlags[12] = 1 ;
 		}
-		else
-		{
+		else if (string(argv[i]).compare("-m") == 0) {
+			m_triangle = atof(argv[i+1]) ;
+      if (m_triangle < 1) {
+        error("parameter m in triangle wave specification should be "
+        "greater than 1 ...") ;
+      }
+			paramFlags[13] = 1 ;
+		} else {
 			cout << "Usage: " << argv[0] << " [options]" << endl ;
 			cout << "Valid options:" << endl ;
 			cout << "\t [-gmean] Mean of Gaussian distribution" << endl ;
@@ -127,12 +131,16 @@ struct Parameters parseCommandLine (int argc, char **argv)
 			cout << "\t [-low] lower bound of interval" << endl ;
 			cout << "\t [-high] upper bound of interval" << endl ;
 			cout << "\t [-fn] function to be used" << endl ;
+      cout << "\t [-m] >1 point at which a triangle wave reaches " 
+      "its peak/maximum value" << endl ;
 			cout << "\t [-t] time period of wave function" << endl ;
 			cout << "\t [-peak] maximum amplitude of the wave" << endl ;
 			cout << "\t [-nsamples] number of data samples to be used" << endl ;
-			cout << "\t [-nof] number of orthogonal basis functions to use" << endl ;
+			cout << "\t [-nof] number of orthogonal basis functions to use" 
+      << endl ;
 			cout << "\t [-file] input file containing data samples" << endl ;
-      cout << "\t [-iterate] choice of iteration over different values" << endl ;
+      cout << "\t [-iterate] choice of iteration over different values" 
+      << endl ;
       cout << "\t [-inv] choice of matrix inverse" << endl ;
       cout << "\t [-basis] choice of orthogonal basis set" << endl ;
 			error ("Invalid command line argument ...") ;
@@ -140,88 +148,122 @@ struct Parameters parseCommandLine (int argc, char **argv)
 		i += 2 ;
 	}	
 
-	if (paramFlags[9] == 1)
-	{
-		if (paramFlags[2] == 1)
-			cout << "Ignoring argument \"-low\"/default value set" << endl ;
-		if (paramFlags[3] == 1)
-			cout << "Ignoring argument \"-high\"/default value set" << endl ;
-		if (paramFlags[7] == 1)
-			cout << "Ignoring argument \"-nsamples\"/default value set" << endl ;
-	}
+	if (iterate == 0) {
+		if (paramFlags[9] == 1)
+		{
+			if (paramFlags[2] == 1) {
+				cout << "Ignoring argument \"-low\"/default value set" << endl ;
+      }
+			if (paramFlags[3] == 1) {
+				cout << "Ignoring argument \"-high\"/default value set" << endl ;
+      }
+			if (paramFlags[7] == 1) {
+				cout << "Ignoring argument \"-nsamples\"/default value set" 
+        << endl ;
+      }
+		}
 
-	if (paramFlags[9] != 1)
-	{
-		if (high <= low)
-			error ("Interval's upper bound should be less than the " 
-      "lower bound ...") ;
+		if (paramFlags[9] != 1) {
+			if (high <= low) {
+				error ("Interval's upper bound should be less than the " 
+	      "lower bound ...") ;
+      }
+			if (numSamples <= 0) {
+				error ("Number of data samples should be non-negative ...") ;
+      }
+		}
 
-		if (numSamples <= 0)
-			error ("Number of data samples should be non-negative ...") ;
-	}
+		//	printing parameter values to be used in simulation
+		if (paramFlags[0] == 0) {
+			cout << "Using default value for Gaussian Mean: " << mean <<endl ;
+    } else {
+				cout << "Gaussian Mean set to: " << mean << endl ;
+    }
 
-	//	printing parameter values to be used in simulation
-	if (paramFlags[0] == 0)
-		cout << "Using default value for Gaussian Mean: " << mean <<endl ;
-	else
-			cout << "Gaussian Mean set to: " << mean << endl ;
+		if (paramFlags[1] == 0) {
+			cout << "Using default value for Gaussian sigma: " << sigma << endl ;    } else {
+				cout << "Gaussian Sigma set to: " << sigma << endl ;
+    }
 
-	if (paramFlags[1] == 0)
-		cout << "Using default value for Gaussian sigma: " << sigma << endl ;
-	else
-			cout << "Gaussian Sigma set to: " << sigma << endl ;
+		if (paramFlags[9] != 1) {
+			if (paramFlags[7] == 0) {
+				cout << "Using default number of samples: " << numSamples << endl ;
+      } else {
+				cout << "Number of data samples set to: " << numSamples << endl ;
+      }
+		}
 
-	if (paramFlags[9] != 1)
-	{
-		if (paramFlags[2] == 0)
-			cout << "Using default value for interval's lower bound: " << low 
+		if (paramFlags[8] == 0) {
+			cout << "Using default number of orthogonal functions (terms): " 
+      << numFunctions 
 			<< endl ;
-		else
-			cout << "Interval lower bound set to: " << low << endl ;
+    } else {
+			cout << "Number of orthogonal functions (terms) set to: " 
+      << numFunctions << endl ;
+    }
 
-		if (paramFlags[3] == 0)
-			cout << "Using default value for interval's higher bound: " << high 
-			<< endl ;
-		else
-			cout << "Interval higher bound set to: " << high << endl ;
+		if (paramFlags[9] == 0) {
+			cout << "Using data generated randomly ..." << endl ;
+		} else {
+			cout << "Using data from file: " << file << "..."  << endl ; 
+    }
+	}	
+
+	if (paramFlags[4] == 0) {
+	  cout << "Using default function to generate data: " << fname 
+    << endl ;
+	} else {
+	  cout << "Function to generate data set to: " << fname << endl ;
+    if (function == 2) {  // triangle wave
+      if (paramFlags[13] == 1) {
+        cout << "Parameter m in triangle wave specification set to: "
+        << m_triangle << endl ;
+      } else {
+        cout << "Using default value of parameter m in triangle wave "
+        "specification: " << m_triangle << endl ;
+      }
+    } else {
+      if (paramFlags[13] == 1) {
+        cout << "Ignoring parameter m value as it does not apply to " 
+        << fname << "function ..." << endl ;
+      }
+    } 
+  }
 	
-		if (paramFlags[7] == 0)
-			cout << "Using default number of samples: " << numSamples << endl ;
-		else
-			cout << "Number of data samples set to: " << numSamples << endl ;
-	}
+  if (function != 3) {		
+    if (paramFlags[6] == 0) {
+	    cout << "Using default value for maximum amplitude of wave: " << peak
+      << endl ;
+    } else {
+		  cout << "Peak value set to: " << peak << endl ;
+    }
+  }
 
-	if (paramFlags[4] == 0)
-		cout << "Using default function to generate data: " << fname << endl ;
-	else
-		cout << "Function to generate data set to: " << fname << endl ;
-	
-	if (paramFlags[5] == 0)
-		cout << "Using default value for time period: " << timePeriod << endl ;
-	else
-		cout << "Time period set to: " << timePeriod << endl ;
-
-	if (paramFlags[6] == 0)
-		cout << "Using default value for maximum amplitude of wave: " << peak 
+	if (paramFlags[2] == 0) {
+		cout << "Using default value for interval's lower bound: " << low 
 		<< endl ;
-	else
-		cout << "Peak value set to: " << peak << endl ;
+  } else {
+  	cout << "Interval lower bound set to: " << low << endl ;
+  }
 
-	if (paramFlags[8] == 0)
-		cout << "Using default number of orthogonal functions(terms): " << numFunctions 
+	if (paramFlags[3] == 0) {
+    cout << "Using default value for interval's higher bound: " << high 
 		<< endl ;
-	else
-		cout << "Number of orthogonal functions(terms) set to: " << numFunctions << endl ;
+  } else {
+	  cout << "Interval higher bound set to: " << high << endl ;
+  }
 
-	if (paramFlags[9] == 0)
-		cout << "Using data generated randomly ..." << endl ;
-	else
-		cout << "Using data from file: " << file << "..."  << endl ; 
+	if (paramFlags[5] == 0) {
+	  cout << "Using default value for time period: " << timePeriod << endl ;
+  } else {
+	  cout << "Time period set to: " << timePeriod << endl ;
+  }	
 
-  if (paramFlags[10] == 0)
+  if (paramFlags[10] == 0) {
     cout << "Running an instance of regression fit ..." << endl ;
-  else
+  } else {
     cout << "Iterating over different values of parameters ..." << endl ; 
+  }
 
   switch(inverse) {
     case 0:
@@ -254,7 +296,6 @@ struct Parameters parseCommandLine (int argc, char **argv)
       error("Invalid choice of orthogonal basis set.") ;
       break ;
   }
-
   
 	struct Parameters params ;
 	params.mean = mean ;
@@ -270,6 +311,7 @@ struct Parameters parseCommandLine (int argc, char **argv)
   params.iterate = iterate ;
   params.inverse = inverse ;
   params.basis = basis ;
+  params.m = m_triangle ;
 
 	return params ;
 }
@@ -302,8 +344,8 @@ int main(int argc, char **argv)
   OrthogonalBasis orthogonal ;
   Message msg ;
 	string filename ; 
-  int sampVals[] = {100} ;
-  std::vector<int> Samples (sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
+  int sampVals[] = {1000} ;
+  std::vector<int>Samples(sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
   long double noiseVals[] = {0} ;
   //long double noiseVals[] = {0.1,0.2,0.3,0.4,0.5} ;
   std::vector<long double> Noise (noiseVals,noiseVals+sizeof(noiseVals)/sizeof(long double)) ;
@@ -329,10 +371,10 @@ int main(int argc, char **argv)
                                           randomX) ;
 			dataGenerator.plotPredictions(randomX,yValues,predictions) ;
 	  	rmse = computeRMSE<long double>(weights,phi,yValues) ;
-			cout << "Error in fitting: " << rmse << endl ;
 			msg = Message (parameters,weights,randomX,yValues,predictions) ;
 			msgLen = msg.messageLength() ;
 			cout << "Msg Len = " << msgLen << endl ;
+			cout << "Error in fitting: " << rmse << endl ;
       break ;
 
     case 1:
@@ -360,27 +402,25 @@ int main(int argc, char **argv)
 				    cout << "N: " << parameters.numSamples << "\t" ;
 				    cout << "S: " << parameters.sigma << "\t" ;
 				    cout << "M: " << M << endl ;
-				    //if (Samples[i] > M+5)
-				    //{
-					    parameters.numFunctions = M ;
-					    orthogonal = OrthogonalBasis (parameters.basis,
-parameters.numFunctions,parameters.timePeriod,parameters.function) ;
-					    phi = orthogonal.designMatrix(randomX) ;
-					    weights = computeWeights<long double>(phi,yValues,parameters.inverse) ;
-              cout << "WEIGHTS:" << endl ;
-              weights.print() ;
-					    predictions = dataGenerator.predict(M,weights,randomX) ;
+					  parameters.numFunctions = M ;
+					  orthogonal = OrthogonalBasis (parameters.basis,
+                          parameters.numFunctions,parameters.timePeriod,
+                          parameters.function) ;
+					  phi = orthogonal.designMatrix(randomX) ;
+					  weights = computeWeights<long double>(phi,yValues,
+                                                parameters.inverse) ;
+            cout << "WEIGHTS:" << endl ;
+            weights.print() ;
+					  predictions = dataGenerator.predict(M,weights,randomX) ;
 
-					    rmse = computeRMSE<long double> (weights,phi,yValues) ;
-					    //cout << "Error in fitting: " << rmse << endl ;
+					  rmse = computeRMSE<long double> (weights,phi,yValues) ;
 
-					    msg = Message (parameters,weights,randomX,yValues,
+					  msg = Message (parameters,weights,randomX,yValues,
                               predictions) ;
-					    msgLen = msg.messageLength() ;
-					    results << parameters.numFunctions << "\t" ;
-					    results << rmse << "\t" ;
-					    results << msgLen << endl ;
-				    //}
+					  msgLen = msg.messageLength() ;
+					  results << parameters.numFunctions << "\t" ;
+					  results << rmse << "\t" ;
+					  results << msgLen << endl ;
           }
           results.close() ;
         }

@@ -55,6 +55,17 @@ using namespace std ;
  *	Member 'numFunctions' contains the number of orthogonal functions
  *	\var Parameters::file
  *	Member 'file' contains the input data to run the experiment 
+ *  \var Parameters::iterate
+ *  Member 'iterate' determines whether to run as a standalone unit or
+ *  iterate over a set of parameters
+ *  \var Parameters::inverse
+ *  Member 'inverse' determines the method to solve the linear system of
+ *  equations to compute the weights in the regression fit
+ *  \var Parameters::basis
+ *  Member 'basis' contains the choice of orthogonal basis set
+ *  \var Parameters:m
+ *  Member 'm' is the parameter which specifies the position at which the
+ *  the peak of a triangle wave is seen
  */
 struct Parameters 
 {
@@ -71,6 +82,7 @@ struct Parameters
   int iterate ;
   int inverse ;
   int basis ;
+  long double m ;
 } ;
 
 /*!
@@ -264,18 +276,19 @@ long double sawtooth (long double x, long double timePeriod, long double peak, l
 	}
   */
   //  Sawtooth [3]
-  if (x >= 0 && x < timePeriod)
+  if (x >= 0 && x < timePeriod) {
     return x * peak / timePeriod ;
-  else if (x > timePeriod)
-	{
-		while (x > timePeriod)
+  }
+  else if (x > timePeriod) {
+		while (x > timePeriod) {
 			x = x - timePeriod ;
+    }
     return sawtooth(x,timePeriod,peak,slope) ;
 	}
-  else if (x < 0)
-  {
-    while (x < 0)
+  else if (x < 0) {
+    while (x < 0) {
       x = x + timePeriod ;
+    }
     return sawtooth(x,timePeriod,peak,slope) ;
   }  
 }
@@ -286,7 +299,7 @@ long double sawtooth (long double x, long double timePeriod, long double peak, l
  * 	randomly generated x's. There are two versions of square waves that 
  *	could be used. If using (1), the function needs to be approximated
  *	using odd cosine harmonics; if using (2) sine series needs to used.
- *	Sqaure wave is discontinuous.
+ *	Square wave is discontinuous.
  *
  *	1. Square wave symmetric about Y-axis and has +ve peak value at the
  *		 origin, hence
@@ -333,18 +346,19 @@ long double square (long double x, long double timePeriod, long double peak)
 		return peak ;
 	*/
 	//	Square [2]
-	if (x < 0)
+	if (x < 0) {
 		return (-1) * square (-x,timePeriod,peak) ;
-	else if (x >= 0)
-	{
-		while (x >= timePeriod)
+  } 
+  else if (x >= 0) {
+		while (x >= timePeriod) {
 			x = x - timePeriod ;
-		if (x > 0 && (2 * x < timePeriod))
+    }
+		if (x > 0 && (2 * x < timePeriod)) {
 			return peak ;
-		else if ((2 * x > timePeriod) && x < timePeriod)
+    }
+		else if ((2 * x > timePeriod) && x < timePeriod) {
 			return (-1) * peak ;
-		else
-		{
+    } else {
 			long double random = (long double)rand() / RAND_MAX ;
 			if (random <= 0.5)
 				return peak ;
@@ -355,10 +369,56 @@ long double square (long double x, long double timePeriod, long double peak)
 
 /*!
  *	\relates RandomDataGenerator
+ *	\brief This module generates the triangle wave function values for the
+ * 	randomly generated x's. 
+ *	Triangle wave is continuous.
+ *
+ *  If T is the time period and p is the peak value, then the functional 
+ *  form of the triangle wave passing through the origin is as follows:-
+ *      if (0 <= x <= T/2m)       => f(x) = 2mpx/T
+ *      if (T/2m <= x < = T-T/2m) => f(x) = (1-2x/T)(mp/m-1)
+ *      if (T-T/2m <= x <= T)     => f(x) = (x-T)(2mp/T)
+ *
+ *  The triangle wave can be symmetric/asymmetric depending on the 
+ *  parameter m. If m = 2 (symmetric), the function reaches a peak at 
+ *  x = T/4, otherwise the peak value will be at x = T/2m
+ *  (asymmetrical).
+ */
+long double triangle (long double x, long double timePeriod, 
+                      long double peak, long double m)
+{
+  if (x >=0 && x <= timePeriod) {
+    long double bound1 = timePeriod / (2*m) ;
+    long double bound2 = timePeriod - bound1 ; 
+    if (x <= bound1) {
+      return 2 * m * peak * x / timePeriod ;
+    }
+    else if (x > bound1 && x < bound2) {
+      return (1 - (2 * x / timePeriod)) * (m * peak / (m - 1)) ;
+    } else {
+      return (x - timePeriod) * (2 * m * peak / timePeriod) ;
+    }
+  }
+  else if (x > timePeriod) {
+    while (x >= timePeriod) {
+      x = x - timePeriod ;
+    }
+    return triangle(x,timePeriod,peak,m) ;
+  } 
+  else if (x < 0) {
+    while (x < 0) {
+      x = x + timePeriod ;
+    }
+    return triangle(x,timePeriod,peak,m) ;
+  }
+}
+
+/*!
+ *	\relates RandomDataGenerator
  *	\brief 
  */
-long double finiteLinearCombination (long double x, long double timePeriod, 
-																lcb::Vector<long double> weights)
+long double finiteLinearCombination (long double x, long double timePeriod,
+                                      lcb::Vector<long double> weights)
 {
 	long double pi = boost::math::constants::pi<long double>() ;
 	int M = weights.size(),k ;
@@ -427,7 +487,17 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 			}
 			fname = "SQUARE" ;
 			break ;
-		case 2:		// using a finite linear combination
+    case 2:   // triangular wave
+			y = new T [parameters.numSamples] ;
+			for (int i=0; i<xVal.nPoints(); i++)
+			{
+				long double randomX = xVal[i].x() ;
+				y[i] = triangle (randomX,parameters.timePeriod,parameters.peak,
+                         parameters.m) ;
+			}
+      fname = "TRIANGLE" ;
+      break ;
+		case 3:		// using a finite linear combination
 			srand (time(NULL)) ;
       //srand(100) ;
 			y = new T [parameters.numSamples] ;
@@ -494,8 +564,8 @@ void RandomDataGenerator<T> :: addNoise (void)
  *	\return a Data object containing the predicted values
  */
 template <class T>
-Data<T> RandomDataGenerator<T> :: predict (unsigned M, lcb::Matrix<T> &weights,
-																					 Data<T> &xVals)
+Data<T> RandomDataGenerator<T> :: predict (unsigned M, lcb::Matrix<T> 
+                                  &weights, Data<T> &xVals)
 {
 	parameters.numFunctions = M ;
 	OrthogonalBasis orthogonal (parameters.basis,parameters.numFunctions,
@@ -635,8 +705,8 @@ void RandomDataGenerator<T> :: plotDataWithNoise (void)
  *	\param predictions a reference to a Data object of type T
  */
 template <class T>
-void RandomDataGenerator<T> :: plotPredictions (Data<T> &xVals, Data<T> &yVals,
-															 Data<T> &predictions) 
+void RandomDataGenerator<T> :: plotPredictions (Data<T> &xVals, 
+                               Data<T> &yVals, Data<T> &predictions) 
 {
 	vector<string> labels ;
 	long double min,max ;
@@ -684,14 +754,18 @@ void RandomDataGenerator<T> :: print (void)
 	cout << "Time Period = " << parameters.timePeriod << endl ;
 	cout << "Peak value = " << parameters.peak << endl ;
 	cout << "Number of samples = " << parameters.numSamples << endl ; 
-	cout << "# of orthogonal fucntions = " << parameters.numFunctions << endl ;
-	if (!parameters.file.empty())
+	cout << "# of orthogonal fucntions = " << parameters.numFunctions 
+  << endl ;
+	if (!parameters.file.empty()) {
 		cout << "Input file: " << parameters.file << endl ;
+  }
 
-	if (xVal.nPoints() > 0)
+	if (xVal.nPoints() > 0) {
 		xVal.print() ;
-	if (fxVal.nPoints() > 0)
+  }
+	if (fxVal.nPoints() > 0) {
 		fxVal.print() ;
+  }
 }
 
 #endif

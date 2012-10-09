@@ -115,7 +115,7 @@ void Plot :: sketch (Data<T> &randomData)
 	dataFile.close() ;
 
 	script.open("temp/plotScript.p",ios::app) ;
-	script << "set output \"temp/file_X.png\"" << endl ;
+	script << "set output \"temp/file_X.eps\"" << endl ;
 	script << "plot \"temp/data.txt\" using 1:2 title 'random Column' \\" << endl ;
 	script << "with points" << endl ;
 	script.close() ;
@@ -144,7 +144,7 @@ void Plot :: sketch (Data<T> &xVal, Data<U> &fxVal)
 	dataFile.close() ;
 
 	script.open("temp/plotScript.p",ios::app) ;
-	script << "set output \"temp/file_XfX.png\"" << endl ;
+	script << "set output \"temp/file_XfX.eps\"" << endl ;
 	script << "plot \"temp/data_XfX.txt\" using 1:2 title 'f(x)' \\" << endl ;
 	script << "with points" << endl ;
 	script.close() ;
@@ -180,7 +180,7 @@ void Plot :: sketch (Data<T> &xVal, Data<U> &fxVal, Data<V> &yVal)
 
 	script.open("temp/plotScript.p",ios::app) ;
 	//script << "set nokey" << endl ;
-	script << "set output \"temp/file_XY.png\"" << endl ;
+	script << "set output \"temp/file_XY.eps\"" << endl ;
 	script << "set multiplot" << endl ;
 	script << "plot \"temp/data_XY.txt\" using 1:2 title 'original data(y)' \\" << endl ;
 	script << "with points lc rgb \"red\", \\" << endl ;

@@ -161,24 +161,27 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues,
 	lcb::Matrix<T> phiT = phi.transpose() ;
 	lcb::Matrix<T> phiTphi = phiT * phi ;
 	unsigned dim = phiTphi.rows() ; 
-  lcb::Matrix<long double> pseudoInv,temp,y,weights,constants ;
+  long double lambda = 1;
+  lcb::Matrix<long double> pseudoInv,temp,y,weights,constants,net ;
   matrix<long double> A,Z ;
-
-  ofstream detFile("temp/determinant",ios::app);
+  lcb::Matrix<long double>penalty = lcb::Matrix<long double>::identity(dim);
+  net = phiTphi + penalty * lambda;
+  /*ofstream detFile("temp/determinant",ios::app);
   detFile << scientific << phiTphi.determinant() << " ";
-  detFile << fixed ;
+  detFile << fixed ;*/
 
 	y = yValues.convertToMatrix() ;
   switch(invChoice)
   {
     case 0:
       /* my implementation of matrix inverse */
-	    pseudoInv = phiTphi.inverse() ;
-      detFile << scientific << pseudoInv.determinant() << " ";
+	    //pseudoInv = phiTphi.inverse() ;
+	    pseudoInv = net.inverse() ;
+      /*detFile << scientific << pseudoInv.determinant() << " ";
       detFile << fixed ;
       detFile << scientific << determinantBoost(phiTphi) << endl;
       detFile << fixed ;
-      detFile.close() ;
+      detFile.close() ;*/
       break ;
     case 1:
       /* boost::ublas implementation of matrix inverse */
@@ -190,7 +193,8 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues,
       break ;
     case 2:
       constants = phiT * y ;
-      weights = phiTphi.solveLinearSystem(constants) ;
+      //weights = phiTphi.solveLinearSystem(constants) ;
+      weights = net.solveLinearSystem(constants) ;
       break ;
     default:
       error("Invalid choice of matrix inverse.") ;
@@ -201,7 +205,7 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues,
   {
 	  temp = pseudoInv * phiT ;
 	  weights = temp * y ;
-	  ofstream phiFile ;
+	  /*ofstream phiFile ;
 	  phiFile.open("temp/phi") ;
 	  for (int i=0; i<phi.rows(); i++)
 	  {
@@ -219,8 +223,34 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues,
 			  invFile << std::fixed << std::setprecision(7) << pseudoInv[i][j] << " " ;
 		  invFile << endl ;
 	  }
-	  invFile.close() ; 
+	  invFile.close() ; */
   }
+
+  /* forcing the weights to be sawtooth's fourier coefficients  */  
+  /*int n,c ;
+  long double pi = boost::math::constants::pi<long double>();
+  weights[0][0] = 0.5 ;
+  for (n=1; n<weights.rows(); n++) {
+    if (n%2 == 1) {
+      c = n/2 + 1;
+      weights[n][0] = -1/(c * pi) ;
+    } else {
+       weights[n][0] = 0 ;
+    }
+  }*/
+
+  /* forcing the weights to be square's fourier coefficients  */  
+  /*int n,c ;
+  long double pi = boost::math::constants::pi<long double>();
+  weights[0][0] = 0 ;
+  for (n=1; n<weights.rows(); n++) {
+    if (n%4 == 1) {
+      c = n/2 + 1 ;
+      weights[n][0] = 4/(c * pi) ;
+    } else {
+       weights[n][0] = 0 ;
+    }
+  }*/
 
 	return weights ;
 }
@@ -240,14 +270,15 @@ long double computeRMSE (lcb::Matrix<T> &weights, lcb::Matrix<T> &phi,
 										Data<T> &yVals)
 {
   lcb::Matrix<T> yEst = phi * weights ; // column matrix
-	long double diff, error = 0 ;
+	long double diff, error = 0,lambda=1 ;
 	int numSamples = phi.rows() ;
 	for (int i=0; i<numSamples; i++)
 	{
 		diff = yEst[i][0] - yVals[i].x() ;
 		error += diff * diff ;
 	}
-	return sqrt(error/numSamples) ;
+  lcb::Matrix<long double> penalty = (weights.transpose() * weights) * (lambda/2) ;
+	return sqrt(error/numSamples+penalty[0][0]) ;
 }
 
 /*!

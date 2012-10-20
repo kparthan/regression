@@ -22,5 +22,5 @@ regression.o: regression.cpp *.h
 #	g++ -c $(CFLAGS) $< -o $@
 
 clean:
-	rm -f *.o *~ regression a.out test/test_Vector test/test_Matrix *.png temp/* *.p
+	rm -f *.o *~ regression a.out test/test_Vector test/test_Matrix *.eps *.p temp/*.eps temp/*.p
 

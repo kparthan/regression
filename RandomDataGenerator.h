@@ -66,6 +66,9 @@ using namespace std ;
  *  \var Parameters:m
  *  Member 'm' is the parameter which specifies the position at which the
  *  the peak of a triangle wave is seen
+ *  \var Parameters:lambda
+ *  Member 'lambda' is the parameter used in the regularized least squares
+ *  version
  */
 struct Parameters 
 {
@@ -83,6 +86,7 @@ struct Parameters
   int inverse ;
   int basis ;
   long double m ;
+  long double lambda ;
 } ;
 
 /*!

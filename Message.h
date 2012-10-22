@@ -148,27 +148,35 @@ long double determinantBoost(lcb::Matrix<T> &M)
 }
 
 /*!
- *	\fn lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues, int invChoice)
+ *	\fn lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> 
+ *  &yValues, int invChoice, long double lambda)
  *	\brief Computes the coefficients of the basis functions
  *	\param phi a reference to a Matrix object
  *	\param yValues a reference to a Data object
+ *  \param invChoice an integer
+ *  \param lambda a long double
  *	\return a matrix object of weights
  */
 template <class T>
 lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues, 
-                                int invChoice)
+                               int invChoice, long double lambda)
 {
 	lcb::Matrix<T> phiT = phi.transpose() ;
 	lcb::Matrix<T> phiTphi = phiT * phi ;
 	unsigned dim = phiTphi.rows() ; 
-  long double lambda = 1;
   lcb::Matrix<long double> pseudoInv,temp,y,weights,constants,net ;
   matrix<long double> A,Z ;
   lcb::Matrix<long double>penalty = lcb::Matrix<long double>::identity(dim);
-  net = phiTphi + penalty * lambda;
   /*ofstream detFile("temp/determinant",ios::app);
   detFile << scientific << phiTphi.determinant() << " ";
   detFile << fixed ;*/
+
+  if (lambda > std::numeric_limits<long double>::epsilon()) {
+    net = phiTphi + penalty * lambda;
+    cout << "***** IN HERE *****" << endl ;
+  } else {
+    net = phiTphi ;
+  }
 
 	y = yValues.convertToMatrix() ;
   switch(invChoice)
@@ -267,18 +275,22 @@ lcb::Matrix<T> computeWeights (lcb::Matrix<T> &phi, Data<T> &yValues,
  */
 template <class T>
 long double computeRMSE (lcb::Matrix<T> &weights, lcb::Matrix<T> &phi, 
-										Data<T> &yVals)
+										     Data<T> &yVals, long double lambda)
 {
   lcb::Matrix<T> yEst = phi * weights ; // column matrix
-	long double diff, error = 0,lambda=1 ;
+	long double diff, error = 0 ;
 	int numSamples = phi.rows() ;
-	for (int i=0; i<numSamples; i++)
-	{
+	for (int i=0; i<numSamples; i++) {
 		diff = yEst[i][0] - yVals[i].x() ;
 		error += diff * diff ;
 	}
-  lcb::Matrix<long double> penalty = (weights.transpose() * weights) * (lambda/2) ;
-	return sqrt(error/numSamples+penalty[0][0]) ;
+  lcb::Matrix<long double> penalty ;
+  if (std::numeric_limits<long double>::epsilon() > 0) {
+    penalty = (weights.transpose() * weights) * (lambda/2) ;
+	  return sqrt(error/numSamples+penalty[0][0]) ;
+  } else {
+	  return sqrt(error/numSamples) ;
+  }
 }
 
 /*!
@@ -580,7 +592,7 @@ long double Message :: messageLength (void)
 	cout << "# of terms & # of samples: " << part1 << ";\tW: " << part2 << ";\tX: " << part3 << ";\tY: " << part4 << endl ;
 	cout << "Message (M+N+W) [PART 1]: " << part1 << " + " << part2 << " = " << part1 + part2 << endl ;
 	cout << "Message (X+Y) [PART 2]: " << part3 << " + " << part4 << " = " << part3 + part4 << endl ;
-  cout << "Total msgLen: " << part1 + part2 << " + " << part3+part4 << " = " << part1 + part2 + part3 + part4 << endl << endl ;
+  cout << "Total msgLen: " << part1 + part2 << " + " << part3+part4 << " = " << part1 + part2 + part3 + part4 << endl ;
 
   ofstream test;
   test.open("temp/test_msglen",ios::app);

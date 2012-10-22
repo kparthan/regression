@@ -39,7 +39,8 @@ struct Parameters parseCommandLine (int argc, char **argv)
   long double m_triangle = 2.0 ;      // determines point at which a 
                                       // triangle wave reaches its peak
                                       // value
-	bool paramFlags[14] = {0} ;
+  long double lambda = 0 ;
+	bool paramFlags[15] = {0} ;
 	int i = 1 ;
 
 	while (i < argc)
@@ -123,6 +124,10 @@ struct Parameters parseCommandLine (int argc, char **argv)
         "greater than 1 ...") ;
       }
 			paramFlags[13] = 1 ;
+    }
+		else if (string(argv[i]).compare("-lambda") == 0) {
+      lambda = atof(argv[i+1]);
+      paramFlags[14] = 1;
 		} else {
 			cout << "Usage: " << argv[0] << " [options]" << endl ;
 			cout << "Valid options:" << endl ;
@@ -265,6 +270,13 @@ struct Parameters parseCommandLine (int argc, char **argv)
     cout << "Iterating over different values of parameters ..." << endl ; 
   }
 
+  if (lambda > std::numeric_limits<long double>::epsilon()) {
+    cout << "Using regularized least squares to compute weights ..." <<
+    endl ;
+  } else {
+    cout << "Using normal least squares to compute weights ..." << endl ;
+  }
+
   switch(inverse) {
     case 0:
       cout << "Using my implementation of inverse [using " 
@@ -312,6 +324,7 @@ struct Parameters parseCommandLine (int argc, char **argv)
   params.inverse = inverse ;
   params.basis = basis ;
   params.m = m_triangle ;
+  params.lambda = lambda ;
 
 	return params ;
 }
@@ -364,13 +377,14 @@ int main(int argc, char **argv)
 					parameters.timePeriod,parameters.function) ;
 			phi = orthogonal.designMatrix(randomX) ;
 
-			weights = computeWeights<long double>(phi,yValues,parameters.inverse) ;
+			weights = computeWeights<long double>(phi,yValues,parameters.inverse,
+                                            parameters.lambda) ;
       weights.print() ;
 
 			predictions = dataGenerator.predict(parameters.numFunctions,weights,
                                           randomX) ;
 			dataGenerator.plotPredictions(randomX,yValues,predictions) ;
-	  	rmse = computeRMSE<long double>(weights,phi,yValues) ;
+	  	rmse = computeRMSE<long double>(weights,phi,yValues,parameters.lambda) ;
 			msg = Message (parameters,weights,randomX,yValues,predictions) ;
 			msgLen = msg.messageLength() ;
 			cout << "Msg Len = " << msgLen << endl ;
@@ -408,16 +422,18 @@ int main(int argc, char **argv)
                           parameters.function) ;
 					  phi = orthogonal.designMatrix(randomX) ;
 					  weights = computeWeights<long double>(phi,yValues,
-                                                parameters.inverse) ;
+                                parameters.inverse,parameters.lambda) ;
             cout << "WEIGHTS:" << endl ;
             weights.print() ;
 					  predictions = dataGenerator.predict(M,weights,randomX) ;
 
-					  rmse = computeRMSE<long double> (weights,phi,yValues) ;
+					  rmse = computeRMSE<long double> (weights,phi,yValues,
+                                             parameters.lambda) ;
 
 					  msg = Message (parameters,weights,randomX,yValues,
                               predictions) ;
 					  msgLen = msg.messageLength() ;
+            cout << "Error in fitting: " << rmse << endl << endl ;
 					  results << parameters.numFunctions << "\t" ;
 					  results << rmse << "\t" ;
 					  results << msgLen << endl ;

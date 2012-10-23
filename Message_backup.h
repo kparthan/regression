@@ -499,8 +499,8 @@ long double Message :: encodeWeights (void)
 	/*if (sigma <= 3 * AOM) {
 		sigma = 3 * AOM ;
 	}*/
-	//cout << "mu(w): " << mu << endl ;
-	//cout << "sigma(w) = " << sigma << endl ;
+	cout << "mu(w): " << mu << endl ;
+	cout << "sigma(w) = " << sigma << endl ;
   size_t N = parameters.numFunctions ;
 	long double rangeMu = 2 ; // mu \in [-1,1]
   long double sigma_max = 1 ;
@@ -545,8 +545,8 @@ long double Message :: encodeOutput (void)
 	/*if (sigma <= 3 * AOM) {
 		sigma = 3 * AOM ;
 	}*/
-  //cout << "mu(dy) = " << normal.mean() << endl ;
-	//cout << "sigma(dy) = " << sigma << endl ;
+  cout << "mu(dy) = " << normal.mean() << endl ;
+	cout << "sigma(dy) = " << sigma << endl ;
   long double sigma_max = 2;
   long double sigma_min = AOM * 3 ;
 	if (sigma_min > sigma_max) {
@@ -589,17 +589,16 @@ long double Message :: messageLength (void)
 	long double part4 = encodeOutput() ;
 	//cout << "encoding Y: " << part4 << endl ;
 
-	/*
-  cout << "# of terms & # of samples: " << part1 << ";\tW: " << part2 << ";\tX: " << part3 << ";\tY: " << part4 << endl ;
+	cout << "# of terms & # of samples: " << part1 << ";\tW: " << part2 << ";\tX: " << part3 << ";\tY: " << part4 << endl ;
 	cout << "Message (M+N+W) [PART 1]: " << part1 << " + " << part2 << " = " << part1 + part2 << endl ;
 	cout << "Message (X+Y) [PART 2]: " << part3 << " + " << part4 << " = " << part3 + part4 << endl ;
   cout << "Total msgLen: " << part1 + part2 << " + " << part3+part4 << " = " << part1 + part2 + part3 + part4 << endl ;
-*/
-  /*ofstream test;
+
+  ofstream test;
   test.open("temp/test_msglen",ios::app);
   test << parameters.numFunctions << "\t\t" << part1 << "\t\t" << part2 << "\t\t" << part3 << "\t\t" << part4 << "\t\t" ;
   test << part1+part2 << "\t\t" << part3+part4 << "\t\t" << part1+part2+part3+part4 << endl ;
-  test.close();*/
+  test.close();
 
 	return part1 + part2 + part3 + part4 ;
 }

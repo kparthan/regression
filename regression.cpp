@@ -357,10 +357,10 @@ int main(int argc, char **argv)
   OrthogonalBasis orthogonal ;
   Message msg ;
 	string filename ; 
-  int sampVals[] = {100} ;
+  int sampVals[] = {10000} ;
   std::vector<int>Samples(sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
-  long double noiseVals[] = {0} ;
-  //long double noiseVals[] = {0.1,0.2,0.3,0.4,0.5} ;
+  long double noiseVals[] = {0.4,0.5} ;
+  //long double noiseVals[] = {0,0.1,0.2,0.3,0.4,0.5} ;
   std::vector<long double> Noise (noiseVals,noiseVals+sizeof(noiseVals)/sizeof(long double)) ;
 	
   switch(parameters.iterate) 
@@ -423,8 +423,8 @@ int main(int argc, char **argv)
 					  phi = orthogonal.designMatrix(randomX) ;
 					  weights = computeWeights<long double>(phi,yValues,
                                 parameters.inverse,parameters.lambda) ;
-            cout << "WEIGHTS:" << endl ;
-            weights.print() ;
+            //cout << "WEIGHTS:" << endl ;
+            //weights.print() ;
 					  predictions = dataGenerator.predict(M,weights,randomX) ;
 
 					  rmse = computeRMSE<long double> (weights,phi,yValues,
@@ -433,7 +433,7 @@ int main(int argc, char **argv)
 					  msg = Message (parameters,weights,randomX,yValues,
                               predictions) ;
 					  msgLen = msg.messageLength() ;
-            cout << "Error in fitting: " << rmse << endl << endl ;
+            //cout << "Error in fitting: " << rmse << endl << endl ;
 					  results << parameters.numFunctions << "\t" ;
 					  results << rmse << "\t" ;
 					  results << msgLen << endl ;

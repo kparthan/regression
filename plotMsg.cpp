@@ -15,7 +15,7 @@ string convertToString(T number)
   return convert.str() ;
 }
 
-void plot (const char *file, int numSamples, long double noise)
+void plot (const char *file, int numSamples, long double noise, long double lambda)
 {
 	ofstream script ;
 	script.open("temp/plotMsgLen.p") ;
@@ -29,7 +29,8 @@ void plot (const char *file, int numSamples, long double noise)
 
 	string n = convertToString<int>(numSamples) ;
 	string s = convertToString<long double>(noise) ;
-	string title = "N = " + n + ", Sigma = " + s ;
+  string l = convertToString<long double>(lambda) ;
+	string title = "N = " + n + ", Sigma = " + s + ", Lambda = " + l ;
 	script << "set title \"" << title << "\"" << endl ; 
 	script << "set xlabel \"# of terms\"" << endl ;
 	script << "set ylabel \"Message Length\"" << endl ;
@@ -42,10 +43,11 @@ void plot (const char *file, int numSamples, long double noise)
 main()
 {			
 	string file ;
-  int sampVals[] = {100} ;
+  int sampVals[] = {10000} ;
   std::vector<int> Samples (sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
-  //long double noiseVals[] = {0,0.1,0.2,0.3,0.4,0.5} ;
-  long double noiseVals[] = {0} ;
+  long double noiseVals[] = {0,0.1,0.2,0.3,0.4,0.5} ;
+  //long double noiseVals[] = {0} ;
+  long double lambda = 1 ;
   std::vector<long double> Noise (noiseVals,noiseVals+sizeof(noiseVals)/sizeof(long double)) ;
 	
 	for (int i=0; i<Samples.size(); i++)
@@ -54,7 +56,7 @@ main()
 		{
 			file = "temp/results_n" + convertToString<int>(Samples[i]) + "_s" ;
       file = file + convertToString<long double>(Noise[j]) + ".txt" ;
-			plot(file.c_str(),Samples[i],Noise[j]) ;
+			plot(file.c_str(),Samples[i],Noise[j],lambda) ;
 		}
 	}
 }

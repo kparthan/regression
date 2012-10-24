@@ -23,7 +23,7 @@ struct Parameters parseCommandLine (int argc, char **argv)
 	long double high = 1 ;							// -high
 	string fname = "sawtooth" ;			    // -fn
 	int function = 0 ;						  
-	long double timePeriod = 0.1 ;		  // -t
+	long double timePeriod = 1 ;		  // -t
 	long double peak = 1 ;							// -peak
 	int numSamples = 100 ;						  // -nsamples
 	int numFunctions = 3 ;					    // -nof
@@ -337,19 +337,12 @@ void setPrecision(void)
 	cout.setf(ios::fixed,ios::floatfield) ;
 }
 
-/*template <class T>
-string convertToString(T number)
-{
-	ostringstream convert ;
-	convert << number ;
-	return convert.str() ;
-}*/
-
-void plot (const char *file, int numSamples, long double noise, long double lambda, string funcOutput)
+void plot (const char *file, int numSamples, long double noise, long double lambda, 
+           string funcOutput)
 {
   ofstream script ;
   script.open("temp/plotMsgLen.p") ;
-  script << "set term post eps" << endl ;
+  script << "set term post eps enhanced" << endl ;
   script << "set autoscale\t" ;
   script << "# scale axes automatically" << endl ;
   script << "set xtic auto\t" ;
@@ -360,13 +353,16 @@ void plot (const char *file, int numSamples, long double noise, long double lamb
   string n = convertToString<int>(numSamples) ;
   string s = convertToString<long double>(noise) ;
   string l = convertToString<long double>(lambda) ;
-  string title = "N = " + n + ", Sigma = " + s + ", Lambda = " + l + "\n" + funcOutput; 
+  string title = "N = " + n + ", Sigma = " + s + ", Lambda = " + l ;
   script << "set title \"" << title << "\"" << endl ; 
+  script << "set label \"" << funcOutput  << "\" at graph 0.005, graph 0.95 "
+  "font \",10\"" << endl ;
   script << "set xlabel \"# of terms\"" << endl ;
   script << "set ylabel \"Message Length\"" << endl ;
   script << "set output \"./" << file << ".eps\"" << endl ;
 
-  script << "plot \"./" << file << "\" using 1:3 notitle with linespoints lc rgb \"blue\"" << endl ;
+  script << "plot \"./" << file << "\" using 1:3 notitle with linespoints lc rgb "
+  "\"blue\"" << endl ;
   system ("gnuplot -persist temp/plotMsgLen.p") ;
 }
 
@@ -382,7 +378,7 @@ int main(int argc, char **argv)
   OrthogonalBasis orthogonal ;
   Message msg ;
 	string filename,funcOutput ; 
-  int sampVals[] = {1000} ;
+  int sampVals[] = {100,1000} ;
   std::vector<int>Samples(sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
   long double noiseVals[] = {0} ;
   //long double noiseVals[] = {0,0.1,0.2,0.3,0.4,0.5} ;

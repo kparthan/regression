@@ -86,8 +86,9 @@ void Plot :: label (vector<string> &labels)
 void Plot :: label (string s, vector<string> &labels)
 {
 	script.open("temp/plotScript.p",ios::app) ;
-  //script << "set key 0.018,50 title \"" << s << "\"" << endl;
-	script << "set title \"" << s << "\"" << endl ;
+	script << "set title \"" << labels[0] << "\"" << endl ;
+  script << "set label \"" << s << "\" at graph 0.005, graph 0.95 "
+  "font \",10\"" << endl ;
 	script << "set xlabel \"" << labels[1] << "\"" << endl ;
 	script << "set ylabel \"" << labels[2] << "\"" << endl ;
 	script.close() ;

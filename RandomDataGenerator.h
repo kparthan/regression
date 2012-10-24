@@ -518,15 +518,18 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 			y = new T [parameters.numSamples] ;
 			// generate the number of terms (between 3 and 100)
 			//M = rand() % (MAX_TERMS-MIN_TERMS+1) + MIN_TERMS ;
-      M = 4 ;
+      M = 6 ;
 			weights = lcb::Vector<long double>(M) ;
 			for (int i=0; i<M; i++) {
         // weights are generated randomly in [-1,1]
 				weights[i] = 2 * (rand() /(long double) RAND_MAX) - 1 ;
 			}
-      //weights[0] = -10.1;
+      weights[0] = 0;
+      weights[1] = 1;
       weights[2] = 0;
       weights[3] = 0;
+      weights[4] = 1;
+      weights[5] = 1;
 			cout << "M_gen: " << M << endl ;
 			weights.print() ;
       

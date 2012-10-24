@@ -104,6 +104,8 @@ class RandomDataGenerator
 		Data<T> fxVal ;
 		Data<T> yVal ;
 		string fname ;
+    string finlincomb ; // used only for finlincomb for verification
+    string inferred ;
 	public:
     //! null constructor
     RandomDataGenerator() ;
@@ -133,7 +135,16 @@ class RandomDataGenerator
 		void plotPredictions(Data<T> &, Data<T> &, Data<T> &) ;	
 		//! prints the private members of the class
 		void print() ;
+    //! 
+    void constructFunctionString(string &, lcb::Vector<T> &, int) ;
+    string getFunctionString() ;
 } ;
+
+template <class T>
+string RandomDataGenerator<T> :: getFunctionString(void)
+{
+  return finlincomb ;
+}
 
 template <class T>
 RandomDataGenerator<T> :: RandomDataGenerator()
@@ -431,7 +442,7 @@ long double finiteLinearCombination (long double x, long double timePeriod,
   //arg = x / timePeriod ;
 	for (int i=1; i<M; i++)
 	{
-    arg = x / timePeriod ;
+    arg = x ;
     if (i % 2 == 1)
     {   
       k = i / 2 + 1 ; 
@@ -502,20 +513,25 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
       fname = "TRIANGLE" ;
       break ;
 		case 3:		// using a finite linear combination
-			srand (time(NULL)) ;
-      //srand(100) ;
+			//srand (time(NULL)) ;
+      srand(100) ;
 			y = new T [parameters.numSamples] ;
 			// generate the number of terms (between 3 and 100)
 			//M = rand() % (MAX_TERMS-MIN_TERMS+1) + MIN_TERMS ;
-      M = 2 ;
+      M = 4 ;
 			weights = lcb::Vector<long double>(M) ;
 			for (int i=0; i<M; i++) {
         // weights are generated randomly in [-1,1]
 				weights[i] = 2 * (rand() /(long double) RAND_MAX) - 1 ;
 			}
-      //weights[0] = 0;
+      //weights[0] = -10.1;
+      weights[2] = 0;
+      weights[3] = 0;
 			cout << "M_gen: " << M << endl ;
 			weights.print() ;
+      
+      constructFunctionString(finlincomb,weights,M);
+      cout << finlincomb << endl ;
 			for (int i=0; i<xVal.nPoints(); i++)
 			{
 				long double randomX = xVal[i].x() ;
@@ -534,6 +550,51 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 	delete[] y ;
 }
 
+template <class T>
+string convertToString(T number)
+{
+  ostringstream convert ;
+  convert << number ;
+  return convert.str() ;
+}
+
+template <class T>
+void RandomDataGenerator<T> :: constructFunctionString (string &s, lcb::Vector<T> &weights, int M)
+{
+  string w,coeffx,fn;
+  s = "f(x) = ";
+  if (fabs(weights[0]) > std::numeric_limits<double>::epsilon()) {
+    w = convertToString<long double>(weights[0]);
+    s = s + w ;
+  }
+  int k;
+  for (int i=1; i<M; i++) {
+    if (fabs(weights[i]) > std::numeric_limits<double>::epsilon()) {
+      if (weights[i] > 0) {
+        s = s + " + " ;
+      } else {
+        s = s + " - " ;
+      }
+      w = convertToString<long double>(fabs(weights[i]));
+      s = s + w + "*";
+      if (i % 2 == 0) {
+        k = i / 2 ;
+        fn = "cos ";
+      } else {
+        k = i / 2 + 1;
+        fn = "sin " ;
+      }
+      if (k != 1) {
+        coeffx = convertToString<int>(k);
+      } else {
+        coeffx = "" ;
+      }
+      s = s + fn + coeffx + "x" ;
+    }
+  }  
+  //cout << s << endl ;
+}
+ 
 /*!
  *	\fn void RandomDataGenerator<T> :: addNoise (void)
  *	\brief This module adds Gaussian noise to the already generated 
@@ -719,7 +780,7 @@ void RandomDataGenerator<T> :: plotPredictions (Data<T> &xVals,
 	labels.push_back("predictions") ;
 
 	Plot graph ;
-	graph.label(labels) ;
+	graph.label(finlincomb,labels) ;
 	
 	pair<long double,long double> xrange,yrange ;
 	xrange = make_pair(parameters.low-0.5,parameters.high+0.5) ;

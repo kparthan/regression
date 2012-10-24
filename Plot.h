@@ -33,6 +33,7 @@ class Plot
 		Plot () ;
 		//! labeling the axes & naming the graph
 		void label (vector<string> &) ;
+		void label (string, vector<string> &) ;
 		//! setting the ranges of X and Y axes
 		template <class T, class U>
 		void setRange (pair<T,T>, pair<U,U>) ;
@@ -77,6 +78,16 @@ void Plot :: label (vector<string> &labels)
 {
 	script.open("temp/plotScript.p",ios::app) ;
 	script << "set title \"" << labels[0] << "\"" << endl ;
+	script << "set xlabel \"" << labels[1] << "\"" << endl ;
+	script << "set ylabel \"" << labels[2] << "\"" << endl ;
+	script.close() ;
+}
+
+void Plot :: label (string s, vector<string> &labels)
+{
+	script.open("temp/plotScript.p",ios::app) ;
+  //script << "set key 0.018,50 title \"" << s << "\"" << endl;
+	script << "set title \"" << s << "\"" << endl ;
 	script << "set xlabel \"" << labels[1] << "\"" << endl ;
 	script << "set ylabel \"" << labels[2] << "\"" << endl ;
 	script.close() ;

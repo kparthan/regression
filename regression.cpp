@@ -337,12 +337,37 @@ void setPrecision(void)
 	cout.setf(ios::fixed,ios::floatfield) ;
 }
 
-template <class T>
+/*template <class T>
 string convertToString(T number)
 {
 	ostringstream convert ;
 	convert << number ;
 	return convert.str() ;
+}*/
+
+void plot (const char *file, int numSamples, long double noise, long double lambda, string funcOutput)
+{
+  ofstream script ;
+  script.open("temp/plotMsgLen.p") ;
+  script << "set term post eps" << endl ;
+  script << "set autoscale\t" ;
+  script << "# scale axes automatically" << endl ;
+  script << "set xtic auto\t" ;
+  script << "# set xtics automatically" << endl ;
+  script << "set ytic auto\t" ;
+  script << "# set ytics automatically" << endl ;
+
+  string n = convertToString<int>(numSamples) ;
+  string s = convertToString<long double>(noise) ;
+  string l = convertToString<long double>(lambda) ;
+  string title = "N = " + n + ", Sigma = " + s + ", Lambda = " + l + "\n" + funcOutput; 
+  script << "set title \"" << title << "\"" << endl ; 
+  script << "set xlabel \"# of terms\"" << endl ;
+  script << "set ylabel \"Message Length\"" << endl ;
+  script << "set output \"./" << file << ".eps\"" << endl ;
+
+  script << "plot \"./" << file << "\" using 1:3 notitle with linespoints lc rgb \"blue\"" << endl ;
+  system ("gnuplot -persist temp/plotMsgLen.p") ;
 }
 
 int main(int argc, char **argv)
@@ -356,10 +381,10 @@ int main(int argc, char **argv)
 	Data<long double> randomX,yValues,predictions ;
   OrthogonalBasis orthogonal ;
   Message msg ;
-	string filename ; 
-  int sampVals[] = {10000} ;
+	string filename,funcOutput ; 
+  int sampVals[] = {1000} ;
   std::vector<int>Samples(sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
-  long double noiseVals[] = {0.4,0.5} ;
+  long double noiseVals[] = {0} ;
   //long double noiseVals[] = {0,0.1,0.2,0.3,0.4,0.5} ;
   std::vector<long double> Noise (noiseVals,noiseVals+sizeof(noiseVals)/sizeof(long double)) ;
 	
@@ -410,6 +435,7 @@ int main(int argc, char **argv)
 			    dataGenerator.generate() ;
 			    randomX = dataGenerator.randomX() ;
 			    yValues = dataGenerator.yValues() ;
+          funcOutput = dataGenerator.getFunctionString();
 
 			    for (unsigned M=1; M<100; M++) 
 			    {
@@ -439,6 +465,7 @@ int main(int argc, char **argv)
 					  results << msgLen << endl ;
           }
           results.close() ;
+          plot(filename.c_str(),Samples[i],Noise[j],parameters.lambda,funcOutput) ;
         }
 			}
 		  break ;

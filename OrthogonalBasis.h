@@ -82,7 +82,8 @@ lcb::Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
   {
     case 0:
       // sines & cosines
-      coefficient = 2 * pi / timePeriod ;
+      // coefficient = 2 * pi / timePeriod ;
+      coefficient = 1 ;
 	    for (i=0; i<numPoints; i++)
 	    {
         phi[i][0] = 1.0 ;

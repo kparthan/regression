@@ -6,8 +6,8 @@
 #include <vector>
 
 using namespace std ;
-template <class T>
 
+template <class T>
 string convertToString(T number)
 {
   ostringstream convert ;

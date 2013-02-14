@@ -76,7 +76,8 @@ lcb::Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
 	lcb::Matrix<T> phi(numPoints,numFunctions) ;
 	T pi = boost::math::constants::pi<T>() ;
   int i,j,k ;
-  double temp,arg,coefficient ;
+  double temp1,temp2,arg,coefficient ;
+  double n = sqrt(2.0 / timePeriod);
 
   switch(basis) 
   {
@@ -87,17 +88,19 @@ lcb::Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
 	    for (i=0; i<numPoints; i++)
 	    {
         phi[i][0] = 1.0 ;
-		    for (j=0; j<numFunctions-1; j++)
+		    for (j=1; j<numFunctions; j++)
 		    {
-          k = j / 2 + 1 ; 
-          arg =  coefficient * k * data[i].x() ;
 			    if (j % 2 == 0)
           {
-				    phi[i][j+1] = sin (arg) ;
+            k = j / 2;
+            arg =  coefficient * k * data[i].x() ;
+				    phi[i][j] = n * cos (arg) ;
           }
 			    else
           {
-				    phi[i][j+1] = cos (arg) ;
+            k = j / 2 + 1;
+            arg =  coefficient * k * data[i].x() ;
+				    phi[i][j] = n * sin (arg) ;
           }
 		    }
 	    }
@@ -113,8 +116,9 @@ lcb::Matrix<T> OrthogonalBasis :: designMatrix (Data<T> &data)
           phi[i][1] = data[i].x() ;
           for (j=2; j<numFunctions; j++)
           {
-            temp = (2 * j - 1) * data[i].x() * phi[i][j-1] ;
-            phi[i][j] = (temp - (j - 1) * phi[i][j-2]) / j ;
+            temp1 = (2 * j - 1) * data[i].x() * phi[i][j-1] ;
+            temp2 = (j-1) * phi[i][j-2];
+            phi[i][j] = (temp1 - temp2) / (double)j ;
           }
         }
       }

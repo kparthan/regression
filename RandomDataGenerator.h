@@ -77,6 +77,7 @@ struct Parameters
   long double low ;
   long double high ; 
   int function ;
+  string funcName;
   long double timePeriod ;
   long double peak ;
   int numSamples ;
@@ -87,6 +88,7 @@ struct Parameters
   int basis ;
   long double m ;
   long double lambda ;
+  int printComponents;
 } ;
 
 /*!
@@ -429,6 +431,27 @@ long double triangle (long double x, long double timePeriod,
 }
 
 /*!
+ *
+ */
+long double parabola (long double x, long double timePeriod, long double peak)
+{
+  if (x >=0 && x <= timePeriod) {
+    long double tmp = (x / (long double)timePeriod) - 0.5;
+    return 4 * peak * tmp * tmp; 
+  } else if (x > timePeriod) {
+    while (x >= timePeriod) {
+      x = x - timePeriod ;
+    }
+    return parabola(x,timePeriod,peak);
+  } else if (x < 0) {
+    while (x < 0) {
+      x = x + timePeriod ;
+    }
+    return parabola(x,timePeriod,peak);
+  }
+}
+
+/*!
  *	\relates RandomDataGenerator
  *	\brief 
  */
@@ -512,7 +535,15 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 			}
       fname = "TRIANGLE" ;
       break ;
-		case 3:		// using a finite linear combination
+    case 3:   // parabolic wave
+			y = new T [parameters.numSamples] ;
+			for (int i=0; i<xVal.nPoints(); i++)
+			{
+				long double randomX = xVal[i].x() ;
+				y[i] = parabola (randomX,parameters.timePeriod,parameters.peak);
+      }
+      break;
+		case 4:		// using a finite linear combination
 			//srand (time(NULL)) ;
       srand(100) ;
 			y = new T [parameters.numSamples] ;
@@ -565,18 +596,25 @@ template <class T>
 void RandomDataGenerator<T> :: constructFunctionString (string &s, lcb::Vector<T> &weights, int M)
 {
   string w,coeffx,fn;
+  int prev = 0;
   s = "f(x) = ";
   if (fabs(weights[0]) > std::numeric_limits<double>::epsilon()) {
     w = convertToString<long double>(weights[0]);
-    s = s + w ;
+    s = s + w ; 
+    prev = 1 ;
   }
   int k;
   for (int i=1; i<M; i++) {
     if (fabs(weights[i]) > std::numeric_limits<double>::epsilon()) {
       if (weights[i] > 0) {
-        s = s + " + " ;
+        if (prev == 1) {
+          s = s + " + " ;
+        } else {
+          prev = 1 ;
+        }
       } else {
         s = s + " - " ;
+        prev = 1 ;
       }
       w = convertToString<long double>(fabs(weights[i]));
       s = s + w + "*";

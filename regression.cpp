@@ -23,7 +23,7 @@ struct Parameters parseCommandLine (int argc, char **argv)
 	long double high = 1 ;							// -high
 	string fname = "sawtooth" ;			    // -fn
 	int function = 0 ;						  
-	long double timePeriod = 1 ;		  // -t
+	long double timePeriod = 1 ;		    // -t
 	long double peak = 1 ;							// -peak
 	int numSamples = 100 ;						  // -nsamples
 	int numFunctions = 3 ;					    // -nof
@@ -39,8 +39,9 @@ struct Parameters parseCommandLine (int argc, char **argv)
   long double m_triangle = 2.0 ;      // determines point at which a 
                                       // triangle wave reaches its peak
                                       // value
-  long double lambda = 0 ;
-	bool paramFlags[15] = {0} ;
+  long double lambda = 1 ;
+  int printComponents = 0;
+	bool paramFlags[16] = {0} ;
 	int i = 1 ;
 
 	while (i < argc)
@@ -61,6 +62,9 @@ struct Parameters parseCommandLine (int argc, char **argv)
 			high = atof(argv[i+1]) ;
 			paramFlags[3] = 1 ;
 		}
+		else if (string(argv[i]).compare("-print") == 0) {
+			printComponents = atoi(argv[i+1]) ;
+		}
 		else if (string(argv[i]).compare("-fn") == 0) {
 			fname = argv[i+1] ;
 			if (fname.compare("sawtooth") == 0) {
@@ -72,8 +76,11 @@ struct Parameters parseCommandLine (int argc, char **argv)
 			else if(fname.compare("triangle") == 0) {
 				function = 2 ;
       }
-			else if(fname.compare("finlincomb") == 0) {
+			else if(fname.compare("parabola") == 0) {
 				function = 3 ;
+      }
+			else if(fname.compare("finlincomb") == 0) {
+				function = 4 ;
       } else {
 				error ("Function not supported ...") ;
       }
@@ -235,7 +242,7 @@ struct Parameters parseCommandLine (int argc, char **argv)
     } 
   }
 	
-  if (function != 3) {		
+  if (function != 4) {		
     if (paramFlags[6] == 0) {
 	    cout << "Using default value for maximum amplitude of wave: " << peak
       << endl ;
@@ -319,12 +326,14 @@ struct Parameters parseCommandLine (int argc, char **argv)
 	params.peak = peak ;
 	params.numSamples = numSamples ;
 	params.numFunctions = numFunctions ;
+  params.funcName = fname;
 	params.file = file ;
   params.iterate = iterate ;
   params.inverse = inverse ;
   params.basis = basis ;
   params.m = m_triangle ;
   params.lambda = lambda ;
+  params.printComponents = printComponents;
 
 	return params ;
 }
@@ -338,7 +347,7 @@ void setPrecision(void)
 }
 
 void plot (const char *file, int numSamples, long double noise, long double lambda, 
-           string funcOutput)
+           string funcOutput, int printComponents)
 {
   ofstream script ;
   script.open("temp/plotMsgLen.p") ;
@@ -353,16 +362,31 @@ void plot (const char *file, int numSamples, long double noise, long double lamb
   string n = convertToString<int>(numSamples) ;
   string s = convertToString<long double>(noise) ;
   string l = convertToString<long double>(lambda) ;
-  string title = "N = " + n + ", Sigma = " + s + ", Lambda = " + l ;
+  string title;
+  //title = "N = " + n + ", Sigma = " + s + ", Lambda = " + l ;
   script << "set title \"" << title << "\"" << endl ; 
   script << "set label \"" << funcOutput  << "\" at graph 0.005, graph 0.95 "
   "font \",10\"" << endl ;
   script << "set xlabel \"# of terms\"" << endl ;
   script << "set ylabel \"Message Length\"" << endl ;
   script << "set output \"./" << file << ".eps\"" << endl ;
-
-  script << "plot \"./" << file << "\" using 1:3 notitle with linespoints lc rgb "
+  script << "plot \"./" << file << "\" using 1:5 notitle with lines lt 1 lc rgb "
   "\"blue\"" << endl ;
+
+  script << "set output \"./" << file << ".comp.eps\"" << endl ;
+  script << "set key left top" << endl;
+  //if (printComponents) {
+    script << "set multiplot" << endl ;
+    script << "plot \"./" << file << "\" using 1:3 title 'part1' with lines lt 1 lc rgb "
+    "\"red\", \\" << endl ;
+    script << "\"./" << file << "\" using 1:4 title 'part2' with lines lt 1 lc rgb "
+    "\"green\", \\" << endl ;
+    script << "\"./" << file << "\" using 1:5 title 'total' with lines lt 1 lc rgb "
+    "\"blue\"" << endl ;
+  //} else {
+    //script << "plot \"./" << file << "\" using 1:5 notitle with lines lt 1 lc rgb "
+    //"\"blue\"" << endl ;
+  //}  
   system ("gnuplot -persist temp/plotMsgLen.p") ;
 }
 
@@ -378,11 +402,7 @@ int main(int argc, char **argv)
   OrthogonalBasis orthogonal ;
   Message msg ;
 	string filename,funcOutput ; 
-  int sampVals[] = {100} ;
-  std::vector<int>Samples(sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
-  long double noiseVals[] = {0} ;
-  //long double noiseVals[] = {0,0.1,0.2,0.3,0.4,0.5} ;
-  std::vector<long double> Noise (noiseVals,noiseVals+sizeof(noiseVals)/sizeof(long double)) ;
+  Components msglen;
 	
   switch(parameters.iterate) 
   {
@@ -407,21 +427,26 @@ int main(int argc, char **argv)
 			dataGenerator.plotPredictions(randomX,yValues,predictions) ;
 	  	rmse = computeRMSE<long double>(weights,phi,yValues,parameters.lambda) ;
 			msg = Message (parameters,weights,randomX,yValues,predictions) ;
-			msgLen = msg.messageLength() ;
-			cout << "Msg Len = " << msgLen << endl ;
+			msglen = msg.messageLength() ;
+			cout << "Msg Len = " << msglen.total << endl ;
 			cout << "Error in fitting: " << rmse << endl ;
       break ;
 
-    case 1:
-      system("rm temp/test_msglen");
-      system("rm temp/determinant");
+    case 1:{
+      int sampVals[] = {100,1000} ;
+      std::vector<int>Samples(sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
+      //long double noiseVals[] = {0} ;
+      long double noiseVals[] = {0,0.1,0.2,0.3,0.4,0.5} ;
+      std::vector<long double>Noise(noiseVals,noiseVals+sizeof(noiseVals)/sizeof(long double)) ;
 	    for (unsigned i=0; i<Samples.size(); i++) 
       {
 		    parameters.numSamples = Samples[i] ;
 		    for (unsigned j=0; j<Noise.size(); j++)
 		    {
-			    filename = "temp/results_n" + convertToString<int>(Samples[i]) + "_s" ;
-			    filename = filename + convertToString<long double>(Noise[j]) + 
+          filename = "results/" + parameters.funcName + "/";
+			    filename = filename + "results_n" + convertToString<int>(Samples[i]) + "_s" ;
+			    filename = filename + convertToString<long double>(Noise[j]) + "_m";
+			    filename = filename + convertToString<long double>(parameters.lambda) + 
                       ".txt" ;
 			    ofstream results ;
 			    results.open(filename.c_str()) ;	
@@ -431,9 +456,11 @@ int main(int argc, char **argv)
 			    dataGenerator.generate() ;
 			    randomX = dataGenerator.randomX() ;
 			    yValues = dataGenerator.yValues() ;
+	        //dataGenerator.plotData() ;
+	        //dataGenerator.plotDataWithNoise() ;
           funcOutput = dataGenerator.getFunctionString();
 
-			    for (unsigned M=1; M<100; M++) 
+			    for (unsigned M=1; M<=200; M++) 
 			    {
 				    cout << "N: " << parameters.numSamples << "\t" ;
 				    cout << "S: " << parameters.sigma << "\t" ;
@@ -445,8 +472,6 @@ int main(int argc, char **argv)
 					  phi = orthogonal.designMatrix(randomX) ;
 					  weights = computeWeights<long double>(phi,yValues,
                                 parameters.inverse,parameters.lambda) ;
-            cout << "WEIGHTS:" << endl ;
-            weights.print() ;
 					  predictions = dataGenerator.predict(M,weights,randomX) ;
 
 					  rmse = computeRMSE<long double> (weights,phi,yValues,
@@ -454,17 +479,20 @@ int main(int argc, char **argv)
 
 					  msg = Message (parameters,weights,randomX,yValues,
                               predictions) ;
-					  msgLen = msg.messageLength() ;
-            cout << "Error in fitting: " << rmse << endl << endl ;
+					  msglen = msg.messageLength() ;
 					  results << parameters.numFunctions << "\t" ;
 					  results << rmse << "\t" ;
-					  results << msgLen << endl ;
+					  results << msglen.part1 << "\t";
+					  results << msglen.part2 << "\t";
+					  results << msglen.total << endl;
           }
           results.close() ;
-          plot(filename.c_str(),Samples[i],Noise[j],parameters.lambda,funcOutput) ;
+          plot(filename.c_str(),Samples[i],Noise[j],parameters.lambda,funcOutput,
+               parameters.printComponents) ;
         }
 			}
-		  break ;
+		  break ;}
+
     default:
       error("Wrong choice entered ...") ;
       break ;

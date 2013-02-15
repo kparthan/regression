@@ -433,7 +433,7 @@ int main(int argc, char **argv)
       break ;
 
     case 1:{
-      int sampVals[] = {100,1000} ;
+      int sampVals[] = {100} ;
       std::vector<int>Samples(sampVals,sampVals+sizeof(sampVals)/sizeof(int)) ;
       //long double noiseVals[] = {0} ;
       long double noiseVals[] = {0,0.1,0.2,0.3,0.4,0.5} ;

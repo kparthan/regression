@@ -403,15 +403,16 @@ int main(int argc, char **argv)
   Message msg ;
 	string filename,funcOutput ; 
   Components msglen;
-	
+  //plot("results_n1000_s0.2_m1.txt",1000,0.2,1,funcOutput,1) ;
+
   switch(parameters.iterate) 
   {
     case 0:
       dataGenerator = RandomDataGenerator<long double>(parameters) ;
 	    dataGenerator.generate() ;
 	    randomX = dataGenerator.randomX() ;
-	    yValues = dataGenerator.yValues() ;
-	    //yValues = dataGenerator.fxValues() ;
+	    //yValues = dataGenerator.yValues() ;
+	    yValues = dataGenerator.fxValues() ;
 	    dataGenerator.plotData() ;
 	    //dataGenerator.plotDataWithNoise() ;
 			orthogonal = OrthogonalBasis(parameters.basis,parameters.numFunctions,

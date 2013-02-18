@@ -195,9 +195,9 @@ void Plot :: sketch (Data<T> &xVal, Data<U> &fxVal, Data<V> &yVal)
 	script << "set output \"temp/file_XY.eps\"" << endl ;
 	script << "set multiplot" << endl ;
 	script << "plot \"temp/data_XY.txt\" using 1:2 title 'original data' \\" << endl ;
-	script << "with points lc rgb \"red\", \\" << endl ;
-	script << "\"temp/data_XY.txt\" using 1:3 title 'regression fit' \\" << endl ;
-	script << "with points lc rgb \"blue\"" << endl ;
+	script << "with lines lt 1 lc rgb \"red\", \\" << endl ;
+	script << "\"temp/data_XY.txt\" using 1:3 title 'legendre approximation' \\" << endl ;
+	script << "with lines  lt 1 lc rgb \"blue\"" << endl ;
 	script.close() ;
 
   system ("gnuplot -persist temp/plotScript.p") ;	

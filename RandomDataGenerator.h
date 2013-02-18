@@ -200,15 +200,15 @@ void RandomDataGenerator<T> :: generate ()
 		T range = parameters.high - parameters.low ;
 		T random ;
 		T *randomValues = new T [parameters.numSamples] ;
-		for (int i=0; i<parameters.numSamples; i++)
+		/*for (int i=0; i<parameters.numSamples; i++)
 		{
 			random = rand() / (T) RAND_MAX ;
 			randomValues[i] = parameters.low + random * range ;
-		}
-		/*long double partition = range / parameters.numSamples ;
+		}*/
+		long double partition = range / parameters.numSamples ;
 		randomValues[0] = parameters.low ;
 		for (int i=1; i<parameters.numSamples; i++)
-			randomValues[i] = partition + randomValues[i-1] ;*/
+			randomValues[i] = partition + randomValues[i-1] ;
 		xVal = Data<T> (randomValues,parameters.numSamples) ;
 		delete[] randomValues ;
 	}
@@ -514,7 +514,7 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
                         slope) ;
         //cout << randomX << " " << y[i] << endl ;
 			}	
-			fname = "SAWTOOTH" ;
+			//fname = "SAWTOOTH" ;
 			break ;
 		case 1:		// square wave
 			y = new T [parameters.numSamples] ;
@@ -523,7 +523,7 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 				long double randomX = xVal[i].x() ;
 				y[i] = square (randomX,parameters.timePeriod,parameters.peak) ;
 			}
-			fname = "SQUARE" ;
+			//fname = "SQUARE" ;
 			break ;
     case 2:   // triangular wave
 			y = new T [parameters.numSamples] ;
@@ -533,7 +533,7 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 				y[i] = triangle (randomX,parameters.timePeriod,parameters.peak,
                          parameters.m) ;
 			}
-      fname = "TRIANGLE" ;
+      //fname = "TRIANGLE" ;
       break ;
     case 3:   // parabolic wave
 			y = new T [parameters.numSamples] ;
@@ -542,6 +542,7 @@ void RandomDataGenerator<T> :: computeFunctionValues (void)
 				long double randomX = xVal[i].x() ;
 				y[i] = parabola (randomX,parameters.timePeriod,parameters.peak);
       }
+      //fname = "PARABOLA";
       break;
 		case 4:		// using a finite linear combination
 			//srand (time(NULL)) ;
@@ -816,10 +817,12 @@ void RandomDataGenerator<T> :: plotPredictions (Data<T> &xVals,
 {
 	vector<string> labels ;
 	long double min,max ;
-	labels.push_back(fname) ;
+	/*labels.push_back(fname) ;
 	labels.push_back("x") ;
-	labels.push_back("predictions") ;
-
+	labels.push_back("predictions") ;*/
+	labels.push_back(fname) ;
+	labels.push_back("") ;
+	labels.push_back("") ;
 	Plot graph ;
 	graph.label(finlincomb,labels) ;
 	

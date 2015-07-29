@@ -191,12 +191,17 @@ void Plot :: sketch (Data<T> &xVal, Data<U> &fxVal, Data<V> &yVal)
 	dataFile.close() ;
 
 	script.open("temp/plotScript.p",ios::app) ;
-	//script << "set nokey" << endl ;
+	script << "set key font \",22\" spacing 2.7" << endl ;
+  //script << "set yr [-2:2]\n";
+  script << "set xtics font \"Times-Roman, 20\"" << endl;
+  script << "set ytics font \"Times-Roman, 20\"" << endl;
+  script << "set xlabel font \"Times-Roman, 25\"" << endl;
+  script << "set ylabel font \"Times-Roman, 25\"" << endl;
 	script << "set output \"temp/file_XY.eps\"" << endl ;
 	script << "set multiplot" << endl ;
-	script << "plot \"temp/data_XY.txt\" using 1:2 title 'original data' \\" << endl ;
+	script << "plot \"temp/data_XY.txt\" using 1:2 title 'Original function' \\" << endl ;
 	script << "with lines lt 1 lc rgb \"red\", \\" << endl ;
-	script << "\"temp/data_XY.txt\" using 1:3 title 'legendre approximation' \\" << endl ;
+	script << "\"temp/data_XY.txt\" using 1:3 title 'Legendre approximation' \\" << endl ;
 	script << "with lines  lt 1 lc rgb \"blue\"" << endl ;
 	script.close() ;
 

@@ -192,18 +192,19 @@ void Plot :: sketch (Data<T> &xVal, Data<U> &fxVal, Data<V> &yVal)
 
 	script.open("temp/plotScript.p",ios::app) ;
 	script << "set key font \",22\" spacing 2.7" << endl ;
+  script << "set xr [-1.2:1.2]\n";
   //script << "set yr [-2:2]\n";
   script << "set xtics font \"Times-Roman, 20\"" << endl;
   script << "set ytics font \"Times-Roman, 20\"" << endl;
   script << "set xlabel font \"Times-Roman, 25\"" << endl;
   script << "set ylabel font \"Times-Roman, 25\"" << endl;
 	script << "set output \"temp/file_XY.eps\"" << endl ;
-  script << "set xlabel \"x\\n\"" << endl;
-  script << "set ylabel \"f(x)\"" << endl;
+  //script << "set xlabel \"x\\n\"" << endl;
+  //script << "set ylabel \"f(x)\"" << endl;
 	script << "set multiplot" << endl ;
 	script << "plot \"temp/data_XY.txt\" using 1:2 title 'Original function' \\" << endl ;
 	script << "with lines lt 1 lc rgb \"red\", \\" << endl ;
-	script << "\"temp/data_XY.txt\" using 1:3 title 'Fourier approximation' \\" << endl ;
+	script << "\"temp/data_XY.txt\" using 1:3 title 'Legendre approximation' \\" << endl ;
 	script << "with lines  lt 1 lc rgb \"blue\"" << endl ;
 	script.close() ;
 
